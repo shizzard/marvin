@@ -1,0 +1,1 @@
+-define(test_spec(Mod), Mod() -> ok).

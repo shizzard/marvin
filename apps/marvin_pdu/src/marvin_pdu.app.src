@@ -1,5 +1,5 @@
 {application, marvin_pdu, [
-    {description, "Makarena PDUs"},
+    {description, "Marvin PDUs"},
     {vsn, "0.0.1"},
     {registered, []},
     {applications, [kernel, stdlib]},

@@ -32,20 +32,23 @@ chain(Name, [Fun | Funs], InitialValue)
 when is_function(Fun, 1) ->
     try Fun(InitialValue) of
         {ok, NewValue} ->
+            marvin_log:debug(
+                "Chain ~p fun#-~p ~p execution",
+                [Name, length(Funs) + 1, Fun]),
             chain(Name, Funs, NewValue);
         {skip, Reason} ->
-            error_logger:info_msg(
+            marvin_log:info(
                 "Chain ~p skipped fun#-~p ~p execution with reason ~p",
                 [Name, length(Funs) + 1, Fun, Reason]),
             {skip, Reason};
         {error, Reason} ->
-            error_logger:info_msg(
+            marvin_log:info(
                 "Chain ~p failed fun#-~p ~p execution with reason ~p",
                 [Name, length(Funs) + 1, Fun, Reason]),
             {error, Reason}
     catch
         _Type:Reason ->
-            error_logger:error_msg(
+            marvin_log:error(
                 "Chain ~p crashed fun#-~p ~p execution with reason ~p when initial value was ~p~n~p",
                 [Name, length(Funs) + 1, Fun, Reason, InitialValue, erlang:get_stacktrace()]),
             {error, Reason}
