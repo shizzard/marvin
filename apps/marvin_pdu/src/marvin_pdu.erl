@@ -11,7 +11,7 @@
 
 
 
--callback new(Data :: #{} | undefined) ->
+-callback new(Data :: term() | undefined) ->
     Ret :: pdu().
 
 -callback data_map() ->
@@ -19,7 +19,7 @@
 
 -callback export(PDU :: pdu()) ->
     marvin_helper_type:generic_return(
-        OkRet :: #{},
+        OkRet :: term() | undefined,
         ErrorRet :: term()
     ).
 
@@ -215,7 +215,7 @@ export_data({Op, Event, ?marvin_pdu(Mod, _) = PDU}) ->
 
 
 -spec construct_external({Mod :: atom(), Op :: op(), Event :: event() | undefined, Data :: #{}}) ->
-    marvin_helper_type:ok_return(OkRet :: #{}).
+    marvin_helper_type:ok_return(OkRet :: {Mod :: atom(), Message :: #{}}).
 
 construct_external({Mod, Op, undefined, undefined}) ->
     {ok, {Mod, #{?discord_key_op => Op}}};

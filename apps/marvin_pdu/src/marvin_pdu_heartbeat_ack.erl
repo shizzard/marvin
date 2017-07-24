@@ -47,7 +47,7 @@ data_map() ->
 
 
 -spec export(PDU :: pdu()) ->
-    marvin_helper_type:ok_return(OkRet :: #{}).
+    marvin_helper_type:ok_return(OkRet :: undefined).
 
 export(?marvin_pdu_heartbeat_ack(#pdu{})) ->
     {ok, undefined}.

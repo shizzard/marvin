@@ -11,7 +11,10 @@
 
 
 -spec start_link() ->
-    marvin_helper_type:supervisor_spec().
+    marvin_helper_type:generic_return(
+        OkRet :: pid(),
+        ErrorRet :: {already_started, pid()} | {shutdown, term()} | term()
+    ).
 
 start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
@@ -19,4 +22,8 @@ start_link() ->
 
 
 init([]) ->
-    {ok, { {one_for_all, 0, 1}, []} }.
+    {ok, {{one_for_all, 0, 1}, [
+        {marvin_gateway_meta, {
+            marvin_gateway_meta, start_link, []
+        }, permanent, 5000, worker, [marvin_gateway_meta]}
+    ]}}.

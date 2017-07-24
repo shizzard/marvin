@@ -1,11 +1,9 @@
 {application, marvin, [
-    {description, "An OTP application"},
+    {description, "Marvin"},
     {vsn, "0.1.0"},
     {registered, []},
-    {mod, { marvin_app, []}},
+    {mod, {marvin_app, []}},
     {applications, [
-        kernel, stdlib
-    ]},
-    {env,[]},
-    {modules, []}
+        kernel, stdlib, gun
+    ]}
  ]}.
