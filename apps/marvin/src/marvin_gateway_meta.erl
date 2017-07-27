@@ -28,6 +28,7 @@
     last_time_gather :: non_neg_integer(),
     timer_reference :: timer:tref() | undefined,
     shards_count :: non_neg_integer(),
+    running_shards_count :: non_neg_integer(),
     wss_url :: binary() | undefined
 }).
 -type state() :: #state{}.
@@ -37,11 +38,12 @@
 %% Interface
 
 
+
 -spec start_link() ->
     marvin_helper_type:ok_return(OkRet :: pid()).
 
 start_link() ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, init, []).
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 
 
@@ -50,7 +52,8 @@ init(_) ->
     {ok, #state{
         internal_state = initial,
         last_time_gather = 0,
-        shards_count = 0
+        shards_count = 0,
+        running_shards_count = 0
     }}.
 
 
@@ -111,7 +114,7 @@ code_change(_OldVsn, S0, _Extra) ->
 handle_info_gun_connect(#state{internal_state = initial} = S0) ->
     {ok, ApiHost} = marvin_config:get(marvin, [discord, api, host]),
     {ok, ApiPort} = marvin_config:get(marvin, [discord, api, port]),
-    marvin_log:info("Connecting to ~s:~p to gather meta", [ApiHost, ApiPort]),
+    marvin_log:info("Connecting to '~s:~p' to gather meta", [ApiHost, ApiPort]),
     {ok, GunPid} = gun:open(ApiHost, ApiPort),
     {noreply, S0#state{
         internal_state = gun_connect,
@@ -269,8 +272,40 @@ handle_info_gun_data(_StreamRef, _Type, Data, #state{
 -spec handle_info_maybe_rebuild_layout(State :: state()) ->
     marvin_helper_type:gen_server_noreply(State :: state()).
 
+handle_info_maybe_rebuild_layout(#state{
+    shards_count = ShardsCount,
+    running_shards_count = RunningShardsCount
+} = S0) when ShardsCount < RunningShardsCount ->
+    marvin_log:info(
+        "Going to reduce shards count due to switch ~p -> ~p",
+        [RunningShardsCount, ShardsCount]
+    ),
+    ShardsToStop = lists:nthtail(ShardsCount, lists:seq(0, RunningShardsCount - 1)),
+    lists:foreach(fun marvin_shard_sup:stop_shard_rx/1, ShardsToStop),
+    {noreply, S0#state{
+        internal_state = gun_up,
+        running_shards_count = ShardsCount
+    }};
+
+handle_info_maybe_rebuild_layout(#state{
+    shards_count = ShardsCount,
+    running_shards_count = RunningShardsCount,
+    wss_url = WssUrl
+} = S0) when ShardsCount > RunningShardsCount ->
+    marvin_log:info(
+        "Going to increase shards count due to switch ~p -> ~p",
+        [RunningShardsCount, ShardsCount]
+    ),
+    ShardsToStart = lists:nthtail(RunningShardsCount, lists:seq(0, ShardsCount - 1)),
+    lists:foreach(fun(ShardId) ->
+        marvin_shard_sup:start_shard_session(ShardId, WssUrl)
+    end, ShardsToStart),
+    {noreply, S0#state{
+        internal_state = gun_up,
+        running_shards_count = ShardsCount
+    }};
+
 handle_info_maybe_rebuild_layout(S0) ->
-    marvin_log:info("Maybe rebuilding layout when state is ~p", [S0]),
     {noreply, S0#state{
         internal_state = gun_up
     }}.
@@ -303,6 +338,7 @@ recover_state_to_initial(S0) ->
         internal_state = initial,
         last_time_gather = S0#state.last_time_gather,
         shards_count = S0#state.shards_count,
+        running_shards_count = S0#state.running_shards_count,
         wss_url = S0#state.wss_url
     }}.
 
@@ -348,7 +384,7 @@ get_header_user_agent() ->
     {ok, LibraryName} = marvin_config:get(marvin, [system_info, library_name]),
     {ok, LibraryVersion} = marvin_config:get(marvin, [system_info, library_version]),
     {ok, LibraryWeb} = marvin_config:get(marvin, [system_info, library_web]),
-    iolist_to_binary([LibraryName, " (", LibraryWeb, ", ", " v", LibraryVersion, ")"]).
+    iolist_to_binary([LibraryName, " (", LibraryWeb, ", v", LibraryVersion, ")"]).
 
 
 

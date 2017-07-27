@@ -22,7 +22,10 @@ start_link() ->
 
 
 init([]) ->
-    {ok, {{one_for_all, 0, 1}, [
+    {ok, {{one_for_one, 5, 10}, [
+        {marvin_shard_sup, {
+            marvin_shard_sup, start_link, []
+        }, permanent, 5000, supervisor, [marvin_shard_sup]},
         {marvin_gateway_meta, {
             marvin_gateway_meta, start_link, []
         }, permanent, 5000, worker, [marvin_gateway_meta]}
