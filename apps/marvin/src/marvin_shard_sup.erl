@@ -6,7 +6,8 @@
 -export([
     start_shard_session/2, stop_shard_session/1,
     start_shard_rx/3, stop_shard_rx/1,
-    start_shard_tx/2, stop_shard_tx/1
+    start_shard_tx/3, stop_shard_tx/1,
+    start_shard_heart/3, stop_shard_heart/1
 ]).
 
 
@@ -41,15 +42,28 @@ start_shard_rx(ShardId, SessionPid, WssUrl) ->
 
 
 
--spec start_shard_tx(ShardId :: non_neg_integer(), WssPid :: pid()) ->
+-spec start_shard_tx(ShardId :: non_neg_integer(), RxPid :: pid(), WssPid :: pid()) ->
     marvin_helper_type:ok_return(OkRet :: pid() | undefined) |
     marvin_helper_type:ok_return(OkRet1 :: pid() | undefined, OkRet2 :: term()) |
     marvin_helper_type:error_return(ErrorRet :: already_present | {already_started, Child :: pid() | undefined} | term()).
 
-start_shard_tx(ShardId, WssPid) ->
+start_shard_tx(ShardId, RxPid, WssPid) ->
     ChildSpec = {shard_name(ShardId, tx), {
-        marvin_shard_tx, start_link, [ShardId, shard_name(ShardId, tx), WssPid]
+        marvin_shard_tx, start_link, [ShardId, shard_name(ShardId, tx), RxPid, WssPid]
     }, temporary, 5000, worker, [marvin_shard_tx]},
+    supervisor:start_child(?MODULE, ChildSpec).
+
+
+
+-spec start_shard_heart(ShardId :: non_neg_integer(), TxPid :: pid(), HeartbeatInterval :: non_neg_integer()) ->
+    marvin_helper_type:ok_return(OkRet :: pid() | undefined) |
+    marvin_helper_type:ok_return(OkRet1 :: pid() | undefined, OkRet2 :: term()) |
+    marvin_helper_type:error_return(ErrorRet :: already_present | {already_started, Child :: pid() | undefined} | term()).
+
+start_shard_heart(ShardId, TxPid, HeartbeatInterval) ->
+    ChildSpec = {shard_name(ShardId, heart), {
+        marvin_shard_heart, start_link, [ShardId, shard_name(ShardId, heart), TxPid, HeartbeatInterval]
+    }, temporary, 5000, worker, [marvin_shard_heart]},
     supervisor:start_child(?MODULE, ChildSpec).
 
 
@@ -84,6 +98,16 @@ stop_shard_tx(ShardId) ->
 
 
 
+-spec stop_shard_heart(ShardId :: non_neg_integer()) ->
+    marvin_helper_type:ok_return().
+
+stop_shard_heart(ShardId) ->
+    supervisor:terminate_child(?MODULE, shard_name(ShardId, heart)),
+    supervisor:delete_child(?MODULE, shard_name(ShardId, heart)),
+    ok.
+
+
+
 -spec start_link() ->
     marvin_helper_type:generic_return(
         OkRet :: pid(),
@@ -104,7 +128,7 @@ init([]) ->
 
 
 
--spec shard_name(Id :: non_neg_integer(), Type :: session | rx | tx) ->
+-spec shard_name(Id :: non_neg_integer(), Type :: session | rx | tx | heart) ->
     ShardName :: atom().
 
 shard_name(0, session) -> 'marvin_shard_session_00';
@@ -157,5 +181,22 @@ shard_name(12, tx) -> 'marvin_shard_tx_12';
 shard_name(13, tx) -> 'marvin_shard_tx_13';
 shard_name(14, tx) -> 'marvin_shard_tx_14';
 shard_name(15, tx) -> 'marvin_shard_tx_15';
+
+shard_name(0, heart) -> 'marvin_shard_heart_00';
+shard_name(1, heart) -> 'marvin_shard_heart_01';
+shard_name(2, heart) -> 'marvin_shard_heart_02';
+shard_name(3, heart) -> 'marvin_shard_heart_03';
+shard_name(4, heart) -> 'marvin_shard_heart_04';
+shard_name(5, heart) -> 'marvin_shard_heart_05';
+shard_name(6, heart) -> 'marvin_shard_heart_06';
+shard_name(7, heart) -> 'marvin_shard_heart_07';
+shard_name(8, heart) -> 'marvin_shard_heart_08';
+shard_name(9, heart) -> 'marvin_shard_heart_09';
+shard_name(10, heart) -> 'marvin_shard_heart_10';
+shard_name(11, heart) -> 'marvin_shard_heart_11';
+shard_name(12, heart) -> 'marvin_shard_heart_12';
+shard_name(13, heart) -> 'marvin_shard_heart_13';
+shard_name(14, heart) -> 'marvin_shard_heart_14';
+shard_name(15, heart) -> 'marvin_shard_heart_15';
 
 shard_name(Id, Type) -> error({not_implemented, {Id, Type}}).

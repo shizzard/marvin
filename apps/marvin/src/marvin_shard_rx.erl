@@ -20,6 +20,8 @@
 -define(start_tx(), {start_tx}).
 -define(report_operational(), {report_operational}).
 -define(gun_ws(WssPid, Type, Data), {gun_ws, WssPid, {Type, Data}}).
+-define(gun_down(WssPid, Proto, Reason, KilledStreams, UnprocessedStreams),
+    {gun_down, WssPid, Proto, Reason, KilledStreams, UnprocessedStreams}).
 
 -record(state, {
     internal_state :: internal_state(),
@@ -94,6 +96,9 @@ handle_info(?report_operational(), S0) ->
 handle_info(?gun_ws(_WssPid, Type, Data), S0) ->
     handle_info_gun_ws(Type, Data, S0);
 
+handle_info(?gun_down(WssPid, _Proto, Reason, _KilledStreams, _UnprocessedStreams), S0) ->
+    handle_info_gun_down(WssPid, Reason, S0);
+
 handle_info(Unexpected, S0) ->
     marvin_log:warn("Unexpected info: ~p", [Unexpected]),
     {noreply, S0}.
@@ -134,7 +139,7 @@ handle_info_gun_connect(#state{
     }};
 
 handle_info_gun_connect(S0) ->
-    controlled_crash(S0).
+    controlled_crash(gun_connect, S0).
 
 
 
@@ -158,7 +163,7 @@ handle_info_gun_up(#state{
     }};
 
 handle_info_gun_up(S0) ->
-    controlled_crash(S0).
+    controlled_crash(gun_up, S0).
 
 
 
@@ -178,7 +183,7 @@ handle_info_gun_ws_upgrade(#state{
     }};
 
 handle_info_gun_ws_upgrade(S0) ->
-    controlled_crash(S0).
+    controlled_crash(ws_upgrade, S0).
 
 
 
@@ -191,7 +196,7 @@ handle_info_start_tx(#state{
     wss_pid = WssPid
 } = S0) ->
     marvin_log:debug("Shard '~p' starting tx", [S0#state.shard_name]),
-    {ok, TxPid} = marvin_shard_sup:start_shard_tx(ShardId, WssPid),
+    {ok, TxPid} = marvin_shard_sup:start_shard_tx(ShardId, self(), WssPid),
     true = erlang:link(TxPid),
     self() ! ?report_operational(),
     {noreply, S0#state{
@@ -200,7 +205,7 @@ handle_info_start_tx(#state{
     }};
 
 handle_info_start_tx(S0) ->
-    controlled_crash(S0).
+    controlled_crash(start_tx, S0).
 
 
 
@@ -217,17 +222,17 @@ handle_info_report_operational(#state{
     {noreply, S0#state{internal_state = operational}};
 
 handle_info_report_operational(S0) ->
-    controlled_crash(S0).
+    controlled_crash(report_operational, S0).
 
 
 
 -spec handle_info_gun_ws(Type :: atom(), Data :: term(), State :: state()) ->
     marvin_helper_type:gen_server_noreply(State :: state()).
 
-handle_info_gun_ws(text, Data, #state{
+handle_info_gun_ws(Type, Data, #state{
     internal_state = operational,
     session_pid = SessionPid
-} = S0) ->
+} = S0) when text == Type orelse binary == Type ->
     marvin_log:debug("Shard '~p' reporting incoming event", [S0#state.shard_name]),
     marvin_shard_session:incoming_event(SessionPid, Data),
     {noreply, S0};
@@ -251,14 +256,30 @@ handle_info_gun_ws(Type, _Data, S0) ->
     {noreply, S0}.
 
 
--spec controlled_crash(State :: state()) ->
+
+-spec handle_info_gun_down(WssPid :: pid(), Reason :: term(), State :: state()) ->
+    marvin_helper_type:gen_server_noreply(State :: state()) | no_return().
+
+handle_info_gun_down(WssPid, Reason, #state{
+    wss_pid = WssPid
+} = S0) ->
+    controlled_crash({gun_down, Reason}, S0);
+
+handle_info_gun_down(_SomePid, _Reason, #state{
+    wss_pid = _WssPid
+} = S0) ->
+    {noreply, S0}.
+
+
+
+-spec controlled_crash(Reason :: term(), State :: state()) ->
     no_return().
 
-controlled_crash(#state{
+controlled_crash(Reason, #state{
     internal_state = InternalState
 } = S0) ->
     marvin_log:alert(
-        "Shard '~p' got 'gun_connect' message while in state '~p', performing controlled crash",
-        [S0#state.shard_name, InternalState]
+        "Shard '~p' performing controlled crash with reason '~p' while in state '~p'",
+        [S0#state.shard_name, Reason, InternalState]
     ),
     exit(controlled_crash).

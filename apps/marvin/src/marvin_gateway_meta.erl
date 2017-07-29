@@ -8,10 +8,12 @@
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
 ]).
+-export([get_shards_count/0]).
 
 -type internal_state() :: initial | gun_connect | gun_up | gun_wait | maybe_rebuild_layout.
 
 
+-define(get_shards_count(), {get_shards_count}).
 -define(gun_connect(), {gun_connect}).
 -define(gun_up(ConnPid, Proto), {gun_up, ConnPid, Proto}).
 -define(gun_response(ConnPid, StreamRef, Type, HttpCode, Data),
@@ -39,6 +41,14 @@
 
 
 
+-spec get_shards_count() ->
+    Ret :: non_neg_integer().
+
+get_shards_count() ->
+    gen_server:call(?MODULE, ?get_shards_count()).
+
+
+
 -spec start_link() ->
     marvin_helper_type:ok_return(OkRet :: pid()).
 
@@ -57,6 +67,9 @@ init(_) ->
     }}.
 
 
+
+handle_call(?get_shards_count(), _GenReplyTo, S0) ->
+    handle_call_get_shards_count(S0);
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
     marvin_log:warn("Unexpected call: ~p", [Unexpected]),
@@ -105,6 +118,19 @@ code_change(_OldVsn, S0, _Extra) ->
 
 
 %% Internals
+
+
+
+-spec handle_call_get_shards_count(State :: state()) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: non_neg_integer(),
+        State :: state()
+    ).
+
+handle_call_get_shards_count(#state{
+    shards_count = ShardsCount
+} = S0) ->
+    {reply, ShardsCount, S0}.
 
 
 
@@ -393,4 +419,4 @@ get_header_user_agent() ->
 
 get_header_authorization() ->
     {ok, Token} = marvin_config:get(marvin, [discord, token]),
-    iolist_to_binary(["Bot ", Token]).
+    iolist_to_binary(["Bot ", binary_to_list(Token)]).

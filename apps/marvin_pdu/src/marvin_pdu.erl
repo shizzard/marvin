@@ -238,7 +238,6 @@ construct_external({Mod, Op, Event, Data}) ->
     ).
 
 encode_json({_Mod, Message}) ->
-    io:format("DEADBEEF"),
     try
         Binary = jiffy:encode(Message),
         {ok, Binary}

@@ -10,7 +10,7 @@ get-deps:
 compile:
 	$(REBAR) compile
 
-release: compile
+release:
 	$(REBAR) release
 
 shell: compile
