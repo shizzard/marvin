@@ -54,4 +54,4 @@ t05_can_get_error_on_negative_last_seq_test() ->
 t99_can_get_valid_parsed_test() ->
     {ok, JSONBin} = file:read_file(
         code:priv_dir(marvin_pdu) ++ "/marvin_pdu_heartbeat_test.json"),
-    ?assertMatch({ok, ?marvin_pdu_heartbeat(_)}, marvin_pdu:parse(JSONBin)).
+    ?assertMatch({ok, {?marvin_pdu_heartbeat(_), undefined}}, marvin_pdu:parse(JSONBin)).

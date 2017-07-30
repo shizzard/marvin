@@ -30,6 +30,7 @@
 
 
 -type pdu_impl() ::
+    marvin_pdu_generic:pdu() |
     marvin_pdu_heartbeat:pdu() |
     marvin_pdu_hello:pdu() |
     marvin_pdu_identify:pdu() |
@@ -79,7 +80,7 @@
 
 -spec parse(Binary :: binary()) ->
     marvin_helper_type:generic_return(
-        OkRet :: pdu(),
+        OkRet :: {pdu(), seq() | undefined},
         ErrorRet ::
             {jiffy_error, term()} |
             not_implemented, invalid_op,
@@ -172,13 +173,14 @@ validate({Mod, Message}) ->
 
 -spec construct_internal({Mod :: atom(), Message :: #{}}) ->
     marvin_helper_type:generic_return(
-        OkRet :: pdu(),
+        OkRet :: {pdu(), seq() | undefined},
         ErrorRet :: term()
     ).
 
 construct_internal({Mod, Message}) ->
     Data = maps:get(?discord_key_data, Message, undefined),
-    {ok, Mod:new(Data)}.
+    Seq = maps:get(?discord_key_seq, Message, undefined),
+    {ok, {Mod:new(Data), Seq}}.
 
 
 
@@ -238,7 +240,6 @@ construct_external({Mod, Op, Event, Data}) ->
     ).
 
 encode_json({_Mod, Message}) ->
-    io:format("DEADBEEF"),
     try
         Binary = jiffy:encode(Message),
         {ok, Binary}
@@ -333,16 +334,16 @@ validate_pdu(fix, _, _) ->
         ErrorRet :: not_implemented | invalid_op
     ).
 
-detect_data_mod_by_op_event(?discord_op_dispatch, _) -> {ok, marvin_pdu_dispatch};
+detect_data_mod_by_op_event(?discord_op_dispatch, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_heartbeat, _) -> {ok, marvin_pdu_heartbeat};
 detect_data_mod_by_op_event(?discord_op_identify, _) -> {ok, marvin_pdu_identify};
-detect_data_mod_by_op_event(?discord_op_status_update, _) -> {ok, marvin_pdu_status_update};
-detect_data_mod_by_op_event(?discord_op_voice_state_update, _) -> {ok, marvin_pdu_voice_state_update};
-detect_data_mod_by_op_event(?discord_op_voice_server_ping, _) -> {ok, marvin_pdu_voice_server_ping};
-detect_data_mod_by_op_event(?discord_op_resume, _) -> {ok, marvin_pdu_resume};
-detect_data_mod_by_op_event(?discord_op_reconnect, _) -> {ok, marvin_pdu_reconnect};
-detect_data_mod_by_op_event(?discord_op_request_guild_members, _) -> {ok, marvin_pdu_request_guild_members};
-detect_data_mod_by_op_event(?discord_op_invalid_session, _) -> {ok, marvin_pdu_invalid_session};
+detect_data_mod_by_op_event(?discord_op_status_update, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_voice_state_update, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_voice_server_ping, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_resume, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_reconnect, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_request_guild_members, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_invalid_session, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_hello, _) -> {ok, marvin_pdu_hello};
 detect_data_mod_by_op_event(?discord_op_heartbeat_ack, _) -> {ok, marvin_pdu_heartbeat_ack};
 detect_data_mod_by_op_event(_, _) -> {error, invalid_op}.

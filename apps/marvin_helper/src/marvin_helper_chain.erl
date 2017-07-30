@@ -32,9 +32,6 @@ chain(Name, [Fun | Funs], InitialValue)
 when is_function(Fun, 1) ->
     try Fun(InitialValue) of
         {ok, NewValue} ->
-            marvin_log:debug(
-                "Chain ~p fun#-~p ~p execution",
-                [Name, length(Funs) + 1, Fun]),
             chain(Name, Funs, NewValue);
         {skip, Reason} ->
             marvin_log:info(
