@@ -229,12 +229,21 @@ handle_info_report_operational(S0) ->
 -spec handle_info_gun_ws(Type :: atom(), Data :: term(), State :: state()) ->
     marvin_helper_type:gen_server_noreply(State :: state()).
 
-handle_info_gun_ws(Type, Data, #state{
+handle_info_gun_ws(text, Data, #state{
     internal_state = operational,
     session_pid = SessionPid
-} = S0) when text == Type orelse binary == Type ->
-    marvin_log:debug("Shard '~p' reporting incoming event", [S0#state.shard_name]),
+} = S0) ->
+    marvin_log:debug("Shard '~p' reporting incoming event ~p", [S0#state.shard_name, jiffy:decode(Data)]),
     marvin_shard_session:incoming_event(SessionPid, Data),
+    {noreply, S0};
+
+handle_info_gun_ws(binary, Data, #state{
+    internal_state = operational
+} = S0) ->
+    marvin_log:debug(
+        "Shard '~p' reporting incoming binary event of ~p bytes",
+        [S0#state.shard_name, byte_size(Data)]
+    ),
     {noreply, S0};
 
 handle_info_gun_ws(Type, Data, #state{

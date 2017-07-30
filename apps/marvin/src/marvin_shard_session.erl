@@ -159,11 +159,14 @@ handle_call_incoming_event(Event, S0) ->
         [S0#state.shard_name, byte_size(Event)]
     ),
     case marvin_pdu:parse(Event) of
-        {ok, ?marvin_pdu_hello(_) = PDU0} ->
+        {ok, {?marvin_pdu_hello(_) = PDU0, Seq}} ->
+            maybe_bump_heart_seq(Seq, S0),
             handle_call_incoming_event_hello(PDU0, S0);
-        {ok, ?marvin_pdu_heartbeat_ack(_) = PDU0} ->
+        {ok, {?marvin_pdu_heartbeat_ack(_) = PDU0, Seq}} ->
+            maybe_bump_heart_seq(Seq, S0),
             handle_call_incoming_event_heartbeat_ack(PDU0, S0);
-        {ok, ?marvin_pdu(_, _) = PDU0} ->
+        {ok, {?marvin_pdu(_, _) = PDU0, Seq}} ->
+            maybe_bump_heart_seq(Seq, S0),
             handle_call_incoming_event_generic(PDU0, S0);
         {error, Reason} ->
             marvin_log:error("Incoming PDU failed to parse due to reason: ~p, ignoring", [Reason]),
@@ -298,7 +301,7 @@ get_pdu_identify(#state{
     {ok, LibraryName} = marvin_config:get(marvin, [system_info, library_name]),
     {ok, LibraryVersion} = marvin_config:get(marvin, [system_info, library_version]),
     Library = <<LibraryName/binary, "/", LibraryVersion/binary>>,
-    Compress = true,
+    Compress = false,
     LargeThreshold = 50,
     Shard = [ShardId, marvin_gateway_meta:get_shards_count()],
     marvin_log:debug(
@@ -306,3 +309,16 @@ get_pdu_identify(#state{
         [S0#state.shard_name, Library]
     ),
     marvin_pdu:render(marvin_pdu_identify:new(Token, OS, Library, Compress, LargeThreshold, Shard)).
+
+
+
+-spec maybe_bump_heart_seq(Seq :: non_neg_integer() | undefined, State :: state()) ->
+    marvin_helper_type:ok_return().
+
+maybe_bump_heart_seq(undefined, _S0) ->
+    ok;
+
+maybe_bump_heart_seq(Seq, #state{
+    heart_pid = HeartPid
+} = _S0) ->
+    marvin_shard_heart:bump_seq(HeartPid, Seq).

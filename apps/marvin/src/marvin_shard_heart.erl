@@ -8,11 +8,12 @@
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
 ]).
--export([heartbeat_ack/1]).
+-export([bump_seq/2, heartbeat_ack/1]).
 
 
 
 -define(do_beat(), {do_beat}).
+-define(bump_seq(Seq), {bump_seq, Seq}).
 -define(heartbeat_ack(), {heartbeat_ack}).
 
 -record(state, {
@@ -29,6 +30,14 @@
 
 
 %% Interface
+
+
+
+-spec bump_seq(HeartPid :: pid(), Seq :: non_neg_integer() | undefined) ->
+    Reply :: marvin_helper_type:ok_return().
+
+bump_seq(HeartPid, Seq) ->
+    gen_server:call(HeartPid, ?bump_seq(Seq)).
 
 
 
@@ -67,6 +76,9 @@ init([ShardId, ShardName, TxPid, HeartbeatInterval]) ->
     }}.
 
 
+
+handle_call(?bump_seq(Seq), _GenReplyTo, S0) ->
+    handle_call_bump_seq(Seq, S0);
 
 handle_call(?heartbeat_ack(), _GenReplyTo, S0) ->
     handle_call_heartbeat_ack(S0);
@@ -122,6 +134,23 @@ handle_info_do_beat(#state{
         timer_reference = TRef,
         waiting_for_ack = true
     }}.
+
+
+
+-spec handle_call_bump_seq(Seq :: non_neg_integer() | undefined, State :: state()) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_bump_seq(Seq, #state{
+    last_seq = PrevSeq
+} = S0) ->
+    ((Seq - 1) == PrevSeq) orelse marvin_log:warn(
+        "Shard '~p' got invalid sequences: ~p -> ~p",
+        [S0#state.shard_name, PrevSeq, Seq]
+    ),
+    {reply, ok, S0#state{last_seq = Seq}}.
 
 
 

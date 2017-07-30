@@ -91,4 +91,4 @@ t06_can_get_error_on_invalid_shard_test() ->
 t99_can_get_valid_parsed_test() ->
     {ok, JSONBin} = file:read_file(
         code:priv_dir(marvin_pdu) ++ "/marvin_pdu_identify_test.json"),
-    ?assertMatch({ok, ?marvin_pdu_identify(_)}, marvin_pdu:parse(JSONBin)).
+    ?assertMatch({ok, {?marvin_pdu_identify(_), undefined}}, marvin_pdu:parse(JSONBin)).
