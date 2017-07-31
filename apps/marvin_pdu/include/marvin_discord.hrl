@@ -116,3 +116,14 @@
 -define(discord_key_hello__trace, <<"_trace">>).
 
 %% ...
+
+%% Generic object keys
+
+-define(discord_key_object_user_id, <<"id">>).
+-define(discord_key_object_user_username, <<"username">>).
+-define(discord_key_object_user_discriminator, <<"discriminator">>).
+-define(discord_key_object_user_avatar, <<"avatar">>).
+-define(discord_key_object_user_bot, <<"bot">>).
+-define(discord_key_object_user_mfa_enabled, <<"mfa_enabled">>).
+-define(discord_key_object_user_verified, <<"verified">>).
+-define(discord_key_object_user_email, <<"email">>).

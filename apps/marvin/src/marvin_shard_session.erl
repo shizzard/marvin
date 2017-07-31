@@ -298,11 +298,11 @@ get_pdu_identify(#state{
         fun($\n) -> false; (_) -> true end,
         os:cmd("uname -rs"))
     ),
+    {ok, Compress} = marvin_config:get(marvin, [discord, gateway, compress]),
+    {ok, LargeThreshold} = marvin_config:get(marvin, [discord, gateway, large_threshold]),
     {ok, LibraryName} = marvin_config:get(marvin, [system_info, library_name]),
     {ok, LibraryVersion} = marvin_config:get(marvin, [system_info, library_version]),
     Library = <<LibraryName/binary, "/", LibraryVersion/binary>>,
-    Compress = false,
-    LargeThreshold = 50,
     Shard = [ShardId, marvin_gateway_meta:get_shards_count()],
     marvin_log:debug(
         "Shard '~p' is identifying against discord server as ~s",
