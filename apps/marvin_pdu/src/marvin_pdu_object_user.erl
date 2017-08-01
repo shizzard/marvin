@@ -1,5 +1,5 @@
 -module(marvin_pdu_object_user).
--behavior(marvin_pdu).
+-behavior(marvin_pdu_object).
 -include("marvin_discord.hrl").
 -include("marvin_pdu_object.hrl").
 -include("marvin_pdu_jiffy_v.hrl").
