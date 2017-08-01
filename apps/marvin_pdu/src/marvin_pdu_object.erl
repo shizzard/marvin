@@ -14,7 +14,7 @@
 -callback data_map() ->
     jiffy_vm:jv_type().
 
--callback export(PDU :: object()) ->
+-callback export(Object :: object()) ->
     marvin_helper_type:generic_return(
         OkRet :: term() | undefined,
         ErrorRet :: term()
@@ -27,8 +27,9 @@
 
 
 -type object_impl() ::
-    marvin_pdu_object_user:object().
--type object() :: ?marvin_pdu_object(Mod :: atom(), PDU :: object_impl()).
+    marvin_pdu_object_user:object() |
+    marvin_pdu_object_channel_dm:object().
+-type object() :: ?marvin_pdu_object(Mod :: atom(), Object :: object_impl()).
 -export_type([object/0]).
 
 

@@ -106,7 +106,7 @@ data_map() ->
         jiffy_vm:hashfield(?discord_key_object_user_bot, required, jiffy_vm:boolean(), fun validate_booleans_default_false/3),
         jiffy_vm:hashfield(?discord_key_object_user_mfa_enabled, required, jiffy_vm:boolean(), fun validate_booleans_default_false/3),
         jiffy_vm:hashfield(?discord_key_object_user_verified, required, jiffy_vm:boolean(), fun validate_booleans_default_false/3),
-        jiffy_vm:hashfield(?discord_key_object_user_email, required, jiffy_vm:string())
+        jiffy_vm:hashfield(?discord_key_object_user_email, required, jiffy_vm:string(), fun validate_email/3)
     ]).
 
 
@@ -286,4 +286,14 @@ validate_booleans_default_false(validate, _, _) ->
 
 validate_booleans_default_false(fix, _, _) ->
     {ok, false}.
+
+
+
+-spec ?validator_spec(validate_email).
+
+validate_email(validate, _, _) ->
+    {ok, valid};
+
+validate_email(fix, _, _) ->
+    {ok, <<>>}.
 

@@ -119,6 +119,8 @@
 
 %% Generic object keys
 
+%% User
+
 -define(discord_key_object_user_id, <<"id">>).
 -define(discord_key_object_user_username, <<"username">>).
 -define(discord_key_object_user_discriminator, <<"discriminator">>).
@@ -127,3 +129,10 @@
 -define(discord_key_object_user_mfa_enabled, <<"mfa_enabled">>).
 -define(discord_key_object_user_verified, <<"verified">>).
 -define(discord_key_object_user_email, <<"email">>).
+
+%% DM channel
+
+-define(discord_key_object_channel_dm_id, <<"id">>).
+-define(discord_key_object_channel_dm_type, <<"type">>).
+-define(discord_key_object_channel_dm_last_message_id, <<"last_message_id">>).
+-define(discord_key_object_channel_dm_recipients, <<"recipients">>).
