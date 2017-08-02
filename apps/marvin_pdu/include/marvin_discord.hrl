@@ -136,3 +136,8 @@
 -define(discord_key_object_channel_dm_type, <<"type">>).
 -define(discord_key_object_channel_dm_last_message_id, <<"last_message_id">>).
 -define(discord_key_object_channel_dm_recipients, <<"recipients">>).
+
+%% Guild unavailable
+
+-define(discord_key_object_guild_unavailable_id, <<"id">>).
+-define(discord_key_object_guild_unavailable_unavailable, <<"unavailable">>).
