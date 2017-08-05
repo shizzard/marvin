@@ -334,6 +334,7 @@ validate_pdu(fix, _, _) ->
         ErrorRet :: not_implemented | invalid_op
     ).
 
+detect_data_mod_by_op_event(?discord_op_dispatch, ?discord_event_ready) -> {ok, marvin_pdu_dispatch_ready};
 detect_data_mod_by_op_event(?discord_op_dispatch, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_heartbeat, _) -> {ok, marvin_pdu_heartbeat};
 detect_data_mod_by_op_event(?discord_op_identify, _) -> {ok, marvin_pdu_identify};
@@ -356,6 +357,7 @@ detect_data_mod_by_op_event(_, _) -> {error, invalid_op}.
         ErrorRet :: invalid_mod
     ).
 
+detect_op_event_by_data_mod(marvin_pdu_dispatch_ready) -> {ok, {?discord_op_dispatch, ?discord_event_ready}};
 detect_op_event_by_data_mod(marvin_pdu_dispatch) -> {ok, {?discord_op_dispatch, undefined}};
 detect_op_event_by_data_mod(marvin_pdu_heartbeat) -> {ok, {?discord_op_heartbeat, undefined}};
 detect_op_event_by_data_mod(marvin_pdu_identify) -> {ok, {?discord_op_identify, undefined}};

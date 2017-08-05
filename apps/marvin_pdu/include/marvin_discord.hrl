@@ -97,6 +97,19 @@
 -define(discord_key_seq, <<"s">>).
 -define(discord_key_event, <<"t">>).
 
+%% '0 Dispatch READY' PDU data keys
+
+-define(discord_key_dispatch_ready_guilds, <<"guilds">>).
+-define(discord_key_dispatch_ready_presences, <<"presences">>).
+-define(discord_key_dispatch_ready_private_channels, <<"private_channels">>).
+-define(discord_key_dispatch_ready_relationships, <<"relationships">>).
+-define(discord_key_dispatch_ready_session_id, <<"session_id">>).
+-define(discord_key_dispatch_ready_shard, <<"shard">>).
+-define(discord_key_dispatch_ready_user, <<"user">>).
+-define(discord_key_dispatch_ready_user_settings, <<"user_settings">>).
+-define(discord_key_dispatch_ready_v, <<"v">>).
+-define(discord_key_dispatch_ready__trace, <<"_trace">>).
+
 %% '2 Identify' PDU data keys
 
 -define(discord_key_identify_token, <<"token">>).

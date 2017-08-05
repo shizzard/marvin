@@ -49,7 +49,8 @@ new(#{
     ?discord_key_object_channel_dm_last_message_id := LastMessageId,
     ?discord_key_object_channel_dm_recipients := Recipients
 }) ->
-    new(Id, Type, LastMessageId, Recipients).
+    RecipientObjects = [marvin_pdu_object_user:new(Recipient) || Recipient <- Recipients],
+    new(Id, Type, LastMessageId, RecipientObjects).
 
 
 
@@ -93,15 +94,17 @@ export(?marvin_pdu_object_channel_dm(#object{
     id = Id,
     type = Type,
     last_message_id = LastMessageId,
-    recipients = Recipients
+    recipients = RecipientObjects
 })) ->
+    Recipients = lists:map(fun(RecipientObject) ->
+        {ok, Recipient} = marvin_pdu_object_user:export(RecipientObject),
+        Recipient
+    end, RecipientObjects),
     {ok, #{
         ?discord_key_object_channel_dm_id => Id,
         ?discord_key_object_channel_dm_type => Type,
         ?discord_key_object_channel_dm_last_message_id => LastMessageId,
-        ?discord_key_object_channel_dm_recipients => [
-            marvin_pdu_object_user:export(Recipient) || Recipient <- Recipients
-        ]
+        ?discord_key_object_channel_dm_recipients => Recipients
     }}.
 
 
@@ -180,7 +183,10 @@ validate_id(validate, _, _Id) ->
     {ok, valid};
 
 validate_id(fix, _, Id) when is_binary(Id) ->
-    {ok, binary_to_integer(Id)}.
+    {ok, binary_to_integer(Id)};
+
+validate_id(fix, _, Id) when is_integer(Id) ->
+    {ok, integer_to_binary(Id)}.
 
 
 
