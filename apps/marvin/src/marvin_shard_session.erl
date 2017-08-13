@@ -166,6 +166,9 @@ handle_call_incoming_event(Event, S0) ->
         {ok, {?marvin_pdu_dispatch_ready(_) = PDU0, Seq}} ->
             {ok, S1} = maybe_bump_heart_seq(Seq, S0),
             handle_call_incoming_event_dispatch_ready(PDU0, S1);
+        {ok, {?marvin_pdu_dispatch_resumed(_) = PDU0, Seq}} ->
+            {ok, S1} = maybe_bump_heart_seq(Seq, S0),
+            handle_call_incoming_event_dispatch_resumed(PDU0, S1);
         {ok, {?marvin_pdu_hello(_) = PDU0, Seq}} ->
             {ok, S1} = maybe_bump_heart_seq(Seq, S0),
             handle_call_incoming_event_hello(PDU0, S1);
@@ -253,6 +256,26 @@ handle_call_incoming_event_dispatch_ready(PDU0, S0) ->
 
 
 
+-spec handle_call_incoming_event_dispatch_resumed(
+    PDU :: marvin_pdu:pdu(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_resumed(_PDU0, #state{
+    session_id = SessionId
+} = S0) ->
+    marvin_log:info(
+        "Shard '~p' successfully resumed session '~s'",
+        [S0#state.shard_name, SessionId]
+    ),
+    {reply, ok, S0#state{}}.
+
+
+
 -spec handle_call_incoming_event_hello(
     PDU :: marvin_pdu:pdu(),
     State :: state()
@@ -261,6 +284,24 @@ handle_call_incoming_event_dispatch_ready(PDU0, S0) ->
         Reply :: marvin_helper_type:ok_return(),
         State :: state()
     ).
+
+handle_call_incoming_event_hello(PDU0, #state{
+    shard_id = ShardId,
+    tx_pid = TxPid,
+    session_id = undefined
+} = S0) ->
+    HeartbeatInterval = marvin_pdu_hello:heartbeat_interval(PDU0),
+    marvin_log:info(
+        "Shard '~p' starting heartbeat with interval '~p'",
+        [S0#state.shard_name, HeartbeatInterval]
+    ),
+    {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
+    erlang:link(HeartPid),
+    {ok, IdentifyEvent} = get_pdu_identify(S0),
+    ok = marvin_shard_tx:send_sync(TxPid, IdentifyEvent),
+    {reply, ok, S0#state{
+        heart_pid = HeartPid
+    }};
 
 handle_call_incoming_event_hello(PDU0, #state{
     shard_id = ShardId,
@@ -273,8 +314,8 @@ handle_call_incoming_event_hello(PDU0, #state{
     ),
     {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
     erlang:link(HeartPid),
-    {ok, IdentifyEvent} = get_pdu_identify(S0),
-    ok = marvin_shard_tx:send_sync(TxPid, IdentifyEvent),
+    {ok, ResumeEvent} = get_pdu_resume(S0),
+    ok = marvin_shard_tx:send_sync(TxPid, ResumeEvent),
     {reply, ok, S0#state{
         heart_pid = HeartPid
     }}.
@@ -339,6 +380,22 @@ get_pdu_identify(#state{
         [S0#state.shard_name, Library]
     ),
     marvin_pdu:render(marvin_pdu_identify:new(Token, OS, Library, Compress, LargeThreshold, Shard)).
+
+
+
+-spec get_pdu_resume(State :: state()) ->
+    marvin_helper_type:ok_return(OkRet :: binary()).
+
+get_pdu_resume(#state{
+    session_id = SessionId,
+    last_seq = LastSeq
+} = S0) ->
+    {ok, Token} = marvin_config:get(marvin, [discord, token]),
+    marvin_log:debug(
+        "Shard '~p' is resuming session '~s'",
+        [S0#state.shard_name, SessionId]
+    ),
+    marvin_pdu:render(marvin_pdu_resume:new(Token, SessionId, LastSeq)).
 
 
 
