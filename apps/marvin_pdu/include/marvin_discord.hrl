@@ -110,6 +110,10 @@
 -define(discord_key_dispatch_ready_v, <<"v">>).
 -define(discord_key_dispatch_ready__trace, <<"_trace">>).
 
+%% '0 Dispatch RESUMED' PDU data keys
+
+-define(discord_key_dispatch_resumed__trace, <<"_trace">>).
+
 %% '2 Identify' PDU data keys
 
 -define(discord_key_identify_token, <<"token">>).
