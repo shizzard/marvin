@@ -123,7 +123,13 @@
 -define(discord_key_identify_large_threshold,<<"large_threshold">>).
 -define(discord_key_identify_shard,<<"shard">>).
 
-%% '11 Hello' PDU data keys
+%% '6 Resume' PDU data keys
+
+-define(discord_key_resume_token, <<"token">>).
+-define(discord_key_resume_session_id, <<"session_id">>).
+-define(discord_key_resume_seq, <<"seq">>).
+
+%% '10 Hello' PDU data keys
 
 -define(discord_key_hello_heartbeat_interval, <<"heartbeat_interval">>).
 -define(discord_key_hello__trace, <<"_trace">>).

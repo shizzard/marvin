@@ -32,6 +32,7 @@
 -type pdu_impl() ::
     marvin_pdu_generic:pdu() |
     marvin_pdu_heartbeat:pdu() |
+    marvin_pdu_resume:pdu() |
     marvin_pdu_hello:pdu() |
     marvin_pdu_identify:pdu() |
     marvin_pdu_heartbeat_ack:pdu().
@@ -341,7 +342,7 @@ detect_data_mod_by_op_event(?discord_op_identify, _) -> {ok, marvin_pdu_identify
 detect_data_mod_by_op_event(?discord_op_status_update, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_voice_state_update, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_voice_server_ping, _) -> {ok, marvin_pdu_generic};
-detect_data_mod_by_op_event(?discord_op_resume, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_resume, _) -> {ok, marvin_pdu_resume};
 detect_data_mod_by_op_event(?discord_op_reconnect, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_request_guild_members, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_invalid_session, _) -> {ok, marvin_pdu_generic};
