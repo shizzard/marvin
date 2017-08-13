@@ -97,6 +97,23 @@
 -define(discord_key_seq, <<"s">>).
 -define(discord_key_event, <<"t">>).
 
+%% '0 Dispatch READY' PDU data keys
+
+-define(discord_key_dispatch_ready_guilds, <<"guilds">>).
+-define(discord_key_dispatch_ready_presences, <<"presences">>).
+-define(discord_key_dispatch_ready_private_channels, <<"private_channels">>).
+-define(discord_key_dispatch_ready_relationships, <<"relationships">>).
+-define(discord_key_dispatch_ready_session_id, <<"session_id">>).
+-define(discord_key_dispatch_ready_shard, <<"shard">>).
+-define(discord_key_dispatch_ready_user, <<"user">>).
+-define(discord_key_dispatch_ready_user_settings, <<"user_settings">>).
+-define(discord_key_dispatch_ready_v, <<"v">>).
+-define(discord_key_dispatch_ready__trace, <<"_trace">>).
+
+%% '0 Dispatch RESUMED' PDU data keys
+
+-define(discord_key_dispatch_resumed__trace, <<"_trace">>).
+
 %% '2 Identify' PDU data keys
 
 -define(discord_key_identify_token, <<"token">>).
@@ -110,9 +127,40 @@
 -define(discord_key_identify_large_threshold,<<"large_threshold">>).
 -define(discord_key_identify_shard,<<"shard">>).
 
-%% '11 Hello' PDU data keys
+%% '6 Resume' PDU data keys
+
+-define(discord_key_resume_token, <<"token">>).
+-define(discord_key_resume_session_id, <<"session_id">>).
+-define(discord_key_resume_seq, <<"seq">>).
+
+%% '10 Hello' PDU data keys
 
 -define(discord_key_hello_heartbeat_interval, <<"heartbeat_interval">>).
 -define(discord_key_hello__trace, <<"_trace">>).
 
 %% ...
+
+%% Generic object keys
+
+%% User
+
+-define(discord_key_object_user_id, <<"id">>).
+-define(discord_key_object_user_username, <<"username">>).
+-define(discord_key_object_user_discriminator, <<"discriminator">>).
+-define(discord_key_object_user_avatar, <<"avatar">>).
+-define(discord_key_object_user_bot, <<"bot">>).
+-define(discord_key_object_user_mfa_enabled, <<"mfa_enabled">>).
+-define(discord_key_object_user_verified, <<"verified">>).
+-define(discord_key_object_user_email, <<"email">>).
+
+%% DM channel
+
+-define(discord_key_object_channel_dm_id, <<"id">>).
+-define(discord_key_object_channel_dm_type, <<"type">>).
+-define(discord_key_object_channel_dm_last_message_id, <<"last_message_id">>).
+-define(discord_key_object_channel_dm_recipients, <<"recipients">>).
+
+%% Guild unavailable
+
+-define(discord_key_object_guild_unavailable_id, <<"id">>).
+-define(discord_key_object_guild_unavailable_unavailable, <<"unavailable">>).

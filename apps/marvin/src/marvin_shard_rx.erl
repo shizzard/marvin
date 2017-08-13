@@ -233,7 +233,7 @@ handle_info_gun_ws(text, Data, #state{
     internal_state = operational,
     session_pid = SessionPid
 } = S0) ->
-    marvin_log:debug("Shard '~p' reporting incoming event ~p", [S0#state.shard_name, jiffy:decode(Data)]),
+    marvin_log:debug("Shard '~p' reporting incoming event ~p", [S0#state.shard_name, jiffy:decode(Data, [return_maps])]),
     marvin_shard_session:incoming_event(SessionPid, Data),
     {noreply, S0};
 

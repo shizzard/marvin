@@ -31,7 +31,11 @@
 
 -type pdu_impl() ::
     marvin_pdu_generic:pdu() |
+    marvin_pdu_dispatch_ready:pdu() |
+    marvin_pdu_dispatch_resumed:pdu() |
     marvin_pdu_heartbeat:pdu() |
+    marvin_pdu_resume:pdu() |
+    marvin_pdu_invalid_session:pdu() |
     marvin_pdu_hello:pdu() |
     marvin_pdu_identify:pdu() |
     marvin_pdu_heartbeat_ack:pdu().
@@ -334,16 +338,18 @@ validate_pdu(fix, _, _) ->
         ErrorRet :: not_implemented | invalid_op
     ).
 
+detect_data_mod_by_op_event(?discord_op_dispatch, ?discord_event_ready) -> {ok, marvin_pdu_dispatch_ready};
+detect_data_mod_by_op_event(?discord_op_dispatch, ?discord_event_resumed) -> {ok, marvin_pdu_dispatch_resumed};
 detect_data_mod_by_op_event(?discord_op_dispatch, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_heartbeat, _) -> {ok, marvin_pdu_heartbeat};
 detect_data_mod_by_op_event(?discord_op_identify, _) -> {ok, marvin_pdu_identify};
 detect_data_mod_by_op_event(?discord_op_status_update, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_voice_state_update, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_voice_server_ping, _) -> {ok, marvin_pdu_generic};
-detect_data_mod_by_op_event(?discord_op_resume, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_resume, _) -> {ok, marvin_pdu_resume};
 detect_data_mod_by_op_event(?discord_op_reconnect, _) -> {ok, marvin_pdu_generic};
 detect_data_mod_by_op_event(?discord_op_request_guild_members, _) -> {ok, marvin_pdu_generic};
-detect_data_mod_by_op_event(?discord_op_invalid_session, _) -> {ok, marvin_pdu_generic};
+detect_data_mod_by_op_event(?discord_op_invalid_session, _) -> {ok, marvin_pdu_invalid_session};
 detect_data_mod_by_op_event(?discord_op_hello, _) -> {ok, marvin_pdu_hello};
 detect_data_mod_by_op_event(?discord_op_heartbeat_ack, _) -> {ok, marvin_pdu_heartbeat_ack};
 detect_data_mod_by_op_event(_, _) -> {error, invalid_op}.
@@ -356,6 +362,8 @@ detect_data_mod_by_op_event(_, _) -> {error, invalid_op}.
         ErrorRet :: invalid_mod
     ).
 
+detect_op_event_by_data_mod(marvin_pdu_dispatch_ready) -> {ok, {?discord_op_dispatch, ?discord_event_ready}};
+detect_op_event_by_data_mod(marvin_pdu_dispatch_resumed) -> {ok, {?discord_op_dispatch, ?discord_event_resumed}};
 detect_op_event_by_data_mod(marvin_pdu_dispatch) -> {ok, {?discord_op_dispatch, undefined}};
 detect_op_event_by_data_mod(marvin_pdu_heartbeat) -> {ok, {?discord_op_heartbeat, undefined}};
 detect_op_event_by_data_mod(marvin_pdu_identify) -> {ok, {?discord_op_identify, undefined}};

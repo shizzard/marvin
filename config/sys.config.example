@@ -11,7 +11,7 @@
             {gateway, [
                 {port, 443},
                 {protocol_version, "6"},
-                {compress, true},
+                {compress, false},
                 {large_threshold, 50}
             ]}
         ]},
