@@ -23,7 +23,10 @@
     wss_url :: binary(),
     rx_pid :: pid() | undefined,
     tx_pid :: pid() | undefined,
-    heart_pid :: pid() | undefined
+    heart_pid :: pid() | undefined,
+    last_seq :: non_neg_integer(),
+    session_id :: binary() | undefined,
+    user :: marvin_pdu_object_user:object() | unedefined
 }).
 -type state() :: #state{}.
 
@@ -69,7 +72,8 @@ init([ShardId, ShardName, WssUrl]) ->
     {ok, #state{
         shard_id = ShardId,
         shard_name = ShardName,
-        wss_url = WssUrl
+        wss_url = WssUrl,
+        last_seq = 0
     }}.
 
 
@@ -159,15 +163,18 @@ handle_call_incoming_event(Event, S0) ->
         [S0#state.shard_name, byte_size(Event)]
     ),
     case marvin_pdu:parse(Event) of
+        {ok, {?marvin_pdu_dispatch_ready(_) = PDU0, Seq}} ->
+            {ok, S1} = maybe_bump_heart_seq(Seq, S0),
+            handle_call_incoming_event_dispatch_ready(PDU0, S1);
         {ok, {?marvin_pdu_hello(_) = PDU0, Seq}} ->
-            maybe_bump_heart_seq(Seq, S0),
-            handle_call_incoming_event_hello(PDU0, S0);
+            {ok, S1} = maybe_bump_heart_seq(Seq, S0),
+            handle_call_incoming_event_hello(PDU0, S1);
         {ok, {?marvin_pdu_heartbeat_ack(_) = PDU0, Seq}} ->
-            maybe_bump_heart_seq(Seq, S0),
-            handle_call_incoming_event_heartbeat_ack(PDU0, S0);
+            {ok, S1} = maybe_bump_heart_seq(Seq, S0),
+            handle_call_incoming_event_heartbeat_ack(PDU0, S1);
         {ok, {?marvin_pdu(_, _) = PDU0, Seq}} ->
-            maybe_bump_heart_seq(Seq, S0),
-            handle_call_incoming_event_generic(PDU0, S0);
+            {ok, S1} = maybe_bump_heart_seq(Seq, S0),
+            handle_call_incoming_event_generic(PDU0, S1);
         {error, Reason} ->
             marvin_log:error("Incoming PDU failed to parse due to reason: ~p, ignoring", [Reason]),
             {reply, ok, S0}
@@ -220,6 +227,29 @@ handle_info_exit(ExitPid, ExitReason, #state{
 
 
 %% Event handlers
+
+
+
+-spec handle_call_incoming_event_dispatch_ready(
+    PDU :: marvin_pdu:pdu(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_ready(PDU0, S0) ->
+    SessionId = marvin_pdu_dispatch_ready:session_id(PDU0),
+    SelfUser = marvin_pdu_dispatch_ready:user(PDU0),
+    marvin_log:info(
+        "Shard '~p' is ready with session '~s'",
+        [S0#state.shard_name, SessionId]
+    ),
+    {reply, ok, S0#state{
+        session_id = SessionId,
+        user = SelfUser
+    }}.
 
 
 
@@ -313,12 +343,13 @@ get_pdu_identify(#state{
 
 
 -spec maybe_bump_heart_seq(Seq :: non_neg_integer() | undefined, State :: state()) ->
-    marvin_helper_type:ok_return().
+    marvin_helper_type:ok_return(OkRet :: state()).
 
-maybe_bump_heart_seq(undefined, _S0) ->
-    ok;
+maybe_bump_heart_seq(undefined, S0) ->
+    {ok, S0};
 
 maybe_bump_heart_seq(Seq, #state{
     heart_pid = HeartPid
-} = _S0) ->
-    marvin_shard_heart:bump_seq(HeartPid, Seq).
+} = S0) ->
+    ok = marvin_shard_heart:bump_seq(HeartPid, Seq),
+    {ok, S0#state{last_seq = Seq}}.
