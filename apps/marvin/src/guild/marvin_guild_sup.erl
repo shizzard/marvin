@@ -11,17 +11,17 @@
 
 
 
--spec start_guild(GuildId :: binary()) ->
+-spec start_guild(GuildId :: non_neg_integer()) ->
     marvin_helper_type:ok_return(OkRet :: pid() | undefined) |
     marvin_helper_type:ok_return(OkRet1 :: pid() | undefined, OkRet2 :: term()) |
     marvin_helper_type:error_return(ErrorRet :: already_present | {already_started, Child :: pid() | undefined} | term()).
 
 start_guild(_GuildId) ->
-    {error, not_implemented}.
+    {ok, self()}.
 
 
 
--spec stop_guild(GuildId :: binary()) ->
+-spec stop_guild(GuildId :: non_neg_integer()) ->
     marvin_helper_type:ok_return().
 
 stop_guild(_GuildId) ->

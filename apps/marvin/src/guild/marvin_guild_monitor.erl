@@ -12,11 +12,9 @@
 
 
 
--define(maybe_start_guild(GuildId), {maybe_start_guild, GuildId}).
+-define(registry_table_name, marvin_guild_monitor_registry).
 -define(start_guild(GuildId), {start_guild, GuildId}).
 -define(stop_guild(GuildId), {stop_guild, GuildId}).
--define(get_guild(GuildId), {get_guild, GuildId}).
--define(get_guilds(), {get_guilds}).
 
 -record(state, {
     registry :: ets:tid()
@@ -33,15 +31,28 @@
     marvin_helper_type:ok_return(OkRet :: pid()).
 
 maybe_start_guild(GuildId) ->
-    gen_server:call(?MODULE, ?maybe_start_guild(GuildId)).
+    case get_guild(GuildId) of
+        {ok, Pid} ->
+            {ok, Pid};
+        {error, not_found} ->
+            start_guild(GuildId)
+    end.
 
 
 
 -spec start_guild(GuildId :: non_neg_integer()) ->
-    marvin_helper_type:ok_return(OkRet :: pid()).
+    marvin_helper_type:ok_return(
+        OkRet :: pid(),
+        ErrorRet :: duplicate
+    ).
 
 start_guild(GuildId) ->
-    gen_server:call(?MODULE, ?start_guild(GuildId)).
+    case get_guild(GuildId) of
+        {ok, _Pid} ->
+            {error, duplicate};
+        {error, not_found} ->
+            gen_server:call(?MODULE, ?start_guild(GuildId))
+    end.
 
 
 
@@ -54,10 +65,18 @@ stop_guild(GuildId) ->
 
 
 -spec get_guild(GuildId :: non_neg_integer()) ->
-    marvin_helper_type:ok_return(OkRet :: pid()).
+    marvin_helper_type:generic_return(
+        OkRet :: pid(),
+        ErrorRet :: not_found
+    ).
 
 get_guild(GuildId) ->
-    gen_server:call(?MODULE, ?get_guild(GuildId)).
+    case ets:lookup(?registry_table_name, GuildId) of
+        [{GuildId, Pid}] ->
+            {ok, Pid};
+        [] ->
+            {error, not_found}
+    end.
 
 
 
@@ -70,12 +89,18 @@ start_link() ->
 
 
 init([]) ->
-    Registry = ets:new(marvin_guild_monitor_registry, [
-        set, protected, named_table, {keypos, 2}, {read_concurrency, true}
+    Registry = ets:new(?registry_table_name, [
+        set, protected, named_table, {keypos, 1}, {read_concurrency, true}
     ]),
     {ok, #state{registry = Registry}}.
 
 
+
+handle_call(?start_guild(GuildId), _GenReplyTo, S0) ->
+    handle_call_start_guild(GuildId, S0);
+
+handle_call(?stop_guild(GuildId), _GenReplyTo, S0) ->
+    handle_call_stop_guild(GuildId, S0);
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
     marvin_log:warn("Unexpected call: ~p", [Unexpected]),
@@ -106,3 +131,29 @@ code_change(_OldVsn, S0, _Extra) ->
 
 
 %% Internals
+
+
+
+-spec handle_call_start_guild(GuildId :: non_neg_integer(), State :: state()) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Ret :: marvin_helper_type:ok_return(OkRet :: pid()),
+        State :: state()
+    ).
+
+handle_call_start_guild(GuildId, S0) ->
+    {ok, Pid} = marvin_guild_sup:start_guild(GuildId),
+    true = ets:insert(?registry_table_name, {GuildId, Pid}),
+    {reply, {ok, Pid}, S0}.
+
+
+
+-spec handle_call_stop_guild(GuildId :: non_neg_integer(), State :: state()) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Ret :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_stop_guild(GuildId, S0) ->
+    ok = marvin_guild_sup:stop_guild(GuildId),
+    true = ets:delete(?registry_table_name, GuildId),
+    {reply, ok, S0}.
