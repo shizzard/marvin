@@ -17,7 +17,7 @@
         ]},
         {system_info, [
             {library_name, <<"Marvin">>},
-            {library_version, <<"0.2.0">>},
+            {library_version, <<"0.3.0">>},
             {library_web, <<"http://shizzard.github.io/marvin">>}
         ]}
     ]},
