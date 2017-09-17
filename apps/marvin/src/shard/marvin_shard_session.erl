@@ -249,10 +249,42 @@ handle_call_incoming_event_dispatch_ready(PDU0, S0) ->
         "Shard '~p' is ready with session '~s'",
         [S0#state.shard_name, SessionId]
     ),
+    _ = marvin_helper_chain:chain(
+        'marvin_shard_session:handle_call_incoming_event_dispatch_ready', [
+            fun handle_call_incoming_event_dispatch_ready_start_guilds_get_ids/1,
+            fun handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds/1
+        ], PDU0),
     {reply, ok, S0#state{
         session_id = SessionId,
         user = SelfUser
     }}.
+
+
+
+-spec handle_call_incoming_event_dispatch_ready_start_guilds_get_ids(
+    PDU0 :: marvin_pdu:pdu()
+) ->
+    Ret :: {ok, [GuildId :: non_neg_integer()]}.
+
+handle_call_incoming_event_dispatch_ready_start_guilds_get_ids(PDU0) ->
+    {ok, lists:map(
+        fun marvin_pdu_object_guild_unavailable:id/1,
+        marvin_pdu_dispatch_ready:guilds(PDU0)
+    )}.
+
+
+
+-spec handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(
+    Ids :: [GuildId :: non_neg_integer()]
+) ->
+    Ret :: {ok, [Pid :: pid()]}.
+
+handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(Ids) ->
+    {ok, lists:map(
+        fun marvin_helper_chain:unwrap2/1,
+        lists:map(fun marvin_guild_monitor:maybe_start_guild/1, Ids)
+    )}.
+
 
 
 

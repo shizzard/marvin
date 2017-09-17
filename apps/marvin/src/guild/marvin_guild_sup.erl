@@ -16,16 +16,16 @@
     marvin_helper_type:ok_return(OkRet1 :: pid() | undefined, OkRet2 :: term()) |
     marvin_helper_type:error_return(ErrorRet :: already_present | {already_started, Child :: pid() | undefined} | term()).
 
-start_guild(_GuildId) ->
-    {ok, self()}.
+start_guild(GuildId) ->
+    supervisor:start_child(?MODULE, [GuildId]).
 
 
 
--spec stop_guild(GuildId :: non_neg_integer()) ->
+-spec stop_guild(Pid :: pid()) ->
     marvin_helper_type:ok_return().
 
-stop_guild(_GuildId) ->
-    ok.
+stop_guild(Pid) ->
+    supervisor:terminate_child(?MODULE, Pid).
 
 
 
@@ -41,10 +41,10 @@ start_link() ->
 
 
 init([]) ->
-    {ok, {{one_for_one, 5, 10}, [{
-        marvin_guild_monitor,
-        {marvin_guild_monitor, start_link, []},
-        permanent, 15000, worker, [marvin_guild_monitor]}
+    {ok, {{simple_one_for_one, 5, 10}, [
+        {marvin_guild, {
+            marvin_guild, start_link, []
+        }, temporary, 15000, worker, [marvin_guild]}
     ]}}.
 
 
