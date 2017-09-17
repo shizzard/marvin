@@ -1,6 +1,6 @@
 -module(marvin_helper_chain).
 
--export([chain/3]).
+-export([chain/3, unwrap2/1]).
 
 -type chain_name() :: atom().
 -type chain_fun() :: fun(
@@ -50,3 +50,14 @@ when is_function(Fun, 1) ->
                 [Name, length(Funs) + 1, Fun, Reason, InitialValue, erlang:get_stacktrace()]),
             {error, Reason}
     end.
+
+
+
+-spec unwrap2(In :: {First :: any(), Item :: any()}) ->
+    Ret :: any().
+
+unwrap2({_, Item}) ->
+    Item;
+
+unwrap2(_) ->
+    throw(badarg).

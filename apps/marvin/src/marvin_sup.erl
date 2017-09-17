@@ -23,6 +23,12 @@ start_link() ->
 
 init([]) ->
     {ok, {{one_for_one, 5, 10}, [
+        {marvin_guild_sup, {
+            marvin_guild_sup, start_link, []
+        }, permanent, 5000, supervisor, [marvin_guild_sup]},
+        {marvin_guild_monitor, {
+            marvin_guild_monitor, start_link, []
+        }, permanent, 15000, worker, [marvin_guild_monitor]},
         {marvin_shard_sup, {
             marvin_shard_sup, start_link, []
         }, permanent, 5000, supervisor, [marvin_shard_sup]},
