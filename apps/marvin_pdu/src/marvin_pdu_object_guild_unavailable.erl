@@ -13,7 +13,7 @@
 
 
 
--type id() :: non_neg_integer().
+-type id() :: marvin_pdu:snowflake().
 
 -export_type([id/0]).
 

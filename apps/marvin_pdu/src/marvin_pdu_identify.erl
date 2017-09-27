@@ -25,8 +25,7 @@
 -type token() :: binary().
 -type compress() :: boolean().
 -type large_threshold() :: non_neg_integer().
--type shard_seq() :: non_neg_integer().
--type shard() :: [shard_seq(), ...].
+-type shard() :: [non_neg_integer(), ...].
 -export_type([
     properties_os/0, properties_library_name/0, properties_browser/0,
     properties_device/0, properties_referrer/0, properties_referring_domain/0,

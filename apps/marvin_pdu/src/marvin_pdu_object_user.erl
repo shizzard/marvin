@@ -18,7 +18,7 @@
 
 
 
--type id() :: non_neg_integer().
+-type id() :: marvin_pdu:snowflake().
 -type username() :: binary().
 -type discriminator() :: binary().
 -type avatar() :: binary().
