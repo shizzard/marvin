@@ -76,6 +76,9 @@
 -type event() :: binary().
 -export_type([event/0]).
 
+-type snowflake() :: non_neg_integer().
+-export_type([snowflake/0]).
+
 
 
 %% Interface

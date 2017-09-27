@@ -16,9 +16,9 @@
 
 
 
--type id() :: non_neg_integer().
+-type id() :: marvin_pdu:snowflake().
 -type type() :: 1.
--type last_message_id() :: non_neg_integer().
+-type last_message_id() :: marvin_pdu:snowflake().
 -type recipients() :: [marvin_pdu_object_user:object(), ...].
 
 -export_type([
