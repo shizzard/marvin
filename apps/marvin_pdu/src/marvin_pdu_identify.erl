@@ -29,7 +29,7 @@
 -export_type([
     properties_os/0, properties_library_name/0, properties_browser/0,
     properties_device/0, properties_referrer/0, properties_referring_domain/0,
-    token/0, properties/0, compress/0, large_threshold/0, shard_seq/0, shard/0
+    token/0, properties/0, compress/0, large_threshold/0, shard/0
 ]).
 
 -record(properties, {
