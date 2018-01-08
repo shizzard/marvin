@@ -27,3 +27,8 @@ can_get_error_on_negative_heatbeat_interval_test() ->
 
 can_get_error_on_nonstring_trace_part_test() ->
     ?assertError(badarg, marvin_pdu2_hello:new(#{<<"heartbeat_interval">> => 100, <<"_trace">> => ["trace_part"]})).
+
+%%can_get_valid_parsed_test() ->
+%%    {ok, JSONBin} = file:read_file(
+%%        code:priv_dir(marvin_pdu) ++ "/marvin_pdu2_hello_test.json"),
+%%    ?assertMatch({ok, {?marvin_pdu2_hello(_), undefined}}, marvin_pdu:parse(JSONBin)).
