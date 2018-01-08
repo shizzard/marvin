@@ -22,7 +22,7 @@ clean:
 dialyze:
 	$(REBAR) dialyzer
 
-test:
+run-tests:
 	$(REBAR) eunit
 
 run-release:
