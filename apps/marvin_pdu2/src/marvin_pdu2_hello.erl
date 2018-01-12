@@ -4,9 +4,12 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    heartbeat_interval :: non_neg_integer(),
-    '_trace' :: [binary()]
+    heartbeat_interval :: marvin_pdu2:heartbeat_interval(),
+    '_trace' :: marvin_pdu2:trace()
 }).
+
+-type t() :: #?MODULE{}.
+-export_type([t/0]).
 
 
 cloak_validate(heartbeat_interval, Value) when Value > 0 ->

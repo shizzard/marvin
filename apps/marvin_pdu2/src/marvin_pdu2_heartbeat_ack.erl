@@ -3,7 +3,12 @@
 
 -export([export/1]).
 
--record(?MODULE, {}).
+-record(?MODULE, {
+    ack = true :: true
+}).
+
+-type t() :: #?MODULE{}.
+-export_type([t/0]).
 
 
 export(#?MODULE{}) ->

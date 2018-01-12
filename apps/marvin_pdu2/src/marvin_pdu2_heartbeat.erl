@@ -4,8 +4,11 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    last_seq :: non_neg_integer()
+    last_seq :: marvin_pdu2:pdu_seq()
 }).
+
+-type t() :: #?MODULE{}.
+-export_type([t/0]).
 
 
 cloak_validate(last_seq, Value) when Value > 0 ->

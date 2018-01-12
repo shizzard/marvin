@@ -7,7 +7,7 @@ can_get_new_test() ->
     marvin_pdu2_heartbeat_ack:new(#{}).
 
 
-can_render_valid_opaque_test() ->
+can_export_valid_opaque_test() ->
     PDU0 = marvin_pdu2_heartbeat_ack:new(#{}),
     ?assertMatch(undefined, marvin_pdu2_heartbeat_ack:export(PDU0)).
 
