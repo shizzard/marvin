@@ -33,7 +33,8 @@ pdu_mods() ->
         marvin_pdu2_invalid_session,
         marvin_pdu2_dispatch_resumed,
 
-        marvin_pdu2_object_user
+        marvin_pdu2_object_user,
+        marvin_pdu2_object_guild_unavailable
     ].
 
 
@@ -184,5 +185,19 @@ marvin_pdu2_object_user() ->
             mfa_enabled => MfaEnabled,
             verified => Verified,
             email => Email
+        }
+    ).
+
+
+marvin_pdu2_object_guild_unavailable() ->
+    ?LET(
+        {Id, Unavailable},
+        {
+            non_empty(marvin_pdu2:snowflake()),
+            marvin_pdu2:unavailable()
+        },
+        #{
+            id => Id,
+            unavailable => Unavailable
         }
     ).

@@ -113,6 +113,8 @@
 -type verified() :: boolean().
 -type email() :: binary().
 
+-type unavailable() :: boolean().
+
 
 -export_type([
     operation/0, data/0, sequence/0, event/0,
@@ -123,7 +125,8 @@
     shard/0, total_shards/0, shard_spec/0,
     session_id/0, protocol_version/0,
     snowflake/0, username/0, discriminator/0, avatar/0,
-    bot/0, mfa_enabled/0, verified/0, email/0
+    bot/0, mfa_enabled/0, verified/0, email/0,
+    unavailable/0
 ]).
 
 
