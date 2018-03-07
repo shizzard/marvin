@@ -31,7 +31,9 @@ pdu_mods() ->
         marvin_pdu2_resume,
         marvin_pdu2_hello,
         marvin_pdu2_invalid_session,
-        marvin_pdu2_dispatch_resumed
+        marvin_pdu2_dispatch_resumed,
+
+        marvin_pdu2_object_user
     ].
 
 
@@ -64,7 +66,7 @@ ensure_same_pdus_fold(Key, Value, ResultPDU) ->
     end.
 
 
-%% Generators
+%% Generators - PDUs
 
 
 marvin_pdu2_heartbeat() ->
@@ -146,11 +148,41 @@ marvin_pdu2_invalid_session() ->
 marvin_pdu2_heartbeat_ack() ->
     #{}.
 
+
 marvin_pdu2_dispatch_resumed() ->
     ?LET(
         Trace,
         list(non_empty(binary())),
         #{
             '_trace' => Trace
+        }
+    ).
+
+
+%% Generators - Objects
+
+
+marvin_pdu2_object_user() ->
+    ?LET(
+        {Id, Username, Discriminator, Avatar, Bot, MfaEnabled, Verified, Email},
+        {
+            non_empty(marvin_pdu2:snowflake()),
+            non_empty(marvin_pdu2:username()),
+            non_empty(marvin_pdu2:discriminator()),
+            non_empty(marvin_pdu2:avatar()),
+            marvin_pdu2:bot(),
+            marvin_pdu2:mfa_enabled(),
+            marvin_pdu2:verified(),
+            non_empty(marvin_pdu2:email())
+        },
+        #{
+            id => Id,
+            username => Username,
+            discriminator => Discriminator,
+            avatar => Avatar,
+            bot => Bot,
+            mfa_enabled => MfaEnabled,
+            verified => Verified,
+            email => Email
         }
     ).

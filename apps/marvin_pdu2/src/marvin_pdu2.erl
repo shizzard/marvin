@@ -104,6 +104,15 @@
 -type session_id() :: binary().
 -type protocol_version() :: pos_integer().
 
+-type snowflake() :: binary().
+-type username() :: binary().
+-type discriminator() :: binary().
+-type avatar() :: binary().
+-type bot() :: boolean().
+-type mfa_enabled() :: boolean().
+-type verified() :: boolean().
+-type email() :: binary().
+
 
 -export_type([
     operation/0, data/0, sequence/0, event/0,
@@ -112,7 +121,9 @@
     properties_os/0, properties_browser/0, properties_device/0,
     properties_referrer/0, properties_referring_domain/0,
     shard/0, total_shards/0, shard_spec/0,
-    session_id/0, protocol_version/0
+    session_id/0, protocol_version/0,
+    snowflake/0, username/0, discriminator/0, avatar/0,
+    bot/0, mfa_enabled/0, verified/0, email/0
 ]).
 
 
