@@ -1,0 +1,18 @@
+{
+    "op": 2,
+    "d": {
+        "properties": {
+            "$os": "windows-98",
+            "$browser": "marvin-0.0.1",
+            "$device": "marvin-0.0.1",
+            "$referrer": "marvin-0.0.1",
+            "$referring_domain": "https://shizzard.github.io/marvin"
+        },
+        "token": "some-long-long-token-here",
+        "compress": false,
+        "large_threshold": 150,
+        "shard": [0,1]
+    },
+    "s": null,
+    "t": null
+}

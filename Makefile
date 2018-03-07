@@ -1,6 +1,6 @@
 REBAR = ./rebar3
 
-.PHONY: all get-deps compile release shell clean dialyze run-release run-tests
+.PHONY: all get-deps compile release shell clean dialyze run-release run-tests run-logtail
 
 all: get-deps compile release
 
@@ -27,3 +27,6 @@ run-tests:
 
 run-release:
 	_build/default/rel/marvin/bin/marvin console
+
+run-logtail:
+	tail -F _build/default/rel/marvin/log/debug.log

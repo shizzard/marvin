@@ -5,7 +5,10 @@
 
 -record(?MODULE, {
     '$os' :: marvin_pdu2:properties_os(),
-    library_name :: marvin_pdu2:properties_library_name()
+    '$browser' :: marvin_pdu2:properties_browser(),
+    '$device' :: marvin_pdu2:properties_device(),
+    '$referrer' :: marvin_pdu2:properties_referrer(),
+    '$referring_domain' :: marvin_pdu2:properties_referring_domain()
 }).
 
 -type t() :: #?MODULE{}.
@@ -16,7 +19,16 @@
 cloak_validate('$os', Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
-cloak_validate(library_name, Value) when is_binary(Value) andalso Value /= <<>> ->
+cloak_validate('$browser', Value) when is_binary(Value) andalso Value /= <<>> ->
+    {ok, Value};
+
+cloak_validate('$device', Value) when is_binary(Value) andalso Value /= <<>> ->
+    {ok, Value};
+
+cloak_validate('$referrer', Value) when is_binary(Value) andalso Value /= <<>> ->
+    {ok, Value};
+
+cloak_validate('$referring_domain', Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
 cloak_validate(_, _) ->
@@ -25,12 +37,15 @@ cloak_validate(_, _) ->
 
 export(#?MODULE{
     '$os' = OS,
-    library_name = LibraryName
+    '$browser' = Browser,
+    '$device' = Device,
+    '$referrer' = Referrer,
+    '$referring_domain' = ReferringDomain
 }) ->
     #{
         <<"$os">> => OS,
-        <<"$browser">> => LibraryName,
-        <<"$device">> => LibraryName,
-        <<"$referrer">> => <<>>,
-        <<"$referring_domain">> => <<>>
+        <<"$browser">> => Browser,
+        <<"$device">> => Device,
+        <<"$referrer">> => Referrer,
+        <<"$referring_domain">> => ReferringDomain
     }.

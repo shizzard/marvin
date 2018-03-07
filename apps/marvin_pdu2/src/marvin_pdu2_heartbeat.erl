@@ -4,20 +4,19 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    last_seq :: marvin_pdu2:pdu_seq()
+    plain_value :: marvin_pdu2:sequence()
 }).
 
 -type t() :: #?MODULE{}.
 -export_type([t/0]).
 
 
-cloak_validate(last_seq, Value) when Value > 0 ->
+cloak_validate(plain_value, Value) when is_integer(Value) andalso Value > 0 ->
     {ok, Value};
 
 cloak_validate(_, _) ->
     {error, invalid}.
 
 
-export(#?MODULE{last_seq = LastSeq}) ->
-    % This PDU is quite inconsistent: data structure is the one integer
-    LastSeq.
+export(#?MODULE{plain_value = LastSeq}) ->
+    #{<<"plain_value">> => LastSeq}.

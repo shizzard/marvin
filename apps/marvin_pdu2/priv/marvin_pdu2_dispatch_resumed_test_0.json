@@ -1,0 +1,11 @@
+{
+    "op": 0,
+    "d": {
+        "_trace": [
+            "discord-gateway-prd-1-27",
+            "discord-sessions-prd-1-15"
+        ]
+    },
+    "s": 1337,
+    "t": "RESUMED"
+}

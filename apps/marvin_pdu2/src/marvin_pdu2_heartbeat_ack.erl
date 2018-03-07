@@ -12,5 +12,4 @@
 
 
 export(#?MODULE{}) ->
-    % This PDU is quite inconsistent: no data in it
-    undefined.
+    #{}.
