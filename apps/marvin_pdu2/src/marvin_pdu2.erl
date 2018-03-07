@@ -83,7 +83,7 @@
 -type sequence() :: pos_integer().
 -type event() :: binary().
 
--type heartbeat_interval() :: non_neg_integer().
+-type heartbeat_interval() :: pos_integer().
 -type trace_part() :: binary().
 -type trace() :: [trace_part(), ...].
 

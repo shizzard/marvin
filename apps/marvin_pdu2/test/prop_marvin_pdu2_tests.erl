@@ -25,8 +25,13 @@ proper_test_for_pdu_mod(PDUMod) ->
 pdu_mods() ->
     [
         marvin_pdu2_heartbeat,
+        marvin_pdu2_heartbeat_ack,
         marvin_pdu2_identify_properties,
-        marvin_pdu2_identify
+        marvin_pdu2_identify,
+        marvin_pdu2_resume,
+        marvin_pdu2_hello,
+        marvin_pdu2_invalid_session,
+        marvin_pdu2_dispatch_resumed
     ].
 
 
@@ -112,13 +117,13 @@ marvin_pdu2_resume() ->
         {Token, SessionId, Sequence},
         {
             non_empty(marvin_pdu2:token()),
-            marvin_pdu2:session_id(),
+            non_empty(marvin_pdu2:session_id()),
             marvin_pdu2:sequence()
         },
         #{
             token => Token,
             session_id => SessionId,
-            sequence => Sequence
+            seq => Sequence
         }
     ).
 
@@ -131,6 +136,21 @@ marvin_pdu2_hello() ->
         },
         #{
             heartbeat_interval => HeartbeatInterval,
+            '_trace' => Trace
+        }
+    ).
+
+marvin_pdu2_invalid_session() ->
+    #{}.
+
+marvin_pdu2_heartbeat_ack() ->
+    #{}.
+
+marvin_pdu2_dispatch_resumed() ->
+    ?LET(
+        Trace,
+        list(non_empty(binary())),
+        #{
             '_trace' => Trace
         }
     ).
