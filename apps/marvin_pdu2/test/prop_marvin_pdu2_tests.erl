@@ -121,3 +121,16 @@ marvin_pdu2_resume() ->
             sequence => Sequence
         }
     ).
+
+marvin_pdu2_hello() ->
+    ?LET(
+        {HeartbeatInterval, Trace},
+        {
+            non_empty(marvin_pdu2:heartbeat_interval()),
+            list(non_empty(binary()))
+        },
+        #{
+            heartbeat_interval => HeartbeatInterval,
+            '_trace' => Trace
+        }
+    ).

@@ -172,7 +172,7 @@ cloak_validate(op, Value) ->
 
 
 cloak_validate(d, Value)
-when null == Value orelse undefined == Value ->
+when null == Value orelse undefined == Value orelse false == Value ->
     {ok, #{}};
 
 cloak_validate(d, Value) ->
