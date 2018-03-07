@@ -106,3 +106,18 @@ marvin_pdu2_identify() ->
             shard => Shard
         }
     ).
+
+marvin_pdu2_resume() ->
+    ?LET(
+        {Token, SessionId, Sequence},
+        {
+            non_empty(marvin_pdu2:token()),
+            marvin_pdu2:session_id(),
+            marvin_pdu2:sequence()
+        },
+        #{
+            token => Token,
+            session_id => SessionId,
+            sequence => Sequence
+        }
+    ).

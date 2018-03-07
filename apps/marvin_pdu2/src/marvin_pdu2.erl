@@ -184,12 +184,16 @@ cloak_validate(d, Value) ->
     end;
 
 cloak_validate(s, Value)
+when null == Value orelse undefined == Value ->
+    {ok, 0};
+
+cloak_validate(s, Value)
 when is_integer(Value) andalso Value > 0 ->
     {ok, Value};
 
-cloak_validate(s, Value)
+cloak_validate(t, Value)
 when null == Value orelse undefined == Value ->
-    {ok, 0};
+    {ok, undefined};
 
 cloak_validate(t, Value) when is_binary(Value) ->
     case lists:member(Value, ?events) of
@@ -198,10 +202,6 @@ cloak_validate(t, Value) when is_binary(Value) ->
         false ->
             {error, invalid}
     end;
-
-cloak_validate(t, Value)
-when null == Value orelse undefined == Value ->
-    {ok, undefined};
 
 cloak_validate(_, _) ->
     {error, invalid}.
@@ -218,7 +218,7 @@ cloak_validate_struct(#?MODULE{op = Op, d = Data, t = undefined} = Struct) ->
     Mod = op_to_mod(Op),
     {ok, Struct#?MODULE{prot_mod = Mod, d = Mod:new(Data)}};
 
-cloak_validate_struct(Struct) ->
+cloak_validate_struct(_Struct) ->
     {error, invalid}.
 
 
