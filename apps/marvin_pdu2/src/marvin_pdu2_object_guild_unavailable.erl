@@ -5,7 +5,7 @@
 
 -record(?MODULE, {
     id :: marvin_pdu2:snowflake(),
-    unavailable = true :: marvin_pdu2:unavailable()
+    unavailable :: marvin_pdu2:unavailable()
 }).
 
 -type t() :: #?MODULE{}.

@@ -8,11 +8,8 @@
         "guilds": [{
             "id": "269209661973069825", "unavailable": true
         }],
-        "presences": [],
         "private_channels": [],
-        "relationships": [],
         "session_id": "b1d4c1953ab135bb90a700e10957ec15",
-        "shard": [0, 1],
         "user": {
             "avatar": "1888f192aa92e3de15f795df27c8475e",
             "bot": true,
@@ -23,7 +20,6 @@
             "username": "Marvin",
             "verified": true
         },
-        "user_settings": {},
         "v": 6
     },
     "s": 1,

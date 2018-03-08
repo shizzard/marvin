@@ -11,7 +11,7 @@
     bot = false :: marvin_pdu2:bot(),
     mfa_enabled = false :: marvin_pdu2:mfa_enabled(),
     verified = false :: marvin_pdu2:verified(),
-    email :: marvin_pdu2:email()
+    email = undefined :: marvin_pdu2:email()
 }).
 
 -type t() :: #?MODULE{}.
