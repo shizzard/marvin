@@ -1,0 +1,27 @@
+{
+    "op": 0,
+    "d": {
+        "_trace": [
+            "discord-gateway-prd-1-27",
+            "discord-sessions-prd-1-15"
+        ],
+        "guilds": [{
+            "id": "269209661973069825", "unavailable": true
+        }],
+        "private_channels": [],
+        "session_id": "b1d4c1953ab135bb90a700e10957ec15",
+        "user": {
+            "avatar": "1888f192aa92e3de15f795df27c8475e",
+            "bot": true,
+            "discriminator": "8455",
+            "email": null,
+            "id": "341500172515278859",
+            "mfa_enabled": false,
+            "username": "Marvin",
+            "verified": true
+        },
+        "v": 6
+    },
+    "s": 1,
+    "t": "READY"
+}
