@@ -1,6 +1,6 @@
 [{<<"cloak">>,
   {git,"https://github.com/shizzard/cloak.git",
-       {ref,"a3dea1556f4a7df2bffa48bd380157f84896db73"}},
+       {ref,"45345c90ccba9a7a3732cbab83827d3da511444b"}},
   0},
  {<<"cowlib">>,
   {git,"https://github.com/ninenines/cowlib",
