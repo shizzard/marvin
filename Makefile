@@ -1,6 +1,6 @@
 REBAR = ./rebar3
 
-.PHONY: all get-deps compile compile-debug release shell clean dialyze run-release run-tests run-logtail
+.PHONY: all get-deps compile release test shell clean dialyze run-release run-logtail
 
 all: get-deps compile release
 
@@ -8,7 +8,7 @@ get-deps:
 	$(REBAR) get-deps
 
 compile:
-	ERL_COMPILER_OPTIONS='[{d, cloak_dump, "temp"}]' $(REBAR) compile
+	$(REBAR) compile
 
 release:
 	$(REBAR) release
@@ -22,7 +22,7 @@ clean:
 dialyze:
 	$(REBAR) dialyzer
 
-run-tests:
+test:
 	$(REBAR) eunit
 
 run-release:
