@@ -84,34 +84,34 @@
 -type event() :: binary().
 
 -type heartbeat_interval() :: pos_integer().
--type trace_part() :: binary().
+-type trace_part() :: unicode:unicode_binary().
 -type trace() :: [trace_part(), ...].
 
--type token() :: binary().
+-type token() :: unicode:unicode_binary().
 -type compress() :: boolean().
 -type large_threshold() :: 50..250.
 
--type properties_os() :: binary().
--type properties_browser() :: binary().
--type properties_device() :: binary().
--type properties_referrer() :: binary().
--type properties_referring_domain() :: binary().
+-type properties_os() :: unicode:unicode_binary().
+-type properties_browser() :: unicode:unicode_binary().
+-type properties_device() :: unicode:unicode_binary().
+-type properties_referrer() :: unicode:unicode_binary().
+-type properties_referring_domain() :: unicode:unicode_binary().
 
 -type shard() :: non_neg_integer().
 -type total_shards() :: pos_integer().
 -type shard_spec() :: [shard() | total_shards()].
 
--type session_id() :: binary().
+-type session_id() :: unicode:unicode_binary().
 -type protocol_version() :: pos_integer().
 
--type snowflake() :: binary().
--type username() :: binary().
--type discriminator() :: binary().
--type avatar() :: binary().
+-type snowflake() :: unicode:unicode_binary().
+-type username() :: unicode:unicode_binary().
+-type discriminator() :: unicode:unicode_binary().
+-type avatar() :: unicode:unicode_binary().
 -type bot() :: boolean().
 -type mfa_enabled() :: boolean().
 -type verified() :: boolean().
--type email() :: binary().
+-type email() :: unicode:unicode_binary().
 
 -type unavailable() :: boolean().
 

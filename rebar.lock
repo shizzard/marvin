@@ -24,6 +24,7 @@
   {git,"git://github.com/erlang-lager/lager",
        {ref,"6cc6b125ad55835748cd847f03314698ae439aea"}},
   0},
+ {<<"proper">>,{pkg,<<"proper">>,<<"1.2.0">>},0},
  {<<"ranch">>,
   {git,"https://github.com/ninenines/ranch",
        {ref,"132dd4dfee8a0cf6f2bd05d21538898bdbbc70ab"}},
@@ -34,5 +35,6 @@
   0}]}.
 [
 {pkg_hash,[
- {<<"goldrush">>, <<"F06E5D5F1277DA5C413E84D5A2924174182FB108DABB39D5EC548B27424CD106">>}]}
+ {<<"goldrush">>, <<"F06E5D5F1277DA5C413E84D5A2924174182FB108DABB39D5EC548B27424CD106">>},
+ {<<"proper">>, <<"1466492385959412A02871505434E72E92765958C60DBA144B43863554B505A4">>}]}
 ].

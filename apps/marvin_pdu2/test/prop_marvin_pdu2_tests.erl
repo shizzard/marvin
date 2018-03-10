@@ -13,12 +13,23 @@
 %% Tests
 
 
-proper_test_() ->
-    [?PROPTEST(proper_test_for_pdu_mod(PDUMod)) || PDUMod <- pdu_mods()].
+can_construct_test_() ->
+    [?PROPTEST(can_construct(PDUMod)) || PDUMod <- pdu_mods() ++ object_mods()].
 
+can_export_test_() ->
+    [?PROPTEST(can_export(PDUMod)) || PDUMod <- pdu_mods() ++ object_mods()].
 
-proper_test_for_pdu_mod(PDUMod) ->
-    ?FORALL(PDU, erlang:apply(?MODULE, PDUMod, []), is_valid(PDU, PDUMod)).
+can_render_test_() ->
+    [?PROPTEST(can_render(PDUMod)) || PDUMod <- pdu_mods()].
+
+can_construct(PDUMod) ->
+    ?FORALL(PDU, erlang:apply(?MODULE, PDUMod, []), can_construct(PDU, PDUMod)).
+
+can_export(PDUMod) ->
+    ?FORALL(PDU, erlang:apply(?MODULE, PDUMod, []), can_export(PDU, PDUMod)).
+
+can_render(PDUMod) ->
+    ?FORALL(PDU, erlang:apply(?MODULE, PDUMod, []), can_render(PDU, PDUMod)).
 
 
 %% Internals
@@ -28,22 +39,37 @@ pdu_mods() ->
     [
         marvin_pdu2_heartbeat,
         marvin_pdu2_heartbeat_ack,
-        marvin_pdu2_identify_properties,
         marvin_pdu2_identify,
         marvin_pdu2_resume,
         marvin_pdu2_hello,
         marvin_pdu2_invalid_session,
         marvin_pdu2_dispatch_ready,
-        marvin_pdu2_dispatch_resumed,
+        marvin_pdu2_dispatch_resumed
+    ].
 
+object_mods() ->
+    [
+        marvin_pdu2_identify_properties,
         marvin_pdu2_object_user,
         marvin_pdu2_object_guild_unavailable,
         marvin_pdu2_object_channel_dm
     ].
 
 
-is_valid(PDU, PDUMod) ->
+can_construct(PDU, PDUMod) ->
     try
+        io:format("~p~n", [PDUMod:new(PDU)]),
+        Struct = PDUMod:new(PDU),
+        is_tuple(Struct)
+    catch
+        throw:badarg ->
+            false
+    end.
+
+
+can_export(PDU, PDUMod) ->
+    try
+        io:format("~p~n", [PDUMod:export(PDUMod:new(PDU))]),
         NewPDU = PDUMod:export(PDUMod:new(PDU)),
         ensure_same_pdus(PDU, NewPDU),
         true
@@ -51,6 +77,17 @@ is_valid(PDU, PDUMod) ->
         throw:badarg ->
             false;
         throw:not_same_pdus ->
+            false
+    end.
+
+
+can_render(PDU, PDUMod) ->
+    try
+        io:format("~p~n", [marvin_pdu2:render(PDUMod:new(PDU), 100)]),
+        {ok, JSON} = marvin_pdu2:render(PDUMod:new(PDU), 100),
+        is_binary(JSON)
+    catch
+        throw:badarg ->
             false
     end.
 
@@ -82,16 +119,16 @@ marvin_pdu2_heartbeat() ->
 
 marvin_pdu2_identify_properties() ->
     ?MAP([
-        {'$os', non_empty(marvin_pdu2:properties_os())},
-        {'$browser', non_empty(marvin_pdu2:properties_browser())},
-        {'$device', non_empty(marvin_pdu2:properties_device())},
-        {'$referrer', non_empty(marvin_pdu2:properties_referrer())},
-        {'$referring_domain', non_empty(marvin_pdu2:properties_referring_domain())}
+        {'$os', non_empty(proper_unicode:utf8(30))},
+        {'$browser', non_empty(proper_unicode:utf8(30))},
+        {'$device', non_empty(proper_unicode:utf8(30))},
+        {'$referrer', non_empty(proper_unicode:utf8(30))},
+        {'$referring_domain', non_empty(proper_unicode:utf8(30))}
     ]).
 
 marvin_pdu2_identify() ->
     ?MAP([
-        {token, non_empty(marvin_pdu2:token())},
+        {token, non_empty(proper_unicode:utf8(30))},
         {compress, marvin_pdu2:compress()},
         {large_threshold, marvin_pdu2:large_threshold()},
         {properties, marvin_pdu2_identify_properties()},
@@ -104,15 +141,15 @@ marvin_pdu2_identify() ->
 
 marvin_pdu2_resume() ->
     ?MAP([
-        {token, non_empty(marvin_pdu2:token())},
-        {session_id, non_empty(marvin_pdu2:session_id())},
+        {token, non_empty(proper_unicode:utf8(30))},
+        {session_id, non_empty(proper_unicode:utf8(30))},
         {seq, marvin_pdu2:sequence()}
     ]).
 
 marvin_pdu2_hello() ->
     ?MAP([
         {heartbeat_interval, non_empty(marvin_pdu2:heartbeat_interval())},
-        {'_trace', list(non_empty(marvin_pdu2:trace_part()))}
+        {'_trace', list(non_empty(proper_unicode:utf8(20)))}
     ]).
 
 marvin_pdu2_invalid_session() ->
@@ -126,15 +163,15 @@ marvin_pdu2_dispatch_ready() ->
     ?MAP([
         {guilds, list(marvin_pdu2_object_guild_unavailable())},
         {private_channels, list(marvin_pdu2_object_channel_dm())},
-        {session_id, non_empty(marvin_pdu2:session_id())},
+        {session_id, non_empty(proper_unicode:utf8(30))},
         {user, marvin_pdu2_object_user()},
         {v, marvin_pdu2:protocol_version()},
-        {'_trace', list(non_empty(marvin_pdu2:trace_part()))}
+        {'_trace', list(non_empty(proper_unicode:utf8(20)))}
     ]).
 
 marvin_pdu2_dispatch_resumed() ->
     ?MAP([
-        {'_trace', list(non_empty(marvin_pdu2:trace_part()))}
+        {'_trace', list(non_empty(proper_unicode:utf8(20)))}
     ]).
 
 
@@ -143,26 +180,26 @@ marvin_pdu2_dispatch_resumed() ->
 
 marvin_pdu2_object_user() ->
     ?MAP([
-        {id, non_empty(marvin_pdu2:snowflake())},
-        {username, non_empty(marvin_pdu2:username())},
-        {discriminator, non_empty(marvin_pdu2:discriminator())},
-        {avatar, non_empty(marvin_pdu2:avatar())},
+        {id, non_empty(proper_unicode:utf8(20))},
+        {username, non_empty(proper_unicode:utf8(15))},
+        {discriminator, non_empty(proper_unicode:utf8(4))},
+        {avatar, non_empty(proper_unicode:utf8(20))},
         ?OPTIONAL({bot, marvin_pdu2:bot()}),
         ?OPTIONAL({mfa_enabled, marvin_pdu2:mfa_enabled()}),
         ?OPTIONAL({verified, marvin_pdu2:verified()}),
-        ?OPTIONAL({email, non_empty(marvin_pdu2:email())})
+        ?OPTIONAL({email, non_empty(proper_unicode:utf8(15))})
     ]).
 
 marvin_pdu2_object_guild_unavailable() ->
     ?MAP([
-        {id, non_empty(marvin_pdu2:snowflake())},
+        {id, non_empty(proper_unicode:utf8())},
         {unavailable, marvin_pdu2:unavailable()}
     ]).
 
 marvin_pdu2_object_channel_dm() ->
     ?MAP([
-        {id, non_empty(marvin_pdu2:snowflake())},
+        {id, non_empty(proper_unicode:utf8(20))},
         {type, 1},
-        {last_message_id, non_empty(marvin_pdu2:snowflake())},
+        {last_message_id, non_empty(proper_unicode:utf8(20))},
         {recipients, list(marvin_pdu2_object_user())}
     ]).
