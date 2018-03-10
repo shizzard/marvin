@@ -198,7 +198,7 @@ construct_internal(Message) ->
     ).
 
 detect_struct_attrs({Struct, Seq})
-when is_tuple(Struct) andalso is_integer(Seq) andalso Seq > 0 ->
+when is_tuple(Struct) andalso is_integer(Seq) ->
     % This is a very dirty hack obviously. To be fixed later (?).
     Mod = element(1, Struct),
     {Op, Event} = mod_to_op_event(Mod),
@@ -279,15 +279,30 @@ cloak_validate_struct(#?MODULE{op = ?op_dispatch, d = Data, t = Event} = Struct)
 when Event /= undefined ->
     % generic 'dispatch' op
     Mod = dispatch_event_to_mod(Event),
-    {ok, Struct#?MODULE{prot_mod = Mod, d = Mod:new(Data)}};
+    {ok, Struct#?MODULE{prot_mod = Mod, d = cloak_validate_struct_construct_data_safe_temp(Mod, Data)}};
 
 cloak_validate_struct(#?MODULE{op = Op, d = Data, t = undefined} = Struct) ->
     % any other case
     Mod = op_to_mod(Op),
-    {ok, Struct#?MODULE{prot_mod = Mod, d = Mod:new(Data)}};
+    {ok, Struct#?MODULE{prot_mod = Mod, d = cloak_validate_struct_construct_data_safe_temp(Mod, Data)}};
 
 cloak_validate_struct(_Struct) ->
     {error, invalid}.
+
+
+cloak_validate_struct_construct_data_safe_temp(Mod, Data) ->
+    try
+        Mod:new(Data)
+    catch
+        _:_ ->
+            spawn(fun() ->
+                {ok, LogDir} = marvin_config:get(lager, log_root),
+                Filename = filename:join([LogDir, io_lib:format("dump_~p_~p.json", [Mod, marvin_helper_time:timestamp()])]),
+                marvin_log:warn("Failed to construct internal of mod '~p', dumping to '~s'.", [Mod, Filename]),
+                file:write_file(Filename, jiffy:encode(Data))
+            end),
+            #{}
+    end.
 
 
 %% Mappings
