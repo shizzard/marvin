@@ -15,10 +15,7 @@ cloak_validate('_trace', Value) ->
     case lists:all(fun is_binary/1, Value) of
         true -> {ok, Value};
         false -> {error, invalid}
-    end;
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+    end.
 
 
 export(#?MODULE{'_trace' = Trace}) ->

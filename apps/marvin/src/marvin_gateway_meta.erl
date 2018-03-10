@@ -7,10 +7,10 @@
 -record(state, {
     gun_pid :: pid() | undefined,
     gun_stream_reference :: reference() | undefined,
-    last_time_gather :: non_neg_integer(),
-    next_gather_after :: non_neg_integer(),
-    shards_count :: non_neg_integer(),
-    running_shards_count :: non_neg_integer(),
+    last_time_gather = 0 :: non_neg_integer(),
+    next_gather_after = 0 :: non_neg_integer(),
+    shards_count = 0 :: non_neg_integer(),
+    running_shards_count = 0 :: non_neg_integer(),
     wss_url :: binary() | undefined
 }).
 
@@ -44,11 +44,7 @@ start_link() ->
 
 
 init(_) ->
-    {ok, on_start, #state{
-        last_time_gather = 0,
-        shards_count = 0,
-        running_shards_count = 0
-    }, {next_event, internal, ?gun_connect()}}.
+    {ok, on_start, #state{}, {next_event, internal, ?gun_connect()}}.
 
 
 callback_mode() ->

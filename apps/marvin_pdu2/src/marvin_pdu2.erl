@@ -4,8 +4,8 @@
 -record(?MODULE, {
     op :: operation(),
     d = #{} :: data(),
-    s = undefined :: sequence(),
-    t = undefined :: event(),
+    s = undefined :: sequence() | undefined,
+    t = undefined :: event() | undefined,
     prot_mod :: atom()
 }).
 
