@@ -9,7 +9,7 @@
     prot_mod :: atom()
 }).
 
--export([parse/1, decode_json/1, construct_pdu2/1]).
+-export([parse/1, render/2]).
 
 
 %% Defines
@@ -144,8 +144,22 @@
 parse(Binary) ->
     marvin_helper_chain:chain('marvin_pdu2:parse', [
         fun decode_json/1,
-        fun construct_pdu2/1
+        fun construct_internal/1
     ], Binary).
+
+
+-spec render(Struct :: t(), Seq :: sequence()) ->
+    marvin_helper_type:generic_return(
+        OkRet :: binary(),
+        ErrorRet :: term()
+    ).
+
+render(Struct, Seq) ->
+    marvin_helper_chain:chain('marvin_pdu2:render', [
+        fun detect_struct_attrs/1,
+        fun construct_external/1,
+        fun render_json/1
+    ], {Struct, Seq}).
 
 
 %% Internals
@@ -166,14 +180,54 @@ decode_json(Binary) ->
     end.
 
 
--spec construct_pdu2(Message :: #{}) ->
+-spec construct_internal(Message :: #{}) ->
     marvin_helper_type:ok_return(
         OkRet :: t()
     ) | no_return().
 
-construct_pdu2(Message) ->
+construct_internal(Message) ->
     {ok, ?MODULE:new(Message)}.
 
+
+-spec detect_struct_attrs({Struct :: t(), Seq :: sequence()}) ->
+    marvin_helper_type:ok_return(
+        OkRet :: {
+            {Mod :: atom(), Op :: operation(), Event :: event()},
+            Struct :: t()
+        }
+    ).
+
+detect_struct_attrs({Struct, Seq})
+when is_tuple(Struct) andalso is_integer(Seq) andalso Seq > 0 ->
+    % This is a very dirty hack obviously. To be fixed later (?).
+    Mod = element(1, Struct),
+    {Op, Event} = mod_to_op_event(Mod),
+    {ok, {{Mod, Op, Event, Seq}, Struct}}.
+
+
+-spec construct_external({
+    {Mod :: atom(), Op :: operation(), Event :: event(), Seq :: sequence()},
+    Struct :: t()
+}) ->
+    marvin_helper_type:ok_return(OkRet :: map()).
+
+construct_external({{Mod, Op, Event, Seq}, Struct}) ->
+    {ok, #{
+        op => Op,
+        d => Mod:export(Struct),
+        s => Seq,
+        t => Event
+    }}.
+
+
+-spec render_json(External :: map()) ->
+    marvin_helper_type:ok_return(OkRet :: binary()).
+
+render_json(External) ->
+    {ok, jiffy:encode(External)}.
+
+
+%% Cloak callbacks
 
 
 cloak_validate(op, Value) ->
@@ -236,6 +290,9 @@ cloak_validate_struct(_Struct) ->
     {error, invalid}.
 
 
+%% Mappings
+
+
 dispatch_event_to_mod(?event_ready) -> marvin_pdu2_dispatch_ready;
 dispatch_event_to_mod(?event_resumed) -> marvin_pdu2_dispatch_resumed;
 dispatch_event_to_mod(?event_channel_create) -> marvin_pdu2_dispatch_channel_create;
@@ -280,3 +337,48 @@ op_to_mod(?op_request_guild_members) -> marvin_pdu2_request_guild_members;
 op_to_mod(?op_invalid_session) -> marvin_pdu2_invalid_session;
 op_to_mod(?op_hello) -> marvin_pdu2_hello;
 op_to_mod(?op_heartbeat_ack) -> marvin_pdu2_heartbeat_ack.
+
+
+mod_to_op_event(marvin_pdu2_heartbeat) -> {?op_heartbeat, undefined};
+mod_to_op_event(marvin_pdu2_identify) -> {?op_identify, undefined};
+mod_to_op_event(marvin_pdu2_status_update) -> {?op_status_update, undefined};
+mod_to_op_event(marvin_pdu2_voice_state_update) -> {?op_voice_state_update, undefined};
+mod_to_op_event(marvin_pdu2_voice_server_ping) -> {?op_voice_server_ping, undefined};
+mod_to_op_event(marvin_pdu2_resume) -> {?op_resume, undefined};
+mod_to_op_event(marvin_pdu2_reconnect) -> {?op_reconnect, undefined};
+mod_to_op_event(marvin_pdu2_request_guild_members) -> {?op_request_guild_members, undefined};
+mod_to_op_event(marvin_pdu2_invalid_session) -> {?op_invalid_session, undefined};
+mod_to_op_event(marvin_pdu2_hello) -> {?op_hello, undefined};
+mod_to_op_event(marvin_pdu2_heartbeat_ack) -> {?op_heartbeat_ack, undefined};
+
+mod_to_op_event(marvin_pdu2_dispatch_ready) -> {?op_dispatch, ?event_ready};
+mod_to_op_event(marvin_pdu2_dispatch_resumed) -> {?op_dispatch, ?event_resumed};
+mod_to_op_event(marvin_pdu2_dispatch_channel_create) -> {?op_dispatch, ?event_channel_create};
+mod_to_op_event(marvin_pdu2_dispatch_channel_update) -> {?op_dispatch, ?event_channel_update};
+mod_to_op_event(marvin_pdu2_dispatch_channel_delete) -> {?op_dispatch, ?event_channel_delete};
+mod_to_op_event(marvin_pdu2_dispatch_guild_create) -> {?op_dispatch, ?event_guild_create};
+mod_to_op_event(marvin_pdu2_dispatch_guild_update) -> {?op_dispatch, ?event_guild_update};
+mod_to_op_event(marvin_pdu2_dispatch_guild_delete) -> {?op_dispatch, ?event_guild_delete};
+mod_to_op_event(marvin_pdu2_dispatch_guild_ban_add) -> {?op_dispatch, ?event_guild_ban_add};
+mod_to_op_event(marvin_pdu2_dispatch_guild_ban_remove) -> {?op_dispatch, ?event_guild_ban_remove};
+mod_to_op_event(marvin_pdu2_dispatch_guild_emojis_update) -> {?op_dispatch, ?event_guild_emojis_update};
+mod_to_op_event(marvin_pdu2_dispatch_guild_integrations_update) -> {?op_dispatch, ?event_guild_integrations_update};
+mod_to_op_event(marvin_pdu2_dispatch_guild_member_add) -> {?op_dispatch, ?event_guild_member_add};
+mod_to_op_event(marvin_pdu2_dispatch_guild_member_remove) -> {?op_dispatch, ?event_guild_member_remove};
+mod_to_op_event(marvin_pdu2_dispatch_guild_member_update) -> {?op_dispatch, ?event_guild_member_update};
+mod_to_op_event(marvin_pdu2_dispatch_guild_members_chunk) -> {?op_dispatch, ?event_guild_members_chunk};
+mod_to_op_event(marvin_pdu2_dispatch_guild_role_create) -> {?op_dispatch, ?event_guild_role_create};
+mod_to_op_event(marvin_pdu2_dispatch_guild_role_update) -> {?op_dispatch, ?event_guild_role_update};
+mod_to_op_event(marvin_pdu2_dispatch_guild_role_delete) -> {?op_dispatch, ?event_guild_role_delete};
+mod_to_op_event(marvin_pdu2_dispatch_message_create) -> {?op_dispatch, ?event_message_create};
+mod_to_op_event(marvin_pdu2_dispatch_message_update) -> {?op_dispatch, ?event_message_update};
+mod_to_op_event(marvin_pdu2_dispatch_message_delete) -> {?op_dispatch, ?event_message_delete};
+mod_to_op_event(marvin_pdu2_dispatch_message_delete_bulk) -> {?op_dispatch, ?event_message_delete_bulk};
+mod_to_op_event(marvin_pdu2_dispatch_message_reaction_add) -> {?op_dispatch, ?event_message_reaction_add};
+mod_to_op_event(marvin_pdu2_dispatch_message_reaction_remove) -> {?op_dispatch, ?event_message_reaction_remove};
+mod_to_op_event(marvin_pdu2_dispatch_message_reaction_remove_all) -> {?op_dispatch, ?event_message_reaction_remove_all};
+mod_to_op_event(marvin_pdu2_dispatch_presence_update) -> {?op_dispatch, ?event_presence_update};
+mod_to_op_event(marvin_pdu2_dispatch_typing_start) -> {?op_dispatch, ?event_typing_start};
+mod_to_op_event(marvin_pdu2_dispatch_user_update) -> {?op_dispatch, ?event_user_update};
+mod_to_op_event(marvin_pdu2_dispatch_voice_state_update) -> {?op_dispatch, ?event_voice_state_update};
+mod_to_op_event(marvin_pdu2_dispatch_voice_server_update) -> {?op_dispatch, ?event_voice_server_update}.
