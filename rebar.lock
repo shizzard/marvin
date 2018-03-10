@@ -1,3 +1,4 @@
+{"1.1.0",
 [{<<"cloak">>,
   {git,"https://github.com/shizzard/cloak.git",
        {ref,"45345c90ccba9a7a3732cbab83827d3da511444b"}},
@@ -6,10 +7,7 @@
   {git,"https://github.com/ninenines/cowlib",
        {ref,"754affa48f749229952e54c8949299c8bf7c5e32"}},
   1},
- {<<"goldrush">>,
-  {git,"https://github.com/basho/goldrush.git",
-       {ref,"8f1b715d36b650ec1e1f5612c00e28af6ab0de82"}},
-  1},
+ {<<"goldrush">>,{pkg,<<"goldrush">>,<<"0.1.9">>},1},
  {<<"gun">>,
   {git,"https://github.com/ninenines/gun.git",
        {ref,"3aab5ef99b98f618f701510d76bcf639b915794f"}},
@@ -23,8 +21,8 @@
        {ref,"98d0502c81c957468c5cff2ff7e2fa87f3173dd3"}},
   0},
  {<<"lager">>,
-  {git,"git://github.com/basho/lager",
-       {ref,"81eaef0ce98fdbf64ab95665e3bc2ec4b24c7dac"}},
+  {git,"git://github.com/erlang-lager/lager",
+       {ref,"6cc6b125ad55835748cd847f03314698ae439aea"}},
   0},
  {<<"ranch">>,
   {git,"https://github.com/ninenines/ranch",
@@ -33,4 +31,8 @@
  {<<"recon">>,
   {git,"https://github.com/ferd/recon.git",
        {ref,"fcc1a7db6d367234171ab24a3d1762f94e57ff22"}},
-  0}].
+  0}]}.
+[
+{pkg_hash,[
+ {<<"goldrush">>, <<"F06E5D5F1277DA5C413E84D5A2924174182FB108DABB39D5EC548B27424CD106">>}]}
+].
