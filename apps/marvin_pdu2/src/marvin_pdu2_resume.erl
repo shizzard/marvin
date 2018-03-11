@@ -4,13 +4,17 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    token :: marvin_pdu2:token(),
-    session_id :: marvin_pdu2:session_id(),
-    seq :: marvin_pdu2:sequence()
+    token :: token(),
+    session_id :: session_id(),
+    seq :: sequence()
 }).
 
+-type token() :: marvin_pdu2:token().
+-type session_id() :: marvin_pdu2:session_id().
+-type sequence() :: marvin_pdu2:sequence().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([token/0, session_id/0, sequence/0, t/0]).
 
 
 cloak_validate(token, Value) when is_binary(Value) andalso Value /= <<>> ->

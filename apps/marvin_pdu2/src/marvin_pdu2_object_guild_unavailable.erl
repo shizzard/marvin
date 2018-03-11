@@ -4,12 +4,15 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    id :: marvin_pdu2:snowflake(),
-    unavailable :: marvin_pdu2:unavailable()
+    id :: id(),
+    unavailable :: unavailable()
 }).
 
+-type id() :: marvin_pdu2:snowflake().
+-type unavailable() :: boolean().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([id/0, unavailable/0, t/0]).
 
 
 cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->

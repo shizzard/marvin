@@ -52,7 +52,8 @@ object_mods() ->
         marvin_pdu2_identify_properties,
         marvin_pdu2_object_user,
         marvin_pdu2_object_guild_unavailable,
-        marvin_pdu2_object_channel_dm
+        marvin_pdu2_object_channel_dm,
+        marvin_pdu2_object_role
     ].
 
 
@@ -83,8 +84,8 @@ can_export(PDU, PDUMod) ->
 
 can_render(PDU, PDUMod) ->
     try
-        io:format("~p~n", [marvin_pdu2:render(PDUMod:new(PDU), 100)]),
-        {ok, JSON} = marvin_pdu2:render(PDUMod:new(PDU), 100),
+        io:format("~p~n", [marvin_pdu2:render(PDUMod:new(PDU))]),
+        {ok, JSON} = marvin_pdu2:render(PDUMod:new(PDU)),
         is_binary(JSON)
     catch
         throw:badarg ->
@@ -115,7 +116,7 @@ ensure_same_pdus_fold(Key, Value, ResultPDU) ->
 
 
 marvin_pdu2_heartbeat() ->
-    ?MAP([{plain_value, marvin_pdu2:sequence()}]).
+    ?MAP([{plain_value, marvin_pdu2_heartbeat:sequence()}]).
 
 marvin_pdu2_identify_properties() ->
     ?MAP([
@@ -129,8 +130,8 @@ marvin_pdu2_identify_properties() ->
 marvin_pdu2_identify() ->
     ?MAP([
         {token, non_empty(proper_unicode:utf8(30))},
-        {compress, marvin_pdu2:compress()},
-        {large_threshold, marvin_pdu2:large_threshold()},
+        {compress, marvin_pdu2_identify:compress()},
+        {large_threshold, marvin_pdu2_identify:large_threshold()},
         {properties, marvin_pdu2_identify_properties()},
         {shard, ?SUCHTHAT(
             [Shard, TotalShards],
@@ -143,12 +144,12 @@ marvin_pdu2_resume() ->
     ?MAP([
         {token, non_empty(proper_unicode:utf8(30))},
         {session_id, non_empty(proper_unicode:utf8(30))},
-        {seq, marvin_pdu2:sequence()}
+        {seq, marvin_pdu2_resume:sequence()}
     ]).
 
 marvin_pdu2_hello() ->
     ?MAP([
-        {heartbeat_interval, non_empty(marvin_pdu2:heartbeat_interval())},
+        {heartbeat_interval, marvin_pdu2_hello:heartbeat_interval()},
         {'_trace', list(non_empty(proper_unicode:utf8(20)))}
     ]).
 
@@ -165,7 +166,7 @@ marvin_pdu2_dispatch_ready() ->
         {private_channels, list(marvin_pdu2_object_channel_dm())},
         {session_id, non_empty(proper_unicode:utf8(30))},
         {user, marvin_pdu2_object_user()},
-        {v, marvin_pdu2:protocol_version()},
+        {v, marvin_pdu2_dispatch_ready:protocol_version()},
         {'_trace', list(non_empty(proper_unicode:utf8(20)))}
     ]).
 
@@ -184,16 +185,16 @@ marvin_pdu2_object_user() ->
         {username, non_empty(proper_unicode:utf8(15))},
         {discriminator, non_empty(proper_unicode:utf8(4))},
         {avatar, non_empty(proper_unicode:utf8(20))},
-        ?OPTIONAL({bot, marvin_pdu2:bot()}),
-        ?OPTIONAL({mfa_enabled, marvin_pdu2:mfa_enabled()}),
-        ?OPTIONAL({verified, marvin_pdu2:verified()}),
+        ?OPTIONAL({bot, marvin_pdu2_object_user:bot()}),
+        ?OPTIONAL({mfa_enabled, marvin_pdu2_object_user:mfa_enabled()}),
+        ?OPTIONAL({verified, marvin_pdu2_object_user:verified()}),
         ?OPTIONAL({email, non_empty(proper_unicode:utf8(15))})
     ]).
 
 marvin_pdu2_object_guild_unavailable() ->
     ?MAP([
         {id, non_empty(proper_unicode:utf8())},
-        {unavailable, marvin_pdu2:unavailable()}
+        {unavailable, marvin_pdu2_object_guild_unavailable:unavailable()}
     ]).
 
 marvin_pdu2_object_channel_dm() ->
@@ -202,4 +203,16 @@ marvin_pdu2_object_channel_dm() ->
         {type, 1},
         {last_message_id, non_empty(proper_unicode:utf8(20))},
         {recipients, list(marvin_pdu2_object_user())}
+    ]).
+
+marvin_pdu2_object_role() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {name, non_empty(proper_unicode:utf8(15))},
+        {permissions, marvin_pdu2_object_role:permissions()},
+        {position, marvin_pdu2_object_role:position()},
+        {color, marvin_pdu2_object_role:color()},
+        {mentionable, marvin_pdu2_object_role:mentionable()},
+        {managed, marvin_pdu2_object_role:managed()},
+        {hoist, marvin_pdu2_object_role:hoist()}
     ]).

@@ -8,7 +8,7 @@
 
 
 
--spec get(App :: atom(), Keys :: [atom()]) ->
+-spec get(App :: atom(), Keys :: [atom()] | atom()) ->
     marvin_helper_type:generic_return(
         OkRet :: term(),
         ErrorRet :: undefined
@@ -21,7 +21,7 @@ get(App, Keys) ->
 
 -spec get_impl(
     Proplist :: marvin_helper_type:proplist(KeyT :: atom(), ValueT :: term()) | undefined,
-    Keys :: [atom()]
+    Keys :: [atom()] | atom()
 ) ->
     marvin_helper_type:generic_return(
         OkRet :: term(),

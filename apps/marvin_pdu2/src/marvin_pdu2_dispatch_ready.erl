@@ -4,17 +4,26 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    guilds :: [marvin_pdu2_object_guild_unavailable:t()],
-    private_channels :: [marvin_pdu2_object_channel_dm:t()],
-    session_id :: marvin_pdu2:session_id(),
-    user :: marvin_pdu2_object_user:t(),
-    v :: marvin_pdu2:protocol_version(),
-    '_trace' :: marvin_pdu2:trace()
+    guilds :: guilds(),
+    private_channels :: private_channels(),
+    session_id :: session_id(),
+    user :: user(),
+    v :: protocol_version(),
+    '_trace' :: trace()
 }).
 
-
+-type guilds() :: [marvin_pdu2_object_guild_unavailable:t()].
+-type private_channels() :: [marvin_pdu2_object_channel_dm:t()].
+-type user() :: marvin_pdu2_object_user:t().
+-type session_id() :: marvin_pdu2:session_id().
+-type protocol_version() :: pos_integer().
+-type trace() :: marvin_pdu2:trace().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([
+    guilds/0, private_channels/0, user/0, session_id/0,
+    protocol_version/0, trace/0, t/0
+]).
 
 
 %% Interface

@@ -4,11 +4,13 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    '_trace' :: marvin_pdu2:trace()
+    '_trace' :: trace()
 }).
 
+-type trace() :: marvin_pdu2:trace().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([trace/0, t/0]).
 
 
 cloak_validate('_trace', Value) ->

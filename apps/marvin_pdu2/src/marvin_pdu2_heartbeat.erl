@@ -4,11 +4,13 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    plain_value :: marvin_pdu2:sequence()
+    plain_value :: sequence()
 }).
 
+-type sequence() :: marvin_pdu2:sequence().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([sequence/0, t/0]).
 
 
 cloak_validate(plain_value, Value) when is_integer(Value) andalso Value > 0 ->

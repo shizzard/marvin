@@ -4,15 +4,21 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    '$os' :: marvin_pdu2:properties_os(),
-    '$browser' :: marvin_pdu2:properties_browser(),
-    '$device' :: marvin_pdu2:properties_device(),
-    '$referrer' :: marvin_pdu2:properties_referrer(),
-    '$referring_domain' :: marvin_pdu2:properties_referring_domain()
+    '$os' :: os(),
+    '$browser' :: browser(),
+    '$device' :: device(),
+    '$referrer' :: referrer(),
+    '$referring_domain' :: referring_domain()
 }).
 
+-type os() :: unicode:unicode_binary().
+-type browser() :: unicode:unicode_binary().
+-type device() :: unicode:unicode_binary().
+-type referrer() :: unicode:unicode_binary().
+-type referring_domain() :: unicode:unicode_binary().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([os/0, browser/0, device/0, referrer/0, referring_domain/0, t/0]).
 
 
 

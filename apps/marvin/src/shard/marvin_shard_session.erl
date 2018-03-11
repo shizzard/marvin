@@ -426,7 +426,7 @@ get_pdu_identify(#state{
             '$referrer' => LibraryWeb,
             '$referring_domain' => LibraryWeb
         }
-    }), S0#state.last_seq).
+    })).
 
 
 

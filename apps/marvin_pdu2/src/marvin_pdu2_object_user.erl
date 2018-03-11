@@ -4,18 +4,30 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    id :: marvin_pdu2:snowflake(),
-    username :: marvin_pdu2:username(),
-    discriminator :: marvin_pdu2:discriminator(),
-    avatar :: marvin_pdu2:avatar(),
-    bot = false :: marvin_pdu2:bot(),
-    mfa_enabled = false :: marvin_pdu2:mfa_enabled(),
-    verified = false :: marvin_pdu2:verified(),
-    email = undefined :: marvin_pdu2:email()
+    id :: id(),
+    username :: username(),
+    discriminator :: discriminator(),
+    avatar :: avatar(),
+    bot = false :: bot(),
+    mfa_enabled = false :: mfa_enabled(),
+    verified = false :: verified(),
+    email = undefined :: email()
 }).
 
+-type id() :: marvin_pdu2:snowflake().
+-type username() :: unicode:unicode_binary().
+-type discriminator() :: unicode:unicode_binary().
+-type avatar() :: unicode:unicode_binary().
+-type bot() :: boolean().
+-type mfa_enabled() :: boolean().
+-type verified() :: boolean().
+-type email() :: unicode:unicode_binary().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([
+    id/0, username/0, discriminator/0, avatar/0, bot/0,
+    mfa_enabled/0, verified/0, email/0, t/0
+]).
 
 
 cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->

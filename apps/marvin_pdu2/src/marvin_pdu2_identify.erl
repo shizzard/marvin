@@ -4,17 +4,28 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    token :: marvin_pdu2:token(),
-    compress :: marvin_pdu2:compress(),
-    large_threshold :: marvin_pdu2:large_threshold(),
-    properties :: marvin_pdu2_identify_properties:t(),
-    shard :: marvin_pdu2:shard_spec(),
-    prot_shard :: marvin_pdu2:shard(),
-    prot_total_shards :: marvin_pdu2:total_shards()
+    token :: token(),
+    compress :: compress(),
+    large_threshold :: large_threshold(),
+    properties :: properties(),
+    shard :: shard(),
+    prot_shard :: prot_shard(),
+    prot_total_shards :: prot_total_shards()
 }).
 
+-type token() :: marvin_pdu2:token().
+-type compress() :: boolean().
+-type large_threshold() :: 50..250.
+-type properties() :: marvin_pdu2_identify_properties:t().
+-type shard() :: marvin_pdu2:shard_spec().
+-type prot_shard() :: marvin_pdu2:shard().
+-type prot_total_shards() :: marvin_pdu2:total_shards().
 -type t() :: #?MODULE{}.
--export_type([t/0]).
+
+-export_type([
+    token/0, compress/0, large_threshold/0, properties/0, shard/0,
+    prot_shard/0, prot_total_shards/0, t/0
+]).
 
 
 cloak_validate(token, Value) when is_binary(Value) andalso Value /= <<>> ->

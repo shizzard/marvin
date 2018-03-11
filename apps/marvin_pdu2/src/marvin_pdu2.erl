@@ -9,7 +9,7 @@
     prot_mod :: atom()
 }).
 
--export([parse/1, render/2]).
+-export([parse/1, render/1]).
 
 
 %% Defines
@@ -83,50 +83,22 @@
 -type sequence() :: pos_integer().
 -type event() :: binary().
 
--type heartbeat_interval() :: pos_integer().
 -type trace_part() :: unicode:unicode_binary().
 -type trace() :: [trace_part(), ...].
-
--type token() :: unicode:unicode_binary().
--type compress() :: boolean().
--type large_threshold() :: 50..250.
-
--type properties_os() :: unicode:unicode_binary().
--type properties_browser() :: unicode:unicode_binary().
--type properties_device() :: unicode:unicode_binary().
--type properties_referrer() :: unicode:unicode_binary().
--type properties_referring_domain() :: unicode:unicode_binary().
 
 -type shard() :: non_neg_integer().
 -type total_shards() :: pos_integer().
 -type shard_spec() :: [shard() | total_shards()].
 
+-type token() :: unicode:unicode_binary().
 -type session_id() :: unicode:unicode_binary().
--type protocol_version() :: pos_integer().
 
 -type snowflake() :: unicode:unicode_binary().
--type username() :: unicode:unicode_binary().
--type discriminator() :: unicode:unicode_binary().
--type avatar() :: unicode:unicode_binary().
--type bot() :: boolean().
--type mfa_enabled() :: boolean().
--type verified() :: boolean().
--type email() :: unicode:unicode_binary().
-
--type unavailable() :: boolean().
-
 
 -export_type([
     operation/0, data/0, sequence/0, event/0,
-    heartbeat_interval/0, trace_part/0, trace/0,
-    token/0, compress/0, large_threshold/0,
-    properties_os/0, properties_browser/0, properties_device/0,
-    properties_referrer/0, properties_referring_domain/0,
-    shard/0, total_shards/0, shard_spec/0,
-    session_id/0, protocol_version/0,
-    snowflake/0, username/0, discriminator/0, avatar/0,
-    bot/0, mfa_enabled/0, verified/0, email/0,
-    unavailable/0
+    trace_part/0, trace/0, shard/0, total_shards/0,
+    shard_spec/0, token/0, session_id/0, snowflake/0
 ]).
 
 
@@ -148,18 +120,18 @@ parse(Binary) ->
     ], Binary).
 
 
--spec render(Struct :: t(), Seq :: sequence()) ->
+-spec render(Struct :: t()) ->
     marvin_helper_type:generic_return(
         OkRet :: binary(),
         ErrorRet :: term()
     ).
 
-render(Struct, Seq) ->
+render(Struct) ->
     marvin_helper_chain:chain('marvin_pdu2:render', [
         fun detect_struct_attrs/1,
         fun construct_external/1,
         fun render_json/1
-    ], {Struct, Seq}).
+    ], Struct).
 
 
 %% Internals
@@ -189,7 +161,7 @@ construct_internal(Message) ->
     {ok, ?MODULE:new(Message)}.
 
 
--spec detect_struct_attrs({Struct :: t(), Seq :: sequence()}) ->
+-spec detect_struct_attrs(Struct :: t()) ->
     marvin_helper_type:ok_return(
         OkRet :: {
             {Mod :: atom(), Op :: operation(), Event :: event()},
@@ -197,25 +169,23 @@ construct_internal(Message) ->
         }
     ).
 
-detect_struct_attrs({Struct, Seq})
-when is_tuple(Struct) andalso is_integer(Seq) ->
+detect_struct_attrs(Struct) when is_tuple(Struct) ->
     % This is a very dirty hack obviously. To be fixed later (?).
     Mod = element(1, Struct),
     {Op, Event} = mod_to_op_event(Mod),
-    {ok, {{Mod, Op, Event, Seq}, Struct}}.
+    {ok, {{Mod, Op, Event}, Struct}}.
 
 
 -spec construct_external({
-    {Mod :: atom(), Op :: operation(), Event :: event(), Seq :: sequence()},
+    {Mod :: atom(), Op :: operation(), Event :: event()},
     Struct :: t()
 }) ->
     marvin_helper_type:ok_return(OkRet :: map()).
 
-construct_external({{Mod, Op, Event, Seq}, Struct}) ->
+construct_external({{Mod, Op, Event}, Struct}) ->
     {ok, #{
         op => Op,
         d => Mod:export(Struct),
-        s => Seq,
         t => Event
     }}.
 
