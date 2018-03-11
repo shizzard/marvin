@@ -54,7 +54,8 @@ object_mods() ->
         marvin_pdu2_object_guild_unavailable,
         marvin_pdu2_object_channel_dm,
         marvin_pdu2_object_role,
-        marvin_pdu2_object_member
+        marvin_pdu2_object_member,
+        marvin_pdu2_object_emoji
     ].
 
 
@@ -226,4 +227,14 @@ marvin_pdu2_object_member() ->
         {mute, marvin_pdu2_object_member:mute()},
         {joined_at, non_empty(proper_unicode:utf8(16))},
         {deaf, marvin_pdu2_object_member:deaf()}
+    ]).
+
+marvin_pdu2_object_emoji() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {name, non_empty(proper_unicode:utf8(15))},
+        {roles, list(non_empty(proper_unicode:utf8(20)))},
+        {require_colons, marvin_pdu2_object_emoji:require_colons()},
+        {managed, marvin_pdu2_object_emoji:managed()},
+        {animated, marvin_pdu2_object_emoji:animated()}
     ]).
