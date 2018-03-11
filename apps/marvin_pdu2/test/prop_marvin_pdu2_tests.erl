@@ -53,7 +53,8 @@ object_mods() ->
         marvin_pdu2_object_user,
         marvin_pdu2_object_guild_unavailable,
         marvin_pdu2_object_channel_dm,
-        marvin_pdu2_object_role
+        marvin_pdu2_object_role,
+        marvin_pdu2_object_member
     ].
 
 
@@ -215,4 +216,14 @@ marvin_pdu2_object_role() ->
         {mentionable, marvin_pdu2_object_role:mentionable()},
         {managed, marvin_pdu2_object_role:managed()},
         {hoist, marvin_pdu2_object_role:hoist()}
+    ]).
+
+marvin_pdu2_object_member() ->
+    ?MAP([
+        {user, marvin_pdu2_object_user()},
+        {roles, list(non_empty(proper_unicode:utf8(20)))},
+        {nick, non_empty(proper_unicode:utf8(15))},
+        {mute, marvin_pdu2_object_member:mute()},
+        {joined_at, non_empty(proper_unicode:utf8(16))},
+        {deaf, marvin_pdu2_object_member:deaf()}
     ]).
