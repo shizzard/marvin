@@ -1,0 +1,29 @@
+{
+    "id": "277784920368087040",
+    "parent_id": "361119489477181442",
+    "name": "Коммуна 'Pünzel Ariki'",
+    "type": 2,
+    "position": 7,
+    "user_limit": 0,
+    "bitrate": 64000,
+    "permission_overwrites": [
+        {
+            "type": "role",
+            "id": "269209661973069825",
+            "deny": 36700160,
+            "allow": 1024
+        },
+        {
+            "type": "member",
+            "id": "269871814010732546",
+            "deny": 0,
+            "allow": 36701184
+        },
+        {
+            "type": "member",
+            "id": "270791717190369283",
+            "deny": 0,
+            "allow": 36701184
+        }
+    ]
+}

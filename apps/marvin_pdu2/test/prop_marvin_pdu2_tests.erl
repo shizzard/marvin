@@ -55,7 +55,9 @@ object_mods() ->
         marvin_pdu2_object_channel_dm,
         marvin_pdu2_object_role,
         marvin_pdu2_object_member,
-        marvin_pdu2_object_emoji
+        marvin_pdu2_object_emoji,
+        marvin_pdu2_object_permission_overwrite,
+        marvin_pdu2_object_guild_channel
     ].
 
 
@@ -237,4 +239,43 @@ marvin_pdu2_object_emoji() ->
         {require_colons, marvin_pdu2_object_emoji:require_colons()},
         {managed, marvin_pdu2_object_emoji:managed()},
         {animated, marvin_pdu2_object_emoji:animated()}
+    ]).
+
+marvin_pdu2_object_permission_overwrite() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {type, oneof([<<"member">>, <<"role">>])},
+        {deny, marvin_pdu2_object_permission_overwrite:deny()},
+        {allow, marvin_pdu2_object_permission_overwrite:allow()}
+    ]).
+
+marvin_pdu2_object_guild_channel() ->
+    oneof([
+        % marvin_pdu2_object_guild_channel_category(),
+        marvin_pdu2_object_guild_channel_text(),
+        marvin_pdu2_object_guild_channel_voice()
+    ]).
+
+marvin_pdu2_object_guild_channel_text() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {type, 0},
+        {parent_id, non_empty(proper_unicode:utf8(20))},
+        {name, non_empty(proper_unicode:utf8(20))},
+        {topic, non_empty(proper_unicode:utf8(20))},
+        {last_message_id, non_empty(proper_unicode:utf8(20))},
+        {position, marvin_pdu2_object_guild_channel:position()},
+        {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
+    ]).
+
+marvin_pdu2_object_guild_channel_voice() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {type, 2},
+        {parent_id, non_empty(proper_unicode:utf8(20))},
+        {name, non_empty(proper_unicode:utf8(20))},
+        {position, marvin_pdu2_object_guild_channel:position()},
+        {user_limit, marvin_pdu2_object_guild_channel:user_limit()},
+        {bitrate, marvin_pdu2_object_guild_channel:bitrate()},
+        {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
     ]).

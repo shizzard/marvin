@@ -1,0 +1,28 @@
+{
+    "name": "welcome",
+    "last_message_id": "269826707815530507",
+    "id": "269209661973069825",
+    "type": 0,
+    "topic": "",
+    "position": 0,
+    "permission_overwrites": [
+        {
+            "type": "role",
+            "id": "269213289978920960",
+            "deny": 805763152,
+            "allow": 65537
+        },
+        {
+            "type": "role",
+            "id": "269209661973069825",
+            "deny": 805763153,
+            "allow": 65536
+        },
+        {
+            "type": "role",
+            "id": "269213127835516929",
+            "deny": 0,
+            "allow": 0
+        }
+    ]
+}
