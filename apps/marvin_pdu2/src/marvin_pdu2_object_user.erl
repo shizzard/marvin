@@ -7,7 +7,7 @@
     id :: id(),
     username :: username(),
     discriminator :: discriminator(),
-    avatar :: avatar(),
+    avatar = undefined :: avatar() | undefined,
     bot = false :: bot(),
     mfa_enabled = false :: mfa_enabled(),
     verified = false :: verified(),
@@ -38,6 +38,9 @@ cloak_validate(username, Value) when is_binary(Value) andalso Value /= <<>> ->
 
 cloak_validate(discriminator, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
+
+cloak_validate(avatar, null) ->
+    {ok, undefined};
 
 cloak_validate(avatar, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};

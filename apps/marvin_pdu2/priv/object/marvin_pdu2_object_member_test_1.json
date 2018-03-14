@@ -1,0 +1,14 @@
+{
+    "user": {
+        "username": "Duck in the house",
+        "id": "269871761787453440",
+        "discriminator": "7527",
+        "avatar": "a598b58132983d7819448099cc34ee9d"
+    },
+    "roles": [
+        "270845668619190273"
+    ],
+    "mute": false,
+    "joined_at": "2017-01-14T16:54:15.899000+00:00",
+    "deaf": false
+}

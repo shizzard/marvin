@@ -6,7 +6,7 @@
 -record(?MODULE, {
     user :: user(),
     roles :: roles(),
-    nick :: nick(),
+    nick = undefined :: nick() | undefined,
     mute :: mute(),
     joined_at :: joined_at(),
     deaf :: deaf()
@@ -31,6 +31,9 @@ cloak_validate(roles, Value) when is_list(Value) ->
         true -> {ok, Value};
         false -> {error, invalid}
     end;
+
+cloak_validate(nick, null) ->
+    {ok, undefined};
 
 cloak_validate(nick, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};

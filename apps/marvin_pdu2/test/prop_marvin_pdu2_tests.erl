@@ -44,7 +44,8 @@ pdu_mods() ->
         marvin_pdu2_hello,
         marvin_pdu2_invalid_session,
         marvin_pdu2_dispatch_ready,
-        marvin_pdu2_dispatch_resumed
+        marvin_pdu2_dispatch_resumed,
+        marvin_pdu2_dispatch_guild_create
     ].
 
 object_mods() ->
@@ -59,7 +60,8 @@ object_mods() ->
         marvin_pdu2_object_permission_overwrite,
         marvin_pdu2_object_guild_channel,
         marvin_pdu2_object_game,
-        marvin_pdu2_object_presence
+        marvin_pdu2_object_presence,
+        marvin_pdu2_object_voice_state
     ].
 
 
@@ -179,6 +181,41 @@ marvin_pdu2_dispatch_ready() ->
 marvin_pdu2_dispatch_resumed() ->
     ?MAP([
         {'_trace', list(non_empty(proper_unicode:utf8(20)))}
+    ]).
+
+marvin_pdu2_dispatch_guild_create() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {name, non_empty(proper_unicode:utf8(15))},
+        {icon, non_empty(proper_unicode:utf8(15))},
+        {splash, non_empty(proper_unicode:utf8(15))},
+        {owner, marvin_pdu2_dispatch_guild_create:owner()},
+        {owner_id, non_empty(proper_unicode:utf8(20))},
+        {permissions, marvin_pdu2_dispatch_guild_create:permissions()},
+        {region, non_empty(proper_unicode:utf8(15))},
+        {afk_channel_id, non_empty(proper_unicode:utf8(20))},
+        {afk_timeout, marvin_pdu2_dispatch_guild_create:afk_timeout()},
+        {embed_enabled, marvin_pdu2_dispatch_guild_create:embed_enabled()},
+        {embed_channel_id, non_empty(proper_unicode:utf8(20))},
+        {verification_level, marvin_pdu2_dispatch_guild_create:verification_level()},
+        {default_message_notifications, marvin_pdu2_dispatch_guild_create:default_message_notifications()},
+        {explicit_content_filter, marvin_pdu2_dispatch_guild_create:explicit_content_filter()},
+        {roles, list(non_empty(proper_unicode:utf8(20)))},
+        {emojis, list(marvin_pdu2_object_emoji())},
+        {features, list(non_empty(proper_unicode:utf8(15)))},
+        {mfa_level, marvin_pdu2_dispatch_guild_create:mfa_level()},
+        {application_id, non_empty(proper_unicode:utf8(20))},
+        {widget_enabled, marvin_pdu2_dispatch_guild_create:widget_enabled()},
+        {widget_channel_id, non_empty(proper_unicode:utf8(20))},
+        {system_channel_id, non_empty(proper_unicode:utf8(20))},
+        {joined_at, non_empty(proper_unicode:utf8(15))},
+        {large, marvin_pdu2_dispatch_guild_create:large()},
+        {unavailable, marvin_pdu2_dispatch_guild_create:unavailable()},
+        {member_count, marvin_pdu2_dispatch_guild_create:member_count()},
+        {voice_states, list(marvin_pdu2_object_voice_state())},
+        {members, list(marvin_pdu2_object_member())},
+        {channels, list(marvin_pdu2_object_guild_channel())},
+        {presences, list(marvin_pdu2_object_presence())}
     ]).
 
 
@@ -319,4 +356,17 @@ marvin_pdu2_object_presence() ->
         ])},
         {game, marvin_pdu2_object_game()},
         {status, oneof([<<"online">>, <<"offline">>, <<"idle">>, <<"dnd">>])}
+    ]).
+
+marvin_pdu2_object_voice_state() ->
+    ?MAP([
+        {user_id, non_empty(proper_unicode:utf8(20))},
+        {channel_id, non_empty(proper_unicode:utf8(20))},
+        {session_id, non_empty(proper_unicode:utf8(20))},
+        {suppress, marvin_pdu2_object_voice_state:suppress()},
+        {self_video, marvin_pdu2_object_voice_state:self_video()},
+        {self_mute, marvin_pdu2_object_voice_state:self_mute()},
+        {self_deaf, marvin_pdu2_object_voice_state:self_deaf()},
+        {mute, marvin_pdu2_object_voice_state:mute()},
+        {deaf, marvin_pdu2_object_voice_state:deaf()}
     ]).
