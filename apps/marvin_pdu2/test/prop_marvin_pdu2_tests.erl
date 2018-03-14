@@ -57,7 +57,9 @@ object_mods() ->
         marvin_pdu2_object_member,
         marvin_pdu2_object_emoji,
         marvin_pdu2_object_permission_overwrite,
-        marvin_pdu2_object_guild_channel
+        marvin_pdu2_object_guild_channel,
+        marvin_pdu2_object_game,
+        marvin_pdu2_object_presence
     ].
 
 
@@ -278,4 +280,43 @@ marvin_pdu2_object_guild_channel_voice() ->
         {user_limit, marvin_pdu2_object_guild_channel:user_limit()},
         {bitrate, marvin_pdu2_object_guild_channel:bitrate()},
         {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
+    ]).
+
+marvin_pdu2_object_game() ->
+    oneof([
+        marvin_pdu2_object_game_playing(),
+        marvin_pdu2_object_game_streaming(),
+        marvin_pdu2_object_game_listening()
+    ]).
+
+marvin_pdu2_object_game_playing() ->
+    ?MAP([
+        {type, 0},
+        {timestamps, ?MAP([
+            {<<"start">>, marvin_pdu2_object_game:timestamps()}
+        ])},
+        {name, non_empty(proper_unicode:utf8(20))}
+    ]).
+
+marvin_pdu2_object_game_streaming() ->
+    ?MAP([
+        {type, 0},
+        {url, non_empty(proper_unicode:utf8(20))},
+        {name, non_empty(proper_unicode:utf8(30))},
+        {details, non_empty(proper_unicode:utf8(20))}
+    ]).
+
+marvin_pdu2_object_game_listening() ->
+    ?MAP([
+        {type, 0},
+        {name, non_empty(proper_unicode:utf8(30))}
+    ]).
+
+marvin_pdu2_object_presence() ->
+    ?MAP([
+        {user, ?MAP([
+            {<<"id">>, non_empty(proper_unicode:utf8(20))}
+        ])},
+        {game, marvin_pdu2_object_game()},
+        {status, oneof([<<"online">>, <<"offline">>, <<"idle">>, <<"dnd">>])}
     ]).

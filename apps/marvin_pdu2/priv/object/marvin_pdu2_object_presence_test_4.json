@@ -1,0 +1,15 @@
+{
+    "user": {
+        "id": "242257112208506881"
+    },
+    "status": "online",
+    "game": {
+        "url": "https://www.twitch.tv/zoolfian",
+        "type": 1,
+        "name": "12 ЧАСОВОЙ РАНГОВЫЙ СТРИМ ПО ЛИГЕ ЛЕГЕНД",
+        "details": "League of Legends",
+        "assets": {
+            "large_image": "twitch:zoolfian"
+        }
+    }
+}
