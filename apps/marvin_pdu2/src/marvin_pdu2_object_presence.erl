@@ -51,6 +51,9 @@ export(#?MODULE{
 }) ->
     #{
         <<"user">> => #{<<"id">> => User},
-        <<"game">> => marvin_pdu2_object_game:export(Game),
+        <<"game">> => case Game of
+            undefined -> null;
+            _ -> marvin_pdu2_object_game:export(Game)
+        end,
         <<"status">> => Status
     }.

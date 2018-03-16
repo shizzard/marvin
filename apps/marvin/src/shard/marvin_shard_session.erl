@@ -174,8 +174,7 @@ handle_call_incoming_event(Event, S0) ->
                 marvin_pdu2_hello ->
                     handle_call_incoming_event_hello(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_heartbeat_ack ->
-                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
-                    handle_call_incoming_event_heartbeat_ack(marvin_pdu2:d(Struct), S1);
+                    handle_call_incoming_event_heartbeat_ack(marvin_pdu2:d(Struct), S0);
                 _ ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     handle_call_incoming_event_generic(Struct, S1)

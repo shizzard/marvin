@@ -62,7 +62,7 @@ export(#?MODULE{
     #{
         <<"user">> => marvin_pdu2_object_user:export(User),
         <<"roles">> => Roles,
-        <<"nick">> => Nick,
+        <<"nick">> => marvin_pdu2:nullify(Nick),
         <<"mute">> => Mute,
         <<"joined_at">> => JoinedAt,
         <<"deaf">> => Deaf

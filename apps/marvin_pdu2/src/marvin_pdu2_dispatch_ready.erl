@@ -13,7 +13,7 @@
 }).
 
 -type guilds() :: [marvin_pdu2_object_guild_unavailable:t()].
--type private_channels() :: [marvin_pdu2_object_channel_dm:t()].
+-type private_channels() :: [marvin_pdu2_object_channel:t()].
 -type user() :: marvin_pdu2_object_user:t().
 -type session_id() :: marvin_pdu2:session_id().
 -type protocol_version() :: pos_integer().
@@ -34,7 +34,7 @@ cloak_validate(guilds, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_guild_unavailable:new(Item) || Item <- Value]};
 
 cloak_validate(private_channels, Value) when is_list(Value) ->
-    {ok, [marvin_pdu2_object_channel_dm:new(Item) || Item <- Value]};
+    {ok, [marvin_pdu2_object_channel:new(Item) || Item <- Value]};
 
 cloak_validate(session_id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
@@ -65,7 +65,7 @@ export(#?MODULE{
 }) ->
     #{
         <<"guilds">> => [marvin_pdu2_object_guild_unavailable:export(Item) || Item <- Guilds],
-        <<"private_channels">> => [marvin_pdu2_object_channel_dm:export(Item) || Item <- PrivateChannels],
+        <<"private_channels">> => [marvin_pdu2_object_channel:export(Item) || Item <- PrivateChannels],
         <<"session_id">> => SessionId,
         <<"user">> => marvin_pdu2_object_user:export(User),
         <<"v">> => Version,

@@ -78,9 +78,9 @@ export(#?MODULE{
         <<"id">> => Id,
         <<"username">> => Username,
         <<"discriminator">> => Discriminator,
-        <<"avatar">> => Avatar,
+        <<"avatar">> => marvin_pdu2:nullify(Avatar),
         <<"bot">> => Bot,
         <<"mfa_enabled">> => MfaEnabled,
         <<"verified">> => Verified,
-        <<"email">> => Email
+        <<"email">> => marvin_pdu2:nullify(Email)
     }.

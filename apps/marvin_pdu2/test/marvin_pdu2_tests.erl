@@ -19,7 +19,7 @@ can_get_valid_parsed_pdu_test_() ->
                 catch
                     _:_ ->
                         io:format("Stacktrace:~n~p~n", [erlang:get_stacktrace()]),
-                        false
+                        throw(test_failed)
                 end
             end | List]
         end,
@@ -41,7 +41,7 @@ can_get_valid_parsed_object_test_() ->
                 catch
                     _:_ ->
                         io:format("Stacktrace:~n~p~n", [erlang:get_stacktrace()]),
-                        false
+                        throw(test_failed)
                 end
             end | List]
         end,

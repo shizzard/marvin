@@ -9,7 +9,7 @@
     prot_mod :: atom()
 }).
 
--export([parse/1, render/1]).
+-export([parse/1, render/1, nullify/1]).
 
 
 %% Defines
@@ -134,6 +134,13 @@ render(Struct) ->
     ], Struct).
 
 
+-spec nullify(Term :: term()) ->
+    Ret :: null | term().
+
+nullify(undefined) -> null;
+nullify(Term) -> Term.
+
+
 %% Internals
 
 
@@ -223,7 +230,7 @@ cloak_validate(d, Value) ->
 
 cloak_validate(s, Value)
 when null == Value orelse undefined == Value ->
-    {ok, 0};
+    {ok, undefined};
 
 cloak_validate(s, Value)
 when is_integer(Value) andalso Value > 0 ->

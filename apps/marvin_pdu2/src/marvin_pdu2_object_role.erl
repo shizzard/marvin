@@ -17,7 +17,7 @@
 -type id() :: marvin_pdu2:snowflake().
 -type name() :: unicode:unicode_binary().
 -type permissions() :: non_neg_integer().
--type position() :: pos_integer().
+-type position() :: non_neg_integer().
 -type color() :: non_neg_integer().
 -type mentionable() :: boolean().
 -type managed() :: boolean().
@@ -39,7 +39,7 @@ cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
 cloak_validate(permissions, Value) when is_integer(Value) andalso Value >= 0 ->
     {ok, Value};
 
-cloak_validate(position, Value) when is_integer(Value) andalso Value > 0 ->
+cloak_validate(position, Value) when is_integer(Value) andalso Value >= 0 ->
     {ok, Value};
 
 cloak_validate(color, Value) when is_integer(Value) andalso Value >= 0 ->

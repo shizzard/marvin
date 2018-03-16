@@ -6,16 +6,16 @@
 -record(?MODULE, {
     id :: id(),
     name :: name(),
-    icon :: icon(),
-    splash :: splash(),
-    owner :: owner(),
+    icon = undefined :: icon() | undefined,
+    splash = undefined :: splash() | undefined,
+    owner = undefined :: owner() | undefined,
     owner_id :: owner_id(),
-    permissions :: permissions(),
+    permissions = undefined :: permissions() | undefined,
     region :: region(),
     afk_channel_id :: afk_channel_id(),
     afk_timeout :: afk_timeout(),
-    embed_enabled :: embed_enabled(),
-    embed_channel_id :: embed_channel_id(),
+    embed_enabled = undefined :: embed_enabled() | undefined,
+    embed_channel_id = unsefined :: embed_channel_id() | undefined,
     verification_level :: verification_level(),
     default_message_notifications :: default_message_notifications(),
     explicit_content_filter :: explicit_content_filter(),
@@ -23,18 +23,18 @@
     emojis :: emojis(),
     features :: features(),
     mfa_level :: mfa_level(),
-    application_id :: application_id(),
-    widget_enabled :: widget_enabled(),
-    widget_channel_id :: widget_channel_id(),
-    system_channel_id :: system_channel_id(),
-    joined_at :: joined_at(),
-    large :: large(),
-    unavailable :: unavailable(),
-    member_count :: member_count(),
-    voice_states :: voice_states(),
-    members :: members(),
-    channels :: channels(),
-    presences :: presences()
+    application_id = undefined :: application_id() | undefined,
+    widget_enabled = undefined :: widget_enabled() | undefined,
+    widget_channel_id = undefined :: widget_channel_id() | undefined,
+    system_channel_id = undefined :: system_channel_id() | undefined,
+    joined_at = undefined :: joined_at() | undefined,
+    large = undefined :: large() | undefined,
+    unavailable = undefined :: unavailable() | undefined,
+    member_count = undefined :: member_count() | undefined,
+    voice_states = [] :: voice_states(),
+    members = [] :: members(),
+    channels = [] :: channels(),
+    presences = [] :: presences()
 }).
 
 -define(verification_level_none, 0).
@@ -82,7 +82,7 @@
 -type member_count() :: pos_integer().
 -type voice_states() :: [marvin_pdu2_object_voice_state:t()].
 -type members() :: [marvin_pdu2_object_member:t()].
--type channels() :: [marvin_pdu2_object_guild_channel:t()].
+-type channels() :: [marvin_pdu2_object_channel:t()].
 -type presences() :: [marvin_pdu2_object_presence:t()].
 -type t() :: #?MODULE{}.
 
@@ -106,8 +106,14 @@ cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
 cloak_validate(icon, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
+cloak_validate(icon, null) ->
+    {ok, undefined};
+
 cloak_validate(splash, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
+
+cloak_validate(splash, null) ->
+    {ok, undefined};
 
 cloak_validate(owner, Value) when is_boolean(Value) ->
     {ok, Value};
@@ -120,6 +126,9 @@ cloak_validate(permissions, Value) when is_integer(Value) andalso Value > 0 ->
 
 cloak_validate(region, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
+
+cloak_validate(afk_channel_id, null) ->
+    {ok, undefined};
 
 cloak_validate(afk_channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
@@ -159,10 +168,7 @@ when is_integer(Value) andalso (
     {ok, Value};
 
 cloak_validate(roles, Value) when is_list(Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
+    {ok, [marvin_pdu2_object_role:new(Item) || Item <- Value]};
 
 cloak_validate(emojis, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_emoji:new(Item) || Item <- Value]};
@@ -180,6 +186,9 @@ when is_integer(Value) andalso (
 ) ->
     {ok, Value};
 
+cloak_validate(application_id, null) ->
+    {ok, undefined};
+
 cloak_validate(application_id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
@@ -188,6 +197,9 @@ cloak_validate(widget_enabled, Value) when is_boolean(Value) ->
 
 cloak_validate(widget_channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
+
+cloak_validate(system_channel_id, null) ->
+    {ok, undefined};
 
 cloak_validate(system_channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
@@ -211,7 +223,7 @@ cloak_validate(members, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_member:new(Item) || Item <- Value]};
 
 cloak_validate(channels, Value) when is_list(Value) ->
-    {ok, [marvin_pdu2_object_guild_channel:new(Item) || Item <- Value]};
+    {ok, [marvin_pdu2_object_channel:new(Item) || Item <- Value]};
 
 cloak_validate(presences, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_presence:new(Item) || Item <- Value]};
@@ -256,33 +268,33 @@ export(#?MODULE{
     #{
         <<"id">> => Id,
         <<"name">> => Name,
-        <<"icon">> => Icon,
-        <<"splash">> => Splash,
-        <<"owner">> => Owner,
+        <<"icon">> => marvin_pdu2:nullify(Icon),
+        <<"splash">> => marvin_pdu2:nullify(Splash),
+        <<"owner">> => marvin_pdu2:nullify(Owner),
         <<"owner_id">> => OwnerId,
-        <<"permissions">> => Permissions,
+        <<"permissions">> => marvin_pdu2:nullify(Permissions),
         <<"region">> => Region,
-        <<"afk_channel_id">> => AfkChannelId,
+        <<"afk_channel_id">> => marvin_pdu2:nullify(AfkChannelId),
         <<"afk_timeout">> => AfkTimeout,
-        <<"embed_enabled">> => EmbedEnabled,
-        <<"embed_channel_id">> => EmbedChannelId,
+        <<"embed_enabled">> => marvin_pdu2:nullify(EmbedEnabled),
+        <<"embed_channel_id">> => marvin_pdu2:nullify(EmbedChannelId),
         <<"verification_level">> => VerificationLevel,
         <<"default_message_notifications">> => DefaultMessageNotifications,
         <<"explicit_content_filter">> => ExplicitContentFilter,
-        <<"roles">> => Roles,
+        <<"roles">> => [marvin_pdu2_object_role:export(Item) || Item <- Roles],
         <<"emojis">> => [marvin_pdu2_object_emoji:export(Item) || Item <- Emojis],
         <<"features">> => Features,
         <<"mfa_level">> => MfaLevel,
-        <<"application_id">> => ApplicationId,
-        <<"widget_enabled">> => WidgetEnabled,
-        <<"widget_channel_id">> => WidgetChannelId,
-        <<"system_channel_id">> => SystemChannelId,
-        <<"joined_at">> => JoinedAt,
-        <<"large">> => Large,
-        <<"unavailable">> => Unavailable,
-        <<"member_count">> => MemberCount,
+        <<"application_id">> => marvin_pdu2:nullify(ApplicationId),
+        <<"widget_enabled">> => marvin_pdu2:nullify(WidgetEnabled),
+        <<"widget_channel_id">> => marvin_pdu2:nullify(WidgetChannelId),
+        <<"system_channel_id">> => marvin_pdu2:nullify(SystemChannelId),
+        <<"joined_at">> => marvin_pdu2:nullify(JoinedAt),
+        <<"large">> => marvin_pdu2:nullify(Large),
+        <<"unavailable">> => marvin_pdu2:nullify(Unavailable),
+        <<"member_count">> => marvin_pdu2:nullify(MemberCount),
         <<"voice_states">> => [marvin_pdu2_object_voice_state:export(Item) || Item <- VoiceStates],
         <<"members">> => [marvin_pdu2_object_member:export(Item) || Item <- Members],
-        <<"channels">> => [marvin_pdu2_object_guild_channel:export(Item) || Item <- Channels],
+        <<"channels">> => [marvin_pdu2_object_channel:export(Item) || Item <- Channels],
         <<"presences">> => [marvin_pdu2_object_presence:export(Item) || Item <- Presences]
     }.

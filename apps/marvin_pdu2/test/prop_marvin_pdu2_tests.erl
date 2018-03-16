@@ -5,9 +5,13 @@
 
 -compile([export_all, nowarn_export_all]).
 
--define(PROPTEST(A), ?_assert(proper:quickcheck(A, [{to_file, user}]))).
+-define(PROPTEST(A), {
+    timeout, 100,
+    ?_assert(proper:quickcheck(A, [{to_file, user}]))
+}).
 -define(MAP(Typedef), ?LET(Proplist, Typedef, maps:from_list(lists:flatten(Proplist)))).
 -define(OPTIONAL(FieldTypedef), oneof([[FieldTypedef], []])).
+-define(NULLABLE(FieldTypedef), oneof([FieldTypedef, null])).
 
 
 %% Tests
@@ -53,12 +57,11 @@ object_mods() ->
         marvin_pdu2_identify_properties,
         marvin_pdu2_object_user,
         marvin_pdu2_object_guild_unavailable,
-        marvin_pdu2_object_channel_dm,
         marvin_pdu2_object_role,
         marvin_pdu2_object_member,
         marvin_pdu2_object_emoji,
         marvin_pdu2_object_permission_overwrite,
-        marvin_pdu2_object_guild_channel,
+        marvin_pdu2_object_channel,
         marvin_pdu2_object_game,
         marvin_pdu2_object_presence,
         marvin_pdu2_object_voice_state
@@ -67,25 +70,26 @@ object_mods() ->
 
 can_construct(PDU, PDUMod) ->
     try
-        io:format("~p~n", [PDUMod:new(PDU)]),
         Struct = PDUMod:new(PDU),
         is_tuple(Struct)
     catch
         throw:badarg ->
+            ?debugMsg(PDUMod),
             false
     end.
 
 
 can_export(PDU, PDUMod) ->
     try
-        io:format("~p~n", [PDUMod:export(PDUMod:new(PDU))]),
         NewPDU = PDUMod:export(PDUMod:new(PDU)),
         ensure_same_pdus(PDU, NewPDU),
         true
     catch
         throw:badarg ->
+            ?debugMsg(PDUMod),
             false;
         throw:not_same_pdus ->
+            ?debugMsg(PDUMod),
             false
     end.
 
@@ -200,7 +204,7 @@ marvin_pdu2_dispatch_guild_create() ->
         {verification_level, marvin_pdu2_dispatch_guild_create:verification_level()},
         {default_message_notifications, marvin_pdu2_dispatch_guild_create:default_message_notifications()},
         {explicit_content_filter, marvin_pdu2_dispatch_guild_create:explicit_content_filter()},
-        {roles, list(non_empty(proper_unicode:utf8(20)))},
+        {roles, list(marvin_pdu2_object_role())},
         {emojis, list(marvin_pdu2_object_emoji())},
         {features, list(non_empty(proper_unicode:utf8(15)))},
         {mfa_level, marvin_pdu2_dispatch_guild_create:mfa_level()},
@@ -214,7 +218,7 @@ marvin_pdu2_dispatch_guild_create() ->
         {member_count, marvin_pdu2_dispatch_guild_create:member_count()},
         {voice_states, list(marvin_pdu2_object_voice_state())},
         {members, list(marvin_pdu2_object_member())},
-        {channels, list(marvin_pdu2_object_guild_channel())},
+        {channels, list(marvin_pdu2_object_channel())},
         {presences, list(marvin_pdu2_object_presence())}
     ]).
 
@@ -227,7 +231,7 @@ marvin_pdu2_object_user() ->
         {id, non_empty(proper_unicode:utf8(20))},
         {username, non_empty(proper_unicode:utf8(15))},
         {discriminator, non_empty(proper_unicode:utf8(4))},
-        {avatar, non_empty(proper_unicode:utf8(20))},
+        {avatar, ?NULLABLE(non_empty(proper_unicode:utf8(20)))},
         ?OPTIONAL({bot, marvin_pdu2_object_user:bot()}),
         ?OPTIONAL({mfa_enabled, marvin_pdu2_object_user:mfa_enabled()}),
         ?OPTIONAL({verified, marvin_pdu2_object_user:verified()}),
@@ -238,14 +242,6 @@ marvin_pdu2_object_guild_unavailable() ->
     ?MAP([
         {id, non_empty(proper_unicode:utf8())},
         {unavailable, marvin_pdu2_object_guild_unavailable:unavailable()}
-    ]).
-
-marvin_pdu2_object_channel_dm() ->
-    ?MAP([
-        {id, non_empty(proper_unicode:utf8(20))},
-        {type, 1},
-        {last_message_id, non_empty(proper_unicode:utf8(20))},
-        {recipients, list(marvin_pdu2_object_user())}
     ]).
 
 marvin_pdu2_object_role() ->
@@ -264,7 +260,7 @@ marvin_pdu2_object_member() ->
     ?MAP([
         {user, marvin_pdu2_object_user()},
         {roles, list(non_empty(proper_unicode:utf8(20)))},
-        {nick, non_empty(proper_unicode:utf8(15))},
+        ?OPTIONAL({nick, ?NULLABLE(non_empty(proper_unicode:utf8(15)))}),
         {mute, marvin_pdu2_object_member:mute()},
         {joined_at, non_empty(proper_unicode:utf8(16))},
         {deaf, marvin_pdu2_object_member:deaf()}
@@ -288,34 +284,45 @@ marvin_pdu2_object_permission_overwrite() ->
         {allow, marvin_pdu2_object_permission_overwrite:allow()}
     ]).
 
-marvin_pdu2_object_guild_channel() ->
+marvin_pdu2_object_channel() ->
     oneof([
-        % marvin_pdu2_object_guild_channel_category(),
-        marvin_pdu2_object_guild_channel_text(),
-        marvin_pdu2_object_guild_channel_voice()
+        marvin_pdu2_object_channel_text(),
+        marvin_pdu2_object_channel_dm(),
+        marvin_pdu2_object_channel_voice()
+        % marvin_pdu2_object_channel_category()
     ]).
 
-marvin_pdu2_object_guild_channel_text() ->
+marvin_pdu2_object_channel_text() ->
     ?MAP([
         {id, non_empty(proper_unicode:utf8(20))},
+        ?OPTIONAL({guild_id, non_empty(proper_unicode:utf8(20))}),
         {type, 0},
         {parent_id, non_empty(proper_unicode:utf8(20))},
         {name, non_empty(proper_unicode:utf8(20))},
         {topic, non_empty(proper_unicode:utf8(20))},
         {last_message_id, non_empty(proper_unicode:utf8(20))},
-        {position, marvin_pdu2_object_guild_channel:position()},
+        {position, marvin_pdu2_object_channel:position()},
         {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
     ]).
 
-marvin_pdu2_object_guild_channel_voice() ->
+marvin_pdu2_object_channel_dm() ->
     ?MAP([
         {id, non_empty(proper_unicode:utf8(20))},
+        {type, 1},
+        {last_message_id, non_empty(proper_unicode:utf8(20))},
+        {recipients, list(marvin_pdu2_object_user())}
+    ]).
+
+marvin_pdu2_object_channel_voice() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        ?OPTIONAL({guild_id, non_empty(proper_unicode:utf8(20))}),
         {type, 2},
         {parent_id, non_empty(proper_unicode:utf8(20))},
         {name, non_empty(proper_unicode:utf8(20))},
-        {position, marvin_pdu2_object_guild_channel:position()},
-        {user_limit, marvin_pdu2_object_guild_channel:user_limit()},
-        {bitrate, marvin_pdu2_object_guild_channel:bitrate()},
+        {position, marvin_pdu2_object_channel:position()},
+        {user_limit, marvin_pdu2_object_channel:user_limit()},
+        {bitrate, marvin_pdu2_object_channel:bitrate()},
         {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
     ]).
 
@@ -361,7 +368,8 @@ marvin_pdu2_object_presence() ->
 marvin_pdu2_object_voice_state() ->
     ?MAP([
         {user_id, non_empty(proper_unicode:utf8(20))},
-        {channel_id, non_empty(proper_unicode:utf8(20))},
+        ?OPTIONAL({guild_id, non_empty(proper_unicode:utf8(20))}),
+        {channel_id, ?NULLABLE(non_empty(proper_unicode:utf8(20)))},
         {session_id, non_empty(proper_unicode:utf8(20))},
         {suppress, marvin_pdu2_object_voice_state:suppress()},
         {self_video, marvin_pdu2_object_voice_state:self_video()},

@@ -2,20 +2,11 @@
 -compile({parse_transform, cloak_transform}).
 
 -export([export/1]).
-% {
-%     "user_id":"157537831718223872",
-%     "channel_id":"321356437068578817",
-%     "session_id":"73571a5bd3a647efd6a7c92fae522f65",
-%     "suppress":false,
-%     "self_video":false,
-%     "self_mute":false,
-%     "self_deaf":false,
-%     "mute":false,
-%     "deaf":false
-% }
+
 -record(?MODULE, {
     user_id :: user_id(),
-    channel_id :: channel_id(),
+    guild_id = undefined :: guild_id() | undefined,
+    channel_id = undefined :: channel_id() | undefined,
     session_id :: session_id(),
     suppress :: suppress(),
     self_video :: self_video(),
@@ -26,6 +17,7 @@
 }).
 
 -type user_id() :: marvin_pdu2:snowflake().
+-type guild_id() :: marvin_pdu2:snowflake().
 -type channel_id() :: marvin_pdu2:snowflake().
 -type session_id() :: marvin_pdu2:snowflake().
 -type suppress() :: boolean().
@@ -37,13 +29,19 @@
 -type t() :: #?MODULE{}.
 
 -export_type([
-    user_id/0, channel_id/0, session_id/0, suppress/0, self_video/0,
+    user_id/0, guild_id/0, channel_id/0, session_id/0, suppress/0, self_video/0,
     self_mute/0, self_deaf/0, mute/0, deaf/0, t/0
 ]).
 
 
 cloak_validate(user_id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
+
+cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
+    {ok, Value};
+
+cloak_validate(channel_id, null) ->
+    {ok, undefined};
 
 cloak_validate(channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
@@ -75,6 +73,7 @@ cloak_validate(_, _) ->
 
 export(#?MODULE{
     user_id = UserId,
+    guild_id = GuildId,
     channel_id = ChannelId,
     session_id = SessionId,
     suppress = Suppress,
@@ -86,7 +85,8 @@ export(#?MODULE{
 }) ->
     #{
         <<"user_id">> => UserId,
-        <<"channel_id">> => ChannelId,
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
+        <<"channel_id">> => marvin_pdu2:nullify(ChannelId),
         <<"session_id">> => SessionId,
         <<"suppress">> => Suppress,
         <<"self_video">> => SelfVideo,
