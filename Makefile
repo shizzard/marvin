@@ -13,6 +13,9 @@ compile:
 release:
 	$(REBAR) release
 
+release-prod:
+	$(REBAR) as prod release
+
 shell: compile
 	$(REBAR) shell
 
@@ -27,6 +30,9 @@ test:
 
 run-release:
 	_build/default/rel/marvin/bin/marvin console
+
+run-release-prod:
+	_build/prod/rel/marvin/bin/marvin console
 
 run-logtail:
 	tail -F _build/default/rel/marvin/log/debug.log

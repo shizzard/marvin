@@ -46,7 +46,7 @@ init([ShardId, ShardName, SessionPid, WssUrl]) ->
         shard_name = ShardName,
         session_pid = SessionPid,
         wss_url = WssUrl
-    }, {next_event, internal, ?gun_connect()}}.
+    }, {state_timeout, 0, ?gun_connect()}}.
 
 
 callback_mode() ->
@@ -58,11 +58,11 @@ callback_mode() ->
 % Initial state.
 % Connecting to websocket endpoint.
 
-handle_event(internal, ?gun_connect(), on_start, #state{
+handle_event(state_timeout, ?gun_connect(), on_start, #state{
     wss_url = <<"wss://", WssHostBin/binary>>
 } = S0) ->
     WssHost = binary_to_list(WssHostBin),
-    {ok, WssPort} = marvin_config:get(marvin, [discord, gateway, port]),
+    {ok, WssPort} = marvin_config:get_integer(marvin, [discord, gateway, port]),
     marvin_log:debug(
         "Shard '~p' connecting to wss endpoint '~s:~p'",
         [S0#state.shard_name, WssHost, WssPort]
@@ -79,7 +79,7 @@ handle_event(info, ?gun_up(_ConnPid, _Proto), on_gun_connect, #state{
     wss_pid = WssPid
 } = S0) ->
     {ok, ProtoVersion} = marvin_config:get(marvin, [discord, gateway, protocol_version]),
-    {ok, Compress} = marvin_config:get(marvin, [discord, gateway, compress]),
+    {ok, Compress} = marvin_config:get_boolean(marvin, [discord, gateway, compress]),
     marvin_log:debug(
         "Shard '~p' trying to upgrade connection to websocket state with opts: version '~s', compress '~p'",
         [S0#state.shard_name, ProtoVersion, Compress]
@@ -97,12 +97,12 @@ handle_event(info, ?gun_ws_upgrade(_ConnPid, _Ret, _Headers), on_gun_up, S0) ->
         "Shard '~p' successfully upgraded connection to websocket state",
         [S0#state.shard_name]
     ),
-    {next_state, on_wss_up, S0, {next_event, internal, ?start_tx()}};
+    {next_state, on_wss_up, S0, {state_timeout, 0, ?start_tx()}};
 
 % Starting pairing `marvin_shard_tx`.
 % Switching to 'on_pre_operational' state immediately.
 
-handle_event(internal, ?start_tx(), on_wss_up, #state{
+handle_event(state_timeout, ?start_tx(), on_wss_up, #state{
     shard_id = ShardId,
     wss_pid = WssPid
 } = S0) ->
@@ -111,12 +111,12 @@ handle_event(internal, ?start_tx(), on_wss_up, #state{
     true = erlang:link(TxPid),
     {next_state, on_pre_operational, S0#state{
         tx_pid = TxPid
-    }, {next_event, internal, ?report_operational()}};
+    }, {state_timeout, 0, ?report_operational()}};
 
 % Reporting operational state to parent `marvin_shard_session`.
 % Switching to operational state.
 
-handle_event(internal, ?report_operational(), on_pre_operational, #state{
+handle_event(state_timeout, ?report_operational(), on_pre_operational, #state{
     session_pid = SessionPid,
     tx_pid = TxPid
 } = S0) ->

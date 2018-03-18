@@ -402,8 +402,8 @@ get_pdu_identify(#state{
         fun($\n) -> false; (_) -> true end,
         os:cmd("uname -rs"))
     ),
-    {ok, Compress} = marvin_config:get(marvin, [discord, gateway, compress]),
-    {ok, LargeThreshold} = marvin_config:get(marvin, [discord, gateway, large_threshold]),
+    {ok, Compress} = marvin_config:get_boolean(marvin, [discord, gateway, compress]),
+    {ok, LargeThreshold} = marvin_config:get_integer(marvin, [discord, gateway, large_threshold]),
     {ok, LibraryWeb} = marvin_config:get(marvin, [system_info, library_web]),
     {ok, LibraryName} = marvin_config:get(marvin, [system_info, library_name]),
     {ok, LibraryVersion} = marvin_config:get(marvin, [system_info, library_version]),

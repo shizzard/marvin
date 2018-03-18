@@ -44,7 +44,7 @@ start_link() ->
 
 
 init(_) ->
-    {ok, on_start, #state{}, {next_event, internal, ?gun_connect()}}.
+    {ok, on_start, #state{}, {state_timeout, 0, ?gun_connect()}}.
 
 
 callback_mode() ->
@@ -54,9 +54,9 @@ callback_mode() ->
 %% States
 
 
-handle_event(internal, ?gun_connect(), on_start, S0) ->
+handle_event(state_timeout, ?gun_connect(), on_start, S0) ->
     {ok, ApiHost} = marvin_config:get(marvin, [discord, api, host]),
-    {ok, ApiPort} = marvin_config:get(marvin, [discord, api, port]),
+    {ok, ApiPort} = marvin_config:get_integer(marvin, [discord, api, port]),
     marvin_log:info("Connecting to '~s:~p' to gather meta", [ApiHost, ApiPort]),
     {ok, GunPid} = gun:open(ApiHost, ApiPort),
     {next_state, on_gun_connect, S0#state{
