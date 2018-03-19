@@ -1,0 +1,7 @@
+marvin:
+  restart: on-failure
+  labels:
+    container_group: marvinapp
+  environment:
+    - MARVIN_APP_ACCESS_TOKEN=MzQxNTAwMTcyNTE1Mjc4ODU5.DZGDYA.uAsH5GUmb9tu3RVSBuKlHFRk3I4
+  image: 'shizzard/marvin:release-0.4.2'

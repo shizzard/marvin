@@ -70,7 +70,7 @@ init([ShardId, ShardName, TxPid, HeartbeatInterval]) ->
         shard_name = ShardName,
         tx_pid = TxPid,
         heartbeat_interval = HeartbeatInterval,
-        last_seq = 0,
+        last_seq = 1,
         timer_reference = TRef,
         waiting_for_ack = false
     }}.
@@ -126,7 +126,7 @@ handle_info_do_beat(#state{
     heartbeat_interval = HeartbeatInterval,
     last_seq = LastSeq
 } = S0) ->
-    {ok, Event} = marvin_pdu:render(marvin_pdu_heartbeat:new(LastSeq)),
+    {ok, Event} = marvin_pdu2:render(marvin_pdu2_heartbeat:new(#{plain_value => LastSeq})),
     marvin_log:debug("Shard '~p' now heartbeats", [S0#state.shard_name]),
     ok = marvin_shard_tx:send_sync(TxPid, Event),
     {ok, TRef} = schedule_beat(HeartbeatInterval),

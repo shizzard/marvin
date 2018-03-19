@@ -1,7 +1,6 @@
 -module(marvin_shard_session).
 -behaviour(gen_server).
 
--include_lib("marvin_pdu/include/marvin_pdu.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
