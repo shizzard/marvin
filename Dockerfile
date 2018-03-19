@@ -45,8 +45,8 @@ ENV MARVIN_APP_SYSINFO_LIBRARY_NAME=Marvin
 ENV MARVIN_APP_SYSINFO_LIBRARY_WEB=http://shizzard.github.io/marvin
 ENV MARVIN_APP_LAGER_LOG_ROOT=/var/log/marvin/
 
-
 # Runtime
+EXPOSE 8080
 HEALTHCHECK --interval=10s --timeout=5s --start-period=1m --retries=5 CMD ["marvin", "ping"]
 ENTRYPOINT ["marvin"]
 CMD ["foreground"]

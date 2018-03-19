@@ -1,0 +1,8 @@
+{application, marvin_metrics, [
+    {description, "Marvin metrics"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {mod, {marvin_metrics_app, []}},
+    {applications, [kernel, stdlib]},
+    {env, []}
+]}.
