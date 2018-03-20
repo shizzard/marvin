@@ -7,7 +7,7 @@
 -record(state, {
     gun_pid :: pid() | undefined,
     gun_stream_reference :: reference() | undefined,
-    http_req_start_time = {0, 0, 0} :: erlang:timestamp(),
+    http_req_start_time = erlang:monotonic_time() :: integer(),
     next_gather_after = 0 :: non_neg_integer(),
     shards_count = 0 :: non_neg_integer(),
     running_shards_count = 0 :: non_neg_integer(),
@@ -77,7 +77,7 @@ handle_event(state_timeout, ?gather_meta(), on_gun_up, S0) ->
         {<<"authorization">>, Authorization}
     ]),
     {next_state, on_gather_meta_headers, S0#state{
-        http_req_start_time = os:timestamp(),
+        http_req_start_time = erlang:monotonic_time(),
         gun_stream_reference = StreamRef
     }};
 
@@ -179,9 +179,9 @@ handle_event({call, From}, ?get_shards_count(), _AnyState, S0) ->
 
 do_report_http_req_duration(HttpReqStartTime) ->
     prometheus_histogram:observe(
-        marvin_gateway_meta_http_request_duration_us,
-        [],
-        timer:now_diff(os:timestamp(), HttpReqStartTime)
+        marvin_gateway_http_request_duration_seconds,
+        [meta],
+        erlang:monotonic_time() - HttpReqStartTime
     ),
     ok.
 
@@ -191,7 +191,7 @@ do_report_http_req_duration(HttpReqStartTime) ->
 
 do_report_http_request_interval(IntervalSec) ->
     prometheus_gauge:set(
-        marvin_gateway_meta_http_request_interval_s,
+        marvin_gateway_http_request_interval_seconds,
         IntervalSec
     ),
     ok.
@@ -202,7 +202,7 @@ do_report_http_request_interval(IntervalSec) ->
 
 do_report_shards_count(ShardsCount) ->
     prometheus_gauge:set(
-        marvin_gateway_meta_shards_count_i,
+        marvin_gateway_shards_count_items,
         ShardsCount
     ),
     ok.

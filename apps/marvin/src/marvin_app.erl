@@ -22,15 +22,17 @@ declare_metrics() ->
     application:ensure_started(prometheus),
     %% marvin_gateway_meta
     prometheus_histogram:new([
-        {name, marvin_gateway_meta_http_request_duration_us},
-        {help, "Gateway metadata request duration in microseconds"},
-        {buckets, prometheus_buckets:new({linear, 100000, 50000, 10})}
+        {name, marvin_gateway_http_request_duration_seconds},
+        {help, "Gateway metadata request duration in seconds"},
+        {buckets, prometheus_buckets:new({linear, 0.05, 0.05, 20})},
+        {labels, [kind]}
     ]),
     prometheus_gauge:new([
-        {name, marvin_gateway_meta_http_request_interval_s},
-        {help, "Gateway metadata requests interval in seconds"}
+        {name, marvin_gateway_http_request_interval_seconds},
+        {help, "Gateway metadata requests interval in seconds"},
+        {duration_unit, false}
     ]),
     prometheus_gauge:new([
-        {name, marvin_gateway_meta_shards_count_i},
+        {name, marvin_gateway_shards_count_items},
         {help, "Amount of shards started"}
     ]).
