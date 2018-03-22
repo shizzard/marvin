@@ -35,4 +35,10 @@ declare_metrics() ->
     prometheus_gauge:new([
         {name, marvin_gateway_shards_count_items},
         {help, "Amount of shards started"}
+    ]),
+    %% marvin_guild
+    prometheus_gauge:new([
+        {name, marvin_guild_presence_state},
+        {help, "Amount of users per guild"},
+        {labels, [guild_id, status]}
     ]).

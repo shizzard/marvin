@@ -164,16 +164,19 @@ handle_call_incoming_event(Event, S0) ->
     case marvin_pdu2:parse(Event) of
         {ok, Struct} ->
             case marvin_pdu2:prot_mod(Struct) of
-                marvin_pdu2_dispatch_ready ->
-                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
-                    handle_call_incoming_event_dispatch_ready(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_hello ->
+                    handle_call_incoming_event_hello(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_dispatch_resumed ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     handle_call_incoming_event_dispatch_resumed(marvin_pdu2:d(Struct), S1);
-                marvin_pdu2_hello ->
-                    handle_call_incoming_event_hello(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_heartbeat_ack ->
                     handle_call_incoming_event_heartbeat_ack(marvin_pdu2:d(Struct), S0);
+                marvin_pdu2_dispatch_ready ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    handle_call_incoming_event_dispatch_ready(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_guild_create ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    handle_call_incoming_event_dispatch_guild_create(marvin_pdu2:d(Struct), S1);
                 _ ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     handle_call_incoming_event_generic(Struct, S1)
@@ -233,8 +236,92 @@ handle_info_exit(ExitPid, ExitReason, #state{
 
 
 
+-spec handle_call_incoming_event_hello(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_hello(Struct, #state{
+    shard_id = ShardId,
+    tx_pid = TxPid,
+    session_id = undefined
+} = S0) ->
+    HeartbeatInterval = marvin_pdu2_hello:heartbeat_interval(Struct),
+    marvin_log:info(
+        "Shard '~p' starting heartbeat with interval '~p'",
+        [S0#state.shard_name, HeartbeatInterval]
+    ),
+    {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
+    erlang:link(HeartPid),
+    {ok, IdentifyEvent} = get_pdu_identify(S0),
+    ok = marvin_shard_tx:send_sync(TxPid, IdentifyEvent),
+    {reply, ok, S0#state{
+        heart_pid = HeartPid
+    }};
+
+handle_call_incoming_event_hello(Struct, #state{
+    shard_id = ShardId,
+    tx_pid = TxPid
+} = S0) ->
+    HeartbeatInterval = marvin_pdu2_hello:heartbeat_interval(Struct),
+    marvin_log:info(
+        "Shard '~p' starting heartbeat with interval '~p'",
+        [S0#state.shard_name, HeartbeatInterval]
+    ),
+    {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
+    erlang:link(HeartPid),
+    {ok, ResumeEvent} = get_pdu_resume(S0),
+    ok = marvin_shard_tx:send_sync(TxPid, ResumeEvent),
+    {reply, ok, S0#state{
+        heart_pid = HeartPid
+    }}.
+
+
+
+-spec handle_call_incoming_event_dispatch_resumed(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_resumed(_Struct, #state{
+    session_id = SessionId
+} = S0) ->
+    marvin_log:info(
+        "Shard '~p' successfully resumed session '~s'",
+        [S0#state.shard_name, SessionId]
+    ),
+    {reply, ok, S0#state{}}.
+
+
+
+-spec handle_call_incoming_event_heartbeat_ack(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_heartbeat_ack(_Struct, #state{
+    heart_pid = HeartPid
+} = S0) ->
+    marvin_log:debug("Shard '~p' got heartbeat ack", [S0#state.shard_name]),
+    marvin_shard_heart:heartbeat_ack(HeartPid),
+    {reply, ok, S0}.
+
+
+
 -spec handle_call_incoming_event_dispatch_ready(
-    PDU :: marvin_pdu2:t(),
+    PDU :: marvin_pdu2:data(),
     State :: state()
 ) ->
     marvin_helper_type:gen_server_reply_simple(
@@ -287,9 +374,8 @@ handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(Ids) -
 
 
 
-
--spec handle_call_incoming_event_dispatch_resumed(
-    PDU :: marvin_pdu2:t(),
+-spec handle_call_incoming_event_dispatch_guild_create(
+    PDU :: marvin_pdu2:data(),
     State :: state()
 ) ->
     marvin_helper_type:gen_server_reply_simple(
@@ -297,83 +383,21 @@ handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(Ids) -
         State :: state()
     ).
 
-handle_call_incoming_event_dispatch_resumed(_Struct, #state{
-    session_id = SessionId
-} = S0) ->
+handle_call_incoming_event_dispatch_guild_create(Struct, S0) ->
+    GuildId = marvin_pdu2_dispatch_guild_create:id(Struct),
     marvin_log:info(
-        "Shard '~p' successfully resumed session '~s'",
-        [S0#state.shard_name, SessionId]
+        "Shard '~p' is provisioning the guild '~s'",
+        [S0#state.shard_name, GuildId]
     ),
-    {reply, ok, S0#state{}}.
-
-
-
--spec handle_call_incoming_event_hello(
-    PDU :: marvin_pdu2:t(),
-    State :: state()
-) ->
-    marvin_helper_type:gen_server_reply_simple(
-        Reply :: marvin_helper_type:ok_return(),
-        State :: state()
-    ).
-
-handle_call_incoming_event_hello(Struct, #state{
-    shard_id = ShardId,
-    tx_pid = TxPid,
-    session_id = undefined
-} = S0) ->
-    HeartbeatInterval = marvin_pdu2_hello:heartbeat_interval(Struct),
-    marvin_log:info(
-        "Shard '~p' starting heartbeat with interval '~p'",
-        [S0#state.shard_name, HeartbeatInterval]
-    ),
-    {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
-    erlang:link(HeartPid),
-    {ok, IdentifyEvent} = get_pdu_identify(S0),
-    ok = marvin_shard_tx:send_sync(TxPid, IdentifyEvent),
-    {reply, ok, S0#state{
-        heart_pid = HeartPid
-    }};
-
-handle_call_incoming_event_hello(Struct, #state{
-    shard_id = ShardId,
-    tx_pid = TxPid
-} = S0) ->
-    HeartbeatInterval = marvin_pdu2_hello:heartbeat_interval(Struct),
-    marvin_log:info(
-        "Shard '~p' starting heartbeat with interval '~p'",
-        [S0#state.shard_name, HeartbeatInterval]
-    ),
-    {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
-    erlang:link(HeartPid),
-    {ok, ResumeEvent} = get_pdu_resume(S0),
-    ok = marvin_shard_tx:send_sync(TxPid, ResumeEvent),
-    {reply, ok, S0#state{
-        heart_pid = HeartPid
-    }}.
-
-
-
--spec handle_call_incoming_event_heartbeat_ack(
-    PDU :: marvin_pdu2:t(),
-    State :: state()
-) ->
-    marvin_helper_type:gen_server_reply_simple(
-        Reply :: marvin_helper_type:ok_return(),
-        State :: state()
-    ).
-
-handle_call_incoming_event_heartbeat_ack(_Struct, #state{
-    heart_pid = HeartPid
-} = S0) ->
-    marvin_log:debug("Shard '~p' got heartbeat ack", [S0#state.shard_name]),
-    marvin_shard_heart:heartbeat_ack(HeartPid),
+    marvin_guild_monitor:maybe_start_guild(GuildId),
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    ok = marvin_guild:do_provision(GuildPid, Struct),
     {reply, ok, S0}.
 
 
 
 -spec handle_call_incoming_event_generic(
-    PDU :: marvin_pdu2:t(),
+    PDU :: marvin_pdu2:data(),
     State :: state()
 ) ->
     marvin_helper_type:gen_server_reply_simple(
