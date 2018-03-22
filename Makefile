@@ -49,7 +49,7 @@ run-release:
 	MARVIN_APP_GATEWAY_LARGE_THRESHOLD=50 \
 	MARVIN_APP_SYSINFO_LIBRARY_NAME=Marvin \
 	MARVIN_APP_SYSINFO_LIBRARY_WEB=http://shizzard.github.io/marvin \
-	MARVIN_APP_LAGER_LOG_ROOT=/var/log/marvin/ \
+	MARVIN_APP_LAGER_LOG_ROOT=log/ \
 	_build/default/rel/marvin/bin/marvin console
 
 run-logtail:

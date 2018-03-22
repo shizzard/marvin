@@ -49,7 +49,8 @@ pdu_mods() ->
         marvin_pdu2_invalid_session,
         marvin_pdu2_dispatch_ready,
         marvin_pdu2_dispatch_resumed,
-        marvin_pdu2_dispatch_guild_create
+        marvin_pdu2_dispatch_guild_create,
+        marvin_pdu2_dispatch_presence_update
     ].
 
 object_mods() ->
@@ -222,6 +223,16 @@ marvin_pdu2_dispatch_guild_create() ->
         {presences, list(marvin_pdu2_object_presence())}
     ]).
 
+marvin_pdu2_dispatch_presence_update() ->
+    ?MAP([
+        {user, ?MAP([{<<"id">>, non_empty(proper_unicode:utf8(20))}])},
+        {nick, ?NULLABLE(non_empty(proper_unicode:utf8(15)))},
+        {roles, list(non_empty(proper_unicode:utf8(20)))},
+        {game, ?NULLABLE(marvin_pdu2_object_game())},
+        {guild_id, non_empty(proper_unicode:utf8(20))},
+        {status, oneof([<<"online">>, <<"offline">>, <<"idle">>, <<"dnd">>])}
+    ]).
+
 
 %% Generators - Objects
 
@@ -361,7 +372,7 @@ marvin_pdu2_object_presence() ->
         {user, ?MAP([
             {<<"id">>, non_empty(proper_unicode:utf8(20))}
         ])},
-        {game, marvin_pdu2_object_game()},
+        {game, ?NULLABLE(marvin_pdu2_object_game())},
         {status, oneof([<<"online">>, <<"offline">>, <<"idle">>, <<"dnd">>])}
     ]).
 

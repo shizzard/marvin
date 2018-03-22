@@ -1,0 +1,21 @@
+{
+    "op": 0,
+    "d": {
+        "user": {
+            "id": "242257112208506881"
+        },
+        "status": "online",
+        "roles": [],
+        "nick": null,
+        "guild_id": "269209661973069825",
+        "game": {
+            "type": 0,
+            "timestamps": {
+                "start": 1521747382640
+            },
+            "name": "League of Legends"
+        }
+    },
+    "s": 1,
+    "t": "PRESENCE_UPDATE"
+}
