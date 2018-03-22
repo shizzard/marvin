@@ -4,7 +4,7 @@
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
-    do_provision/2,
+    do_provision/2, presence_update/2,
     start_link/1, init/1,
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
@@ -25,6 +25,7 @@
 -type state() :: #state{}.
 
 -define(do_provision(Struct), {do_provision, Struct}).
+-define(presence_update(Struct), {presence_update, Struct}).
 
 
 
@@ -51,6 +52,17 @@ do_provision(GuildPid, Struct) ->
 
 
 
+-spec presence_update(GuildPid :: pid(), Struct :: marvin_pdu2_dispatch_presence_update:t()) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+presence_update(GuildPid, Struct) ->
+    gen_server:call(GuildPid, ?presence_update(Struct)).
+
+
+
 init([GuildId]) ->
     {ok, #state{
         guild_id = GuildId,
@@ -64,6 +76,10 @@ init([GuildId]) ->
 handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
     marvin_log:info("Guild '~s' is being provisioned", [S0#state.guild_id]),
     handle_call_do_provision(Struct, S0);
+
+handle_call(?presence_update(Struct), _GenReplyTo, S0) ->
+    marvin_log:info("Guild '~s' got presence update", [S0#state.guild_id]),
+    handle_call_presence_update(Struct, S0);
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
     marvin_log:warn("Unexpected call: ~p", [Unexpected]),
@@ -105,7 +121,7 @@ code_change(_OldVsn, S0, _Extra) ->
 
 handle_call_do_provision(Struct, S0) ->
     S1 = lists:foldl(
-        fun do_update_member_presence/2, S0,
+        fun do_update_member_presence_from_object/2, S0,
         marvin_pdu2_dispatch_guild_create:presences(Struct)
     ),
     do_report_presence_state(S1),
@@ -113,15 +129,47 @@ handle_call_do_provision(Struct, S0) ->
 
 
 
-do_update_member_presence(Presence, #state{
+-spec handle_call_presence_update(Struct :: marvin_pdu2_dispatch_presence_update:t(), S0 :: state()) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_presence_update(Struct, S0) ->
+    UserId = marvin_pdu2_dispatch_presence_update:user(Struct),
+    Status = marvin_pdu2_dispatch_presence_update:status(Struct),
+    OldStatus = get_member_status(UserId, S0),
+    S1 = do_update_member_presence(UserId, OldStatus, Status, S0),
+    do_report_presence_state(S1),
+    {reply, ok, S1}.
+
+
+
+-spec do_update_member_presence_from_object(Struct :: marvin_pdu2_object_presence:t(), S0 :: state()) ->
+    Ret :: state().
+
+do_update_member_presence_from_object(Struct, S0) ->
+    UserId = marvin_pdu2_object_presence:user(Struct),
+    Status = marvin_pdu2_object_presence:status(Struct),
+    OldStatus = get_member_status(UserId, S0),
+    do_update_member_presence(UserId, OldStatus, Status, S0).
+
+
+
+-spec do_update_member_presence(
+    UserId :: marvin_pdu2_object_user:id(),
+    OldStatus :: marvin_pdu2_object_presence:status(),
+    Status :: marvin_pdu2_object_presence:status(),
+    S0 :: state()
+) ->
+    Ret :: state().
+
+do_update_member_presence(UserId, OldStatus, Status, #state{
     presence_state = PresenceStateEts,
     members_online = MembersOnline,
     members_idle = MembersIdle,
     members_dnd = MembersDnd
 } = S0) ->
-    UserId = marvin_pdu2_object_presence:user(Presence),
-    Status = marvin_pdu2_object_presence:status(Presence),
-    OldStatus = get_member_status(UserId, S0),
     case {OldStatus, Status} of
         {<<"online">>, <<"online">>} ->
             S0;

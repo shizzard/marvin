@@ -177,6 +177,9 @@ handle_call_incoming_event(Event, S0) ->
                 marvin_pdu2_dispatch_guild_create ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     handle_call_incoming_event_dispatch_guild_create(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_presence_update ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    handle_call_incoming_event_dispatch_presence_update(marvin_pdu2:d(Struct), S1);
                 _ ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     handle_call_incoming_event_generic(Struct, S1)
@@ -392,6 +395,19 @@ handle_call_incoming_event_dispatch_guild_create(Struct, S0) ->
     marvin_guild_monitor:maybe_start_guild(GuildId),
     {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
     ok = marvin_guild:do_provision(GuildPid, Struct),
+    {reply, ok, S0}.
+
+
+
+handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
+    GuildId = marvin_pdu2_dispatch_presence_update:guild_id(Struct),
+    UserId = marvin_pdu2_dispatch_presence_update:user(Struct),
+    marvin_log:info(
+        "Shard '~p' got presence update for guild '~s'/user '~s')",
+        [S0#state.shard_name, GuildId, UserId]
+    ),
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    ok = marvin_guild:presence_update(GuildPid, Struct),
     {reply, ok, S0}.
 
 
