@@ -165,23 +165,30 @@ handle_call_incoming_event(Event, S0) ->
         {ok, Struct} ->
             case marvin_pdu2:prot_mod(Struct) of
                 marvin_pdu2_hello ->
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_hello]),
                     handle_call_incoming_event_hello(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_dispatch_resumed ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_resumed]),
                     handle_call_incoming_event_dispatch_resumed(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_heartbeat_ack ->
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_heartbeat_ack]),
                     handle_call_incoming_event_heartbeat_ack(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_dispatch_ready ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_ready]),
                     handle_call_incoming_event_dispatch_ready(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_guild_create ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_create]),
                     handle_call_incoming_event_dispatch_guild_create(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_presence_update ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_presence_update]),
                     handle_call_incoming_event_dispatch_presence_update(marvin_pdu2:d(Struct), S1);
                 _ ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_generic]),
                     handle_call_incoming_event_generic(Struct, S1)
             end;
         {error, Reason} ->

@@ -36,6 +36,12 @@ declare_metrics() ->
         {name, marvin_gateway_shards_count_items},
         {help, "Amount of shards started"}
     ]),
+    %% marvin_shard_session
+    prometheus_counter:new([
+        {name, marvin_shard_session_incoming_events},
+        {help, "Shard session incoming events per shard/type"},
+        {labels, [shard_id, event_type]}
+    ]),
     %% marvin_guild
     prometheus_gauge:new([
         {name, marvin_guild_presence_state},
