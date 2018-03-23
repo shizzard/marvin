@@ -197,7 +197,7 @@ do_report_http_request_interval(IntervalSec) ->
     ok.
 
 
--spec do_report_shards_count(ShardsCount :: pos_integer()) ->
+-spec do_report_shards_count(ShardsCount :: pos_integer() | 0) ->
     marvin_helper_type:ok_return().
 
 do_report_shards_count(ShardsCount) ->

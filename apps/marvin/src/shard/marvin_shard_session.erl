@@ -348,7 +348,8 @@ handle_call_incoming_event_dispatch_ready(Struct, #state{
         "Shard '~p' is ready with session '~s'",
         [S0#state.shard_name, SessionId]
     ),
-    ok = marvin_shard_tx:send_sync(TxPid, get_pdu_status_update(S0)),
+    {ok, StatusUpdate} = get_pdu_status_update(S0),
+    ok = marvin_shard_tx:send_sync(TxPid, StatusUpdate),
     _ = marvin_helper_chain:chain(
         'marvin_shard_session:handle_call_incoming_event_dispatch_ready', [
             fun handle_call_incoming_event_dispatch_ready_start_guilds_get_ids/1,

@@ -42,10 +42,7 @@ start_link(GuildId) ->
 
 
 -spec do_provision(GuildPid :: pid(), Struct :: marvin_pdu2_dispatch_guild_create:t()) ->
-    marvin_helper_type:gen_server_reply_simple(
-        Reply :: marvin_helper_type:ok_return(),
-        State :: state()
-    ).
+    Ret :: marvin_helper_type:ok_return().
 
 do_provision(GuildPid, Struct) ->
     gen_server:call(GuildPid, ?do_provision(Struct)).
@@ -53,10 +50,7 @@ do_provision(GuildPid, Struct) ->
 
 
 -spec presence_update(GuildPid :: pid(), Struct :: marvin_pdu2_dispatch_presence_update:t()) ->
-    marvin_helper_type:gen_server_reply_simple(
-        Reply :: marvin_helper_type:ok_return(),
-        State :: state()
-    ).
+    Ret :: marvin_helper_type:ok_return().
 
 presence_update(GuildPid, Struct) ->
     gen_server:call(GuildPid, ?presence_update(Struct)).

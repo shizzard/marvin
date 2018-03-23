@@ -18,7 +18,7 @@
 -define(monitor_down(MonRef, Pid, Info), {'DOWN', MonRef, process, Pid, Info}).
 
 -record(guild, {
-    guild_id :: non_neg_integer(),
+    guild_id :: marvin_pdu2_object_guild:id(),
     guild_pid :: pid(),
     guild_mon_ref :: reference()
 }).
@@ -33,7 +33,7 @@
 
 
 
--spec maybe_start_guild(GuildId :: non_neg_integer()) ->
+-spec maybe_start_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
     marvin_helper_type:ok_return(OkRet :: pid()).
 
 maybe_start_guild(GuildId) ->
@@ -46,7 +46,7 @@ maybe_start_guild(GuildId) ->
 
 
 
--spec start_guild(GuildId :: non_neg_integer()) ->
+-spec start_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
     marvin_helper_type:ok_return(
         OkRet :: pid(),
         ErrorRet :: duplicate
@@ -62,7 +62,7 @@ start_guild(GuildId) ->
 
 
 
--spec stop_guild(GuildId :: non_neg_integer()) ->
+-spec stop_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
     marvin_helper_type:ok_return().
 
 stop_guild(GuildId) ->
@@ -70,7 +70,7 @@ stop_guild(GuildId) ->
 
 
 
--spec get_guild(GuildId :: non_neg_integer()) ->
+-spec get_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
     marvin_helper_type:generic_return(
         OkRet :: pid(),
         ErrorRet :: not_found
