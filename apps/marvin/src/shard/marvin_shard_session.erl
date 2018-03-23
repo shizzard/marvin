@@ -339,13 +339,16 @@ handle_call_incoming_event_heartbeat_ack(_Struct, #state{
         State :: state()
     ).
 
-handle_call_incoming_event_dispatch_ready(Struct, S0) ->
+handle_call_incoming_event_dispatch_ready(Struct, #state{
+    tx_pid = TxPid
+} = S0) ->
     SessionId = marvin_pdu2_dispatch_ready:session_id(Struct),
     SelfUser = marvin_pdu2_dispatch_ready:user(Struct),
     marvin_log:info(
         "Shard '~p' is ready with session '~s'",
         [S0#state.shard_name, SessionId]
     ),
+    ok = marvin_shard_tx:send_sync(TxPid, get_pdu_status_update(S0)),
     _ = marvin_helper_chain:chain(
         'marvin_shard_session:handle_call_incoming_event_dispatch_ready', [
             fun handle_call_incoming_event_dispatch_ready_start_guilds_get_ids/1,
@@ -471,6 +474,18 @@ get_pdu_identify(#state{
             '$referrer' => LibraryWeb,
             '$referring_domain' => LibraryWeb
         }
+    })).
+
+
+
+-spec get_pdu_status_update(State :: state()) ->
+    marvin_helper_type:ok_return(OkRet :: binary()).
+
+get_pdu_status_update(_S0) ->
+    {ok, Version} = marvin_config:get(marvin, [system_info, library_version]),
+    marvin_pdu2:render(marvin_pdu2_status_update:new(#{
+        game => #{type => 0, name => Version},
+        status => <<"online">>
     })).
 
 
