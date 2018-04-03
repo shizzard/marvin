@@ -186,6 +186,10 @@ handle_call_incoming_event(Event, S0) ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_presence_update]),
                     handle_call_incoming_event_dispatch_presence_update(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_message_create ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_message_create]),
+                    handle_call_incoming_event_dispatch_message_create(marvin_pdu2:d(Struct), S1);
                 _ ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_generic]),
@@ -410,6 +414,15 @@ handle_call_incoming_event_dispatch_guild_create(Struct, S0) ->
 
 
 
+-spec handle_call_incoming_event_dispatch_presence_update(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
 handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
     GuildId = marvin_pdu2_dispatch_presence_update:guild_id(Struct),
     UserId = marvin_pdu2_dispatch_presence_update:user(Struct),
@@ -419,6 +432,26 @@ handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
     ),
     {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
     ok = marvin_guild:presence_update(GuildPid, Struct),
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_message_create(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_message_create(Struct, S0) ->
+    ChannelId = marvin_pdu2_dispatch_message_create:channel_id(Struct),
+    UserId = marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Struct)),
+    marvin_log:info(
+        "Shard '~p' got message create for channel '~s'/user '~s')",
+        [S0#state.shard_name, ChannelId, UserId]
+    ),
     {reply, ok, S0}.
 
 
