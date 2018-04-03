@@ -1,0 +1,37 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-03-26T18:30:36.662000+00:00",
+        "pinned": false,
+        "nonce": null,
+        "mentions": [],
+        "mention_roles": [],
+        "mention_everyone": false,
+        "id": "427897175826235403",
+        "embeds": [],
+        "edited_timestamp": null,
+        "content": "",
+        "channel_id": "296248793823838208",
+        "author": {
+            "username": "Deathtechnikk",
+            "id": "397025970076254226",
+            "discriminator": "8415",
+            "avatar": "f2dd523b2c783f4246cbbe204494661a"
+        },
+        "attachments": [
+            {
+                "width": 640,
+                "url": "https://cdn.discordapp.com/attachments/296248793823838208/427897175826235402/11260474.png",
+                "size": 242217,
+                "proxy_url": "https://media.discordapp.net/attachments/296248793823838208/427897175826235402/11260474.png",
+                "id": "427897175826235402",
+                "height": 581,
+                "filename": "11260474.png"
+            }
+        ]
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}

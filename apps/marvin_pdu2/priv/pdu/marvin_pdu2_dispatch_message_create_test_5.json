@@ -1,0 +1,87 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-03-29T10:45:37.108000+00:00",
+        "pinned": false,
+        "nonce": null,
+        "mentions": [],
+        "mention_roles": [],
+        "mention_everyone": false,
+        "id": "428867320212094996",
+        "embeds": [
+            {
+                "url": "https://vk.com/imbasquad",
+                "type": "rich",
+                "title": "Here goes title",
+                "timestamp": "2018-03-29T10:22:40.605000+00:00",
+                "thumbnail": {
+                    "width": 0,
+                    "url": "https://cdn.discordapp.com/embed/avatars/0.png",
+                    "proxy_url": "https://images-ext-2.discordapp.net/external/2dZVVL6feMSM7lxfFkKVW__LToSOzmToSEmocJV5vcA/https/cdn.discordapp.com/embed/avatars/0.png",
+                    "height": 0
+                },
+                "image": {
+                    "width": 0,
+                    "url": "https://cdn.discordapp.com/embed/avatars/0.png",
+                    "proxy_url": "https://images-ext-2.discordapp.net/external/2dZVVL6feMSM7lxfFkKVW__LToSOzmToSEmocJV5vcA/https/cdn.discordapp.com/embed/avatars/0.png",
+                    "height": 0
+                },
+                "footer": {
+                    "text": "Some footer",
+                    "proxy_icon_url": "https://images-ext-2.discordapp.net/external/2dZVVL6feMSM7lxfFkKVW__LToSOzmToSEmocJV5vcA/https/cdn.discordapp.com/embed/avatars/0.png",
+                    "icon_url": "https://cdn.discordapp.com/embed/avatars/0.png"
+                },
+                "fields": [
+                    {
+                        "value": "![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png) Dolor sit amet, consectetur adipiscing elit.",
+                        "name": "Lorem ipsum",
+                        "inline": false
+                    },
+                    {
+                        "value": "Quisque venenatis erat eget faucibus dictum.",
+                        "name": "Integer dignissim",
+                        "inline": false
+                    },
+                    {
+                        "value": "Integer dignissim felis eu lorem fringilla convallis.",
+                        "name": "In porttitor",
+                        "inline": false
+                    },
+                    {
+                        "value": "![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png) Sed sit ametdui et ipsum semper porttitor.",
+                        "name": "Nunc at mauris",
+                        "inline": true
+                    },
+                    {
+                        "value": "Nullam ornare diam scelerisque scelerisque feugiat.",
+                        "name": "Mauris blandit",
+                        "inline": true
+                    }
+                ],
+                "description": "[Imbasquad vk.com](https://vk.com/imbasquad)",
+                "color": 14654978,
+                "author": {
+                    "url": "https://github.com/shizzard/marvin",
+                    "proxy_icon_url": "https://images-ext-2.discordapp.net/external/2dZVVL6feMSM7lxfFkKVW__LToSOzmToSEmocJV5vcA/https/cdn.discordapp.com/embed/avatars/0.png",
+                    "name": "Marvin",
+                    "icon_url": "https://cdn.discordapp.com/embed/avatars/0.png"
+                }
+            }
+        ],
+        "edited_timestamp": null,
+        "content": "**TEST MESSAGE**",
+        "channel_id": "341496525613957120",
+        "author": {
+            "username": "Marvin",
+            "id": "341500172515278859",
+            "discriminator": "8455",
+            "bot": true,
+            "avatar": "1888f192aa92e3de15f795df27c8475e"
+        },
+        "attachments": []
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}

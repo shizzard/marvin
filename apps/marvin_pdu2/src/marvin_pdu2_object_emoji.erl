@@ -4,12 +4,12 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    id :: id(),
+    id = undefined :: id(),
     name :: name(),
-    roles :: roles(),
-    require_colons :: require_colons(),
-    managed :: managed(),
-    animated :: animated()
+    roles = [] :: roles(),
+    require_colons = false :: require_colons(),
+    managed = false :: managed(),
+    animated = false :: animated()
 }).
 
 -type id() :: marvin_pdu2:snowflake().
@@ -22,6 +22,9 @@
 
 -export_type([id/0, name/0, roles/0, require_colons/0, managed/0, animated/0, t/0]).
 
+
+cloak_validate(id, null) ->
+    {ok, undefined};
 
 cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
@@ -57,7 +60,7 @@ export(#?MODULE{
     animated = Animated
 }) ->
     #{
-        <<"id">> => Id,
+        <<"id">> => marvin_pdu2:nullify(Id),
         <<"name">> => Name,
         <<"roles">> => Roles,
         <<"require_colons">> => RequireColons,

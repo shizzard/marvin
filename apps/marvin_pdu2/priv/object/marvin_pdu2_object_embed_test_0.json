@@ -1,0 +1,25 @@
+{
+    "video": {
+        "width": 1280,
+        "url": "https://www.youtube.com/embed/54iufAxoviI",
+        "height": 720
+    },
+    "url": "https://www.youtube.com/watch?v=54iufAxoviI",
+    "type": "video",
+    "title": "<D0><A5><D1><80><D0><B5><D0><BD> <D1><82><D0><B5><D0><B1><D0><B5> <D0><B2> <D1><80><D1><8B><D0><BB><D0><BE>! <D0><A1><D1><80><D0><B0><D0><BD><D1><8B><D0><B9> <D1><83><D1><80><D0><BE><D0><B4>",
+    "thumbnail": {
+        "width": 1280,
+        "url": "https://i.ytimg.com/vi/54iufAxoviI/maxresdefault.jpg",
+        "proxy_url": "https://images-ext-1.discordapp.net/external/V30DMR0z6XW0xftHZZQR5MAzAy6r8xqX_0NdvKsDgEs/https/i.ytimg.com/vi/54iufAxoviI/maxresdefault.jpg",
+        "height": 720
+    },
+    "provider": {
+        "url": "https://www.youtube.com/",
+        "name": "YouTube"
+    },
+    "color": 16711680,
+    "author": {
+        "url": "https://www.youtube.com/channel/UCiQ9_VDVdq4HZTAhNOsbARw",
+        "name": "Ruslan"
+    }
+}

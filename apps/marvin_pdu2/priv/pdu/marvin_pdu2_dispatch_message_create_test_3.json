@@ -1,0 +1,29 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-03-26T18:13:59.664000+00:00",
+        "pinned": false,
+        "nonce": "427892995925213184",
+        "mentions": [],
+        "mention_roles": [
+            "323193132441272331"
+        ],
+        "mention_everyone": false,
+        "id": "427892994113404928",
+        "embeds": [],
+        "edited_timestamp": null,
+        "content": "<@&323193132441272331> https://puu.sh/zQ16O/f0ff63b9eb.png\n<D0><9F><D1><80><D0><BE><D1><81><D1><82><D0><BE> <D0><BA><D0><BD><D0><BE><D0><BF><D0><BA><D1><83> <D1><82><D1><83><D1><86><D0><BD><D1><83><D1><82><D1><8C>\nhttps://worldofwarships.ru/ru/news/event/award_mo/",
+        "channel_id": "269219052239585281",
+        "author": {
+            "username": "UrsusSapiens",
+            "id": "271550397980737537",
+            "discriminator": "7377",
+            "avatar": "617c07c044803d35e97c62de46f65d96"
+        },
+        "attachments": []
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}

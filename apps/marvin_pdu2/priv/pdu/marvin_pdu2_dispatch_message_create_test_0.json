@@ -1,0 +1,27 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-03-26T11:49:25.312000+00:00",
+        "pinned": false,
+        "nonce": "433966993255694336",
+        "mentions": [],
+        "mention_roles": [],
+        "mention_everyone": false,
+        "id": "427796213266513920",
+        "embeds": [],
+        "edited_timestamp": null,
+        "content": "А играл в танки, таких проблем не было бы",
+        "channel_id": "269219052239585281",
+        "author": {
+            "username": "Luciferius",
+            "id": "255082434884927509",
+            "discriminator": "9709",
+            "avatar": "25d733eb8bf718fac8844148b5f7abe9"
+        },
+        "attachments": []
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}

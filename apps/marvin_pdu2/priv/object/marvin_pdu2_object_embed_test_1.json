@@ -1,0 +1,13 @@
+{
+    "url": "https://github.com/shizzard/marvin/issues/22",
+    "type": "rich",
+    "title": "[shizzard/marvin] Issue opened: #22 marvin\\_shard\\_rx does not handle connection close properly",
+    "description": "```\r\n2018-03-26 20:21:17.227 [error] <0.2496.0> Unexpected message: {'DOWN',#Ref<0.1662249623.3207069698.102534>,process,<0.2495.0>,{function_clause,[{marvin_shard_rx,handle_event,[info,{gun_ws,<0.2496.0>,{close,1001,<<>>}},on_operational,{state,0,marvin_shard_rx_00,<0.612.0>,<<119,115,115,58,47,47,103,97,116,101,119,97,121,46,100,105,115,99,111,114,100,46,103,103>>,<0.2496.0>,#Ref<0.1662249623.3207069697.134428>,<0.2498.0>}],[{file,[47,115,114,99,47,95,98,117,105,108,100,47,112,114,111,100,4...",
+    "color": 15426592,
+    "author": {
+        "url": "https://github.com/shizzard",
+        "proxy_icon_url": "https://images-ext-1.discordapp.net/external/dg3ffr2YzuIjTONbsgKelpgYZyGyi4kJEvTBSaExHKc/%3Fv%3D4/https/avatars2.githubusercontent.com/u/399886",
+        "name": "shizzard",
+        "icon_url": "https://avatars2.githubusercontent.com/u/399886?v=4"
+    }
+}

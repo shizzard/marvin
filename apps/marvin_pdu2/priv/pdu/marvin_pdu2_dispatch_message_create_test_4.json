@@ -1,0 +1,60 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-03-26T13:42:16.692000+00:00",
+        "pinned": false,
+        "nonce": "427824604799565824",
+        "mentions": [
+            {
+                "username": "Luciferius",
+                "id": "255082434884927509",
+                "discriminator": "9709",
+                "avatar": "25d733eb8bf718fac8844148b5f7abe9"
+            }
+        ],
+        "mention_roles": [],
+        "mention_everyone": false,
+        "id": "427824614492602379",
+        "embeds": [
+            {
+                "video": {
+                    "width": 1280,
+                    "url": "https://www.youtube.com/embed/54iufAxoviI",
+                    "height": 720
+                },
+                "url": "https://www.youtube.com/watch?v=54iufAxoviI",
+                "type": "video",
+                "title": "<D0><A5><D1><80><D0><B5><D0><BD> <D1><82><D0><B5><D0><B1><D0><B5> <D0><B2> <D1><80><D1><8B><D0><BB><D0><BE>! <D0><A1><D1><80><D0><B0><D0><BD><D1><8B><D0><B9> <D1><83><D1><80><D0><BE><D0><B4>",
+                "thumbnail": {
+                    "width": 1280,
+                    "url": "https://i.ytimg.com/vi/54iufAxoviI/maxresdefault.jpg",
+                    "proxy_url": "https://images-ext-1.discordapp.net/external/V30DMR0z6XW0xftHZZQR5MAzAy6r8xqX_0NdvKsDgEs/https/i.ytimg.com/vi/54iufAxoviI/maxresdefault.jpg",
+                    "height": 720
+                },
+                "provider": {
+                    "url": "https://www.youtube.com/",
+                    "name": "YouTube"
+                },
+                "color": 16711680,
+                "author": {
+                    "url": "https://www.youtube.com/channel/UCiQ9_VDVdq4HZTAhNOsbARw",
+                    "name": "Ruslan"
+                }
+            }
+        ],
+        "edited_timestamp": null,
+        "content": "<@!255082434884927509> https://www.youtube.com/watch?v=54iufAxoviI",
+        "channel_id": "269219052239585281",
+        "author": {
+            "username": "Mimi Virus",
+            "id": "237296628250312706",
+            "discriminator": "0562",
+            "avatar": "4f1e32bc5876c76366d362862ed9f590"
+        },
+        "attachments": []
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}

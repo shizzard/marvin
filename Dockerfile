@@ -11,7 +11,8 @@ RUN rm -rf src/_build src/log/*
 RUN cd src && make get-deps release-prod
 
 # Copying release
-RUN mkdir -p /opt
+RUN mkdir -p /opt/
+RUN mkdir -p /tmp/erl_pipes/
 RUN cp -R src/_build/prod/rel/marvin /opt/.
 RUN mkdir -p /var/log/marvin/
 

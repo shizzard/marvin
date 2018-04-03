@@ -5,9 +5,12 @@
 
 -compile([export_all, nowarn_export_all]).
 
--define(PROPTEST(A), {
+-define(PROPTEST(A, PDUMod), {
     timeout, 100,
-    ?_assert(proper:quickcheck(A, [{to_file, user}]))
+    ?_assert(begin
+        ?debugMsg(PDUMod),
+        proper:quickcheck(A, [{to_file, user}])
+    end)
 }).
 -define(MAP(Typedef), ?LET(Proplist, Typedef, maps:from_list(lists:flatten(Proplist)))).
 -define(OPTIONAL(FieldTypedef), oneof([[FieldTypedef], []])).
@@ -18,13 +21,13 @@
 
 
 can_construct_test_() ->
-    [?PROPTEST(can_construct(PDUMod)) || PDUMod <- pdu_mods() ++ object_mods()].
+    [?PROPTEST(can_construct(PDUMod), PDUMod) || PDUMod <- pdu_mods() ++ object_mods()].
 
 can_export_test_() ->
-    [?PROPTEST(can_export(PDUMod)) || PDUMod <- pdu_mods() ++ object_mods()].
+    [?PROPTEST(can_export(PDUMod), PDUMod) || PDUMod <- pdu_mods() ++ object_mods()].
 
 can_render_test_() ->
-    [?PROPTEST(can_render(PDUMod)) || PDUMod <- pdu_mods()].
+    [?PROPTEST(can_render(PDUMod), PDUMod) || PDUMod <- pdu_mods()].
 
 can_construct(PDUMod) ->
     ?FORALL(PDU, erlang:apply(?MODULE, PDUMod, []), can_construct(PDU, PDUMod)).
@@ -65,7 +68,18 @@ object_mods() ->
         marvin_pdu2_object_channel,
         marvin_pdu2_object_game,
         marvin_pdu2_object_presence,
-        marvin_pdu2_object_voice_state
+        marvin_pdu2_object_voice_state,
+
+        marvin_pdu2_object_embed_footer,
+        marvin_pdu2_object_embed_image,
+        marvin_pdu2_object_embed_thumbnail,
+        marvin_pdu2_object_embed_video,
+        marvin_pdu2_object_embed_provider,
+        marvin_pdu2_object_embed_author,
+        marvin_pdu2_object_embed_field,
+        marvin_pdu2_object_embed,
+
+        marvin_pdu2_object_reaction
     ].
 
 
@@ -279,12 +293,12 @@ marvin_pdu2_object_member() ->
 
 marvin_pdu2_object_emoji() ->
     ?MAP([
-        {id, non_empty(proper_unicode:utf8(20))},
+        {id, ?NULLABLE(non_empty(proper_unicode:utf8(20)))},
         {name, non_empty(proper_unicode:utf8(15))},
-        {roles, list(non_empty(proper_unicode:utf8(20)))},
-        {require_colons, marvin_pdu2_object_emoji:require_colons()},
-        {managed, marvin_pdu2_object_emoji:managed()},
-        {animated, marvin_pdu2_object_emoji:animated()}
+        ?OPTIONAL({roles, list(non_empty(proper_unicode:utf8(20)))}),
+        ?OPTIONAL({require_colons, marvin_pdu2_object_emoji:require_colons()}),
+        ?OPTIONAL({managed, marvin_pdu2_object_emoji:managed()}),
+        ?OPTIONAL({animated, marvin_pdu2_object_emoji:animated()})
     ]).
 
 marvin_pdu2_object_permission_overwrite() ->
@@ -388,4 +402,79 @@ marvin_pdu2_object_voice_state() ->
         {self_deaf, marvin_pdu2_object_voice_state:self_deaf()},
         {mute, marvin_pdu2_object_voice_state:mute()},
         {deaf, marvin_pdu2_object_voice_state:deaf()}
+    ]).
+
+marvin_pdu2_object_embed_footer() ->
+    ?MAP([
+        {text, non_empty(proper_unicode:utf8(15))},
+        {icon_url, non_empty(proper_unicode:utf8(20))},
+        {proxy_icon_url, non_empty(proper_unicode:utf8(20))}
+    ]).
+
+marvin_pdu2_object_embed_image() ->
+    ?MAP([
+        {url, non_empty(proper_unicode:utf8(15))},
+        {proxy_url, non_empty(proper_unicode:utf8(15))},
+        {height, marvin_pdu2_object_embed_image:height()},
+        {width, marvin_pdu2_object_embed_image:width()}
+    ]).
+
+marvin_pdu2_object_embed_thumbnail() ->
+    ?MAP([
+        {url, non_empty(proper_unicode:utf8(15))},
+        {proxy_url, non_empty(proper_unicode:utf8(15))},
+        {height, marvin_pdu2_object_embed_thumbnail:height()},
+        {width, marvin_pdu2_object_embed_thumbnail:width()}
+    ]).
+
+marvin_pdu2_object_embed_video() ->
+    ?MAP([
+        {url, non_empty(proper_unicode:utf8(15))},
+        {height, marvin_pdu2_object_embed_video:height()},
+        {width, marvin_pdu2_object_embed_video:width()}
+    ]).
+
+marvin_pdu2_object_embed_provider() ->
+    ?MAP([
+        {name, non_empty(proper_unicode:utf8(15))},
+        {url, non_empty(proper_unicode:utf8(15))}
+    ]).
+
+marvin_pdu2_object_embed_author() ->
+    ?MAP([
+        {name, non_empty(proper_unicode:utf8(15))},
+        {url, non_empty(proper_unicode:utf8(15))},
+        ?OPTIONAL({icon_url, non_empty(proper_unicode:utf8(20))}),
+        ?OPTIONAL({proxy_icon_url, non_empty(proper_unicode:utf8(20))})
+    ]).
+
+marvin_pdu2_object_embed_field() ->
+    ?MAP([
+        {name, non_empty(proper_unicode:utf8(15))},
+        {value, non_empty(proper_unicode:utf8(15))},
+        {inline, marvin_pdu2_object_embed_field:inline()}
+    ]).
+
+marvin_pdu2_object_embed() ->
+    ?MAP([
+        ?OPTIONAL({title, non_empty(proper_unicode:utf8(15))}),
+        ?OPTIONAL({type, non_empty(proper_unicode:utf8(15))}),
+        ?OPTIONAL({description, non_empty(proper_unicode:utf8(15))}),
+        ?OPTIONAL({url, non_empty(proper_unicode:utf8(15))}),
+        ?OPTIONAL({timestamp, non_empty(proper_unicode:utf8(15))}),
+        {color, marvin_pdu2_object_embed:color()},
+        ?OPTIONAL({footer, marvin_pdu2_object_embed_footer()}),
+        ?OPTIONAL({image, marvin_pdu2_object_embed_image()}),
+        ?OPTIONAL({thumbnail, marvin_pdu2_object_embed_thumbnail()}),
+        ?OPTIONAL({video, marvin_pdu2_object_embed_video()}),
+        ?OPTIONAL({provider, marvin_pdu2_object_embed_provider()}),
+        ?OPTIONAL({author, marvin_pdu2_object_embed_author()}),
+        ?OPTIONAL({fields, list(marvin_pdu2_object_embed_field())})
+    ]).
+
+marvin_pdu2_object_reaction() ->
+    ?MAP([
+        {count, marvin_pdu2_object_reaction:count()},
+        {me, marvin_pdu2_object_reaction:me()},
+        {emoji, marvin_pdu2_object_emoji()}
     ]).
