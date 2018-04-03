@@ -38,9 +38,9 @@
     nonce = undefined :: nonce(),
     pinned :: pinned(),
     webhook_id = undefined :: webhook_id(),
-    type :: type(),
-    activity = undefined :: activity(),
-    application = undefined :: application()
+    type :: type()
+    % activity = undefined :: activity(),
+    % application = undefined :: application()
 }).
 
 -define(type_default, 0).
@@ -69,15 +69,16 @@
 -type pinned() :: boolean().
 -type webhook_id() :: marvin_pdu2:showflake().
 -type type() :: ?type_default..?type_guild_member_join.
--type activity() :: marvin_pdu2_object_message_activity:t().
--type application() :: marvin_pdu2_object_message_application:t().
+% -type activity() :: marvin_pdu2_object_message_activity:t().
+% -type application() :: marvin_pdu2_object_message_application:t().
 -type t() :: #?MODULE{}.
 
 -export_type([
     id/0, channel_id/0, author/0, content/0, timestamp/0, edited_timestamp/0,
     tts/0, mention_everyone/0, mentions/0, mention_roles/0, attachments/0,
-    embeds/0, reactions/0, nonce/0, pinned/0, webhook_id/0, type/0, activity/0,
-    application/0, t/0
+    embeds/0, reactions/0, nonce/0, pinned/0, webhook_id/0, type/0,
+    % activity/0, application/0,
+    t/0
 ]).
 
 cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
@@ -150,11 +151,11 @@ when is_integer(Value) andalso (
 ) ->
     {ok, Value};
 
-cloak_validate(activity, Value) ->
-    {ok, marvin_pdu2_object_activity:new(Value)};
+% cloak_validate(activity, Value) ->
+%     {ok, marvin_pdu2_object_activity:new(Value)};
 
-cloak_validate(application, Value) ->
-    {ok, marvin_pdu2_object_application:new(Value)};
+% cloak_validate(application, Value) ->
+%     {ok, marvin_pdu2_object_application:new(Value)};
 
 cloak_validate(_, _) ->
     {error, invalid}.
@@ -177,9 +178,9 @@ export(#?MODULE{
     nonce = Nonce,
     pinned = Pinned,
     webhook_id = WebhookId,
-    type = Type,
-    activity = Activity,
-    application = Application
+    type = Type
+    % activity = Activity,
+    % application = Application
 }) ->
     #{
         <<"id">> => Id,
@@ -198,13 +199,13 @@ export(#?MODULE{
         <<"nonce">> => marvin_pdu2:nullify(Nonce),
         <<"pinned">> => Pinned,
         <<"webhook_id">> => marvin_pdu2:nullify(WebhookId),
-        <<"type">> => Type,
-        <<"activity">> => case Activity of
-            undefined -> null;
-            _ -> marvin_pdu2_object_activity:export(Activity)
-        end,
-        <<"application">> => case Application of
-            undefined -> null;
-            _ -> marvin_pdu2_object_application:export(Application)
-        end
+        <<"type">> => Type
+        % <<"activity">> => case Activity of
+        %     undefined -> null;
+        %     _ -> marvin_pdu2_object_activity:export(Activity)
+        % end,
+        % <<"application">> => case Application of
+        %     undefined -> null;
+        %     _ -> marvin_pdu2_object_application:export(Application)
+        % end
     }.

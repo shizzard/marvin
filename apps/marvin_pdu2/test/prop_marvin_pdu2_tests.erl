@@ -79,7 +79,8 @@ object_mods() ->
         marvin_pdu2_object_embed_field,
         marvin_pdu2_object_embed,
 
-        marvin_pdu2_object_reaction
+        marvin_pdu2_object_reaction,
+        marvin_pdu2_object_attachment
     ].
 
 
@@ -246,6 +247,29 @@ marvin_pdu2_dispatch_presence_update() ->
         {guild_id, non_empty(proper_unicode:utf8(20))},
         {status, oneof([<<"online">>, <<"offline">>, <<"idle">>, <<"dnd">>])}
     ]).
+
+marvin_pdu2_dispatch_message_create() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {channel_id, non_empty(proper_unicode:utf8(20))},
+        {author, marvin_pdu2_object_user()},
+        {content, non_empty(proper_unicode:utf8(128))},
+        {timestamp, non_empty(proper_unicode:utf8(15))},
+        ?OPTIONAL({edited_timestamp, non_empty(proper_unicode:utf8(15))}),
+        {tts, marvin_pdu2_dispatch_message_create:tts()},
+        {mention_everyone, marvin_pdu2_dispatch_message_create:mention_everyone()},
+        {mentions, list(marvin_pdu2_object_user())},
+        {mention_roles, list(non_empty(proper_unicode:utf8(20)))},
+        {attachments, list(marvin_pdu2_object_attachment())},
+        {embeds, list(marvin_pdu2_object_embed())},
+        {reactions, list(marvin_pdu2_object_reaction())},
+        ?OPTIONAL({nonce, non_empty(proper_unicode:utf8(20))}),
+        {pinned, marvin_pdu2_dispatch_message_create:pinned()},
+        ?OPTIONAL({webhook_id, non_empty(proper_unicode:utf8(20))}),
+        {type, marvin_pdu2_dispatch_message_create:type()}
+    ]).
+
+
 
 
 %% Generators - Objects
@@ -477,4 +501,15 @@ marvin_pdu2_object_reaction() ->
         {count, marvin_pdu2_object_reaction:count()},
         {me, marvin_pdu2_object_reaction:me()},
         {emoji, marvin_pdu2_object_emoji()}
+    ]).
+
+marvin_pdu2_object_attachment() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        {filename, non_empty(proper_unicode:utf8(30))},
+        {size, marvin_pdu2_object_attachment:size()},
+        {url, non_empty(proper_unicode:utf8(30))},
+        {proxy_url, non_empty(proper_unicode:utf8(30))},
+        ?OPTIONAL({height, marvin_pdu2_object_attachment:height()}),
+        ?OPTIONAL({width, marvin_pdu2_object_attachment:width()})
     ]).
