@@ -1,0 +1,4254 @@
+{
+    "op": 0,
+    "d": {
+        "voice_states": [
+            {
+                "user_id": "276238239914786817",
+                "suppress": false,
+                "session_id": "741bc31a76b0b5cced6ae9c749d5b164",
+                "self_video": false,
+                "self_mute": true,
+                "self_deaf": false,
+                "mute": false,
+                "deaf": false,
+                "channel_id": "398156623811444757"
+            }
+        ],
+        "verification_level": 1,
+        "unavailable": false,
+        "system_channel_id": "269219052239585281",
+        "splash": null,
+        "roles": [
+            {
+                "position": 12,
+                "permissions": 104156225,
+                "name": "g-d2",
+                "mentionable": true,
+                "managed": false,
+                "id": "323192343778033666",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 10,
+                "permissions": 104156225,
+                "name": "g-fp",
+                "mentionable": true,
+                "managed": false,
+                "id": "403106989678264333",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 37,
+                "permissions": 506977351,
+                "name": "bot",
+                "mentionable": false,
+                "managed": false,
+                "id": "272021218838708235",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 22,
+                "permissions": 104156225,
+                "name": "граждане",
+                "mentionable": true,
+                "managed": false,
+                "id": "270845668619190273",
+                "hoist": true,
+                "color": 9219919
+            },
+            {
+                "position": 34,
+                "permissions": 104156225,
+                "name": "c-palace-visitor",
+                "mentionable": true,
+                "managed": false,
+                "id": "332104185677873152",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 13,
+                "permissions": 104156225,
+                "name": "g-ow",
+                "mentionable": true,
+                "managed": false,
+                "id": "318382381960790016",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 35,
+                "permissions": 104156225,
+                "name": "c-обижуля",
+                "mentionable": false,
+                "managed": false,
+                "id": "319878580106428418",
+                "hoist": false,
+                "color": 8380369
+            },
+            {
+                "position": 9,
+                "permissions": 104156225,
+                "name": "twix",
+                "mentionable": true,
+                "managed": false,
+                "id": "301663960132747264",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 6,
+                "permissions": 104156225,
+                "name": "00000110",
+                "mentionable": true,
+                "managed": false,
+                "id": "332188255824904193",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 5,
+                "permissions": 104156225,
+                "name": "hipster",
+                "mentionable": true,
+                "managed": false,
+                "id": "335395823196045313",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 36,
+                "permissions": 37215296,
+                "name": "Королева",
+                "mentionable": true,
+                "managed": false,
+                "id": "269213127835516929",
+                "hoist": true,
+                "color": 14654978
+            },
+            {
+                "position": 25,
+                "permissions": 309849159,
+                "name": "полиция",
+                "mentionable": true,
+                "managed": false,
+                "id": "269213289978920960",
+                "hoist": true,
+                "color": 5279423
+            },
+            {
+                "position": 4,
+                "permissions": 104156225,
+                "name": "дрищ",
+                "mentionable": true,
+                "managed": false,
+                "id": "387273646663532544",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 27,
+                "permissions": 104156225,
+                "name": "c-урсико",
+                "mentionable": false,
+                "managed": false,
+                "id": "401316082864095242",
+                "hoist": false,
+                "color": 12946803
+            },
+            {
+                "position": 17,
+                "permissions": 104156225,
+                "name": "g-tf2",
+                "mentionable": true,
+                "managed": false,
+                "id": "301043360536199168",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 11,
+                "permissions": 104156225,
+                "name": "g-cs",
+                "mentionable": true,
+                "managed": false,
+                "id": "324135440561078274",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 8,
+                "permissions": 104156225,
+                "name": "m&m's",
+                "mentionable": true,
+                "managed": false,
+                "id": "302834696449163265",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 7,
+                "permissions": 104156225,
+                "name": "concilium",
+                "mentionable": true,
+                "managed": false,
+                "id": "328544886905110538",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 2,
+                "permissions": 104156225,
+                "name": "анимешник",
+                "mentionable": true,
+                "managed": false,
+                "id": "411093326666661888",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 21,
+                "permissions": 104156225,
+                "name": "top-streamer",
+                "mentionable": true,
+                "managed": false,
+                "id": "301059825637392384",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 30,
+                "permissions": 104156225,
+                "name": "c-морская-волна",
+                "mentionable": false,
+                "managed": false,
+                "id": "400230534103564288",
+                "hoist": false,
+                "color": 7454397
+            },
+            {
+                "position": 16,
+                "permissions": 104156225,
+                "name": "g-r6",
+                "mentionable": true,
+                "managed": false,
+                "id": "301058554821869569",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 26,
+                "permissions": 104156225,
+                "name": "c-аннушка-уже-",
+                "mentionable": false,
+                "managed": false,
+                "id": "401320204807700480",
+                "hoist": false,
+                "color": 16645526
+            },
+            {
+                "position": 33,
+                "permissions": 104156225,
+                "name": "c-dreamcatcher",
+                "mentionable": false,
+                "managed": false,
+                "id": "332102374175014912",
+                "hoist": false,
+                "color": 8826290
+            },
+            {
+                "position": 14,
+                "permissions": 104156225,
+                "name": "g-hs",
+                "mentionable": true,
+                "managed": false,
+                "id": "309707282437111809",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 28,
+                "permissions": 104156225,
+                "name": "c-taloser",
+                "mentionable": false,
+                "managed": false,
+                "id": "401269447928578070",
+                "hoist": false,
+                "color": 15502264
+            },
+            {
+                "position": 32,
+                "permissions": 104156225,
+                "name": "c-люцежопельфарельмосель",
+                "mentionable": false,
+                "managed": false,
+                "id": "333965334963027970",
+                "hoist": false,
+                "color": 12627682
+            },
+            {
+                "position": 0,
+                "permissions": 104156225,
+                "name": "@everyone",
+                "mentionable": false,
+                "managed": false,
+                "id": "269209661973069825",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 3,
+                "permissions": 104156225,
+                "name": "иксперд",
+                "mentionable": true,
+                "managed": false,
+                "id": "402786904967348235",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 20,
+                "permissions": 104156225,
+                "name": "g-pubg",
+                "mentionable": true,
+                "managed": false,
+                "id": "301042304880345088",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 23,
+                "permissions": 104188993,
+                "name": "аристократы",
+                "mentionable": true,
+                "managed": false,
+                "id": "269565043446644739",
+                "hoist": true,
+                "color": 12800418
+            },
+            {
+                "position": 1,
+                "permissions": 2146958583,
+                "name": "MarvinDev",
+                "mentionable": false,
+                "managed": true,
+                "id": "425394683682750474",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 18,
+                "permissions": 104156225,
+                "name": "g-wows",
+                "mentionable": true,
+                "managed": false,
+                "id": "323193132441272331",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 24,
+                "permissions": 3072,
+                "name": "GEHENNA",
+                "mentionable": false,
+                "managed": false,
+                "id": "277189846664085505",
+                "hoist": false,
+                "color": 15844367
+            },
+            {
+                "position": 19,
+                "permissions": 104156225,
+                "name": "g-wot",
+                "mentionable": true,
+                "managed": false,
+                "id": "301043143292354570",
+                "hoist": false,
+                "color": 0
+            },
+            {
+                "position": 29,
+                "permissions": 104156225,
+                "name": "c-pang",
+                "mentionable": false,
+                "managed": false,
+                "id": "339112605497163788",
+                "hoist": false,
+                "color": 8169370
+            },
+            {
+                "position": 31,
+                "permissions": 104156225,
+                "name": "c-cristinaglo",
+                "mentionable": false,
+                "managed": false,
+                "id": "335835989836824576",
+                "hoist": false,
+                "color": 16416882
+            },
+            {
+                "position": 15,
+                "permissions": 104156225,
+                "name": "g-fshelter",
+                "mentionable": true,
+                "managed": false,
+                "id": "306744487789723648",
+                "hoist": false,
+                "color": 0
+            }
+        ],
+        "region": "russia",
+        "presences": [
+            {
+                "user": {
+                    "id": "271591975399063553"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "145635313157537792"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522836447397
+                    },
+                    "name": "World of Warships"
+                }
+            },
+            {
+                "user": {
+                    "id": "389184868342562836"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522846817640
+                    },
+                    "name": "World of Tanks"
+                }
+            },
+            {
+                "user": {
+                    "id": "303741951335989250"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "311084622891188225"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522847201607
+                    },
+                    "name": "DOTA 2"
+                }
+            },
+            {
+                "user": {
+                    "id": "308508073624862721"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522841521648
+                    },
+                    "name": "Boku no Horus"
+                }
+            },
+            {
+                "user": {
+                    "id": "165990678315139072"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "state": "В отряде",
+                    "party": {
+                        "size": [
+                            4,
+                            4
+                        ]
+                    },
+                    "name": "Warframe",
+                    "details": "ЗАЧИСТКА 50-60",
+                    "assets": {
+                        "large_text": "Сатурн: Numa"
+                    },
+                    "application_id": "422772752647323649"
+                }
+            },
+            {
+                "user": {
+                    "id": "268691111692730369"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "184354974749163520"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "361929050945617933"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "267990702259044352"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "409023180326567947"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "269914596658249739"
+                },
+                "status": "dnd",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "395515894572515329"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "281996662799597570"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522834454220
+                    },
+                    "name": "Tom Clancy's Rainbow Six Siege"
+                }
+            },
+            {
+                "user": {
+                    "id": "321852198432538625"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522846405504
+                    },
+                    "name": "Tom Clancy's Rainbow Six Siege"
+                }
+            },
+            {
+                "user": {
+                    "id": "355782085249859585"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522844255177
+                    },
+                    "name": "Tom Clancy's Rainbow Six Siege"
+                }
+            },
+            {
+                "user": {
+                    "id": "313302324665909259"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "157537831718223872"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "272570478789525515"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "276411014029770754"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "341500172515278859"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "270791717190369283"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522845751520
+                    },
+                    "name": "Pro Evolution Soccer 2016"
+                }
+            },
+            {
+                "user": {
+                    "id": "271742847391105024"
+                },
+                "status": "dnd",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "369537067681710080"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522845514648
+                    },
+                    "name": "World of Warcraft"
+                }
+            },
+            {
+                "user": {
+                    "id": "412932741366284288"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "266305287491682304"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "314020519382876162"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "269898264235474945"
+                },
+                "status": "dnd",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "267742788387340289"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "237296628250312706"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "142988168084324352"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "270506092029673473"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "269449629517479937"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "274576537142165524"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "278191224949571584"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "277729643396857856"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "354178330284523521"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "321638900156071939"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522835682776
+                    },
+                    "name": "Path of Exile"
+                }
+            },
+            {
+                "user": {
+                    "id": "271550397980737537"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "268083654549307402"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "358221359672983553"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "277156877845135370"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522847957764
+                    },
+                    "name": "World of Tanks"
+                }
+            },
+            {
+                "user": {
+                    "id": "285084639738200064"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "311065037022167041"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "326849208357486594"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "287320285550608395"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "276618262870228992"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "198697730992898048"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "260749249447329792"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "256143757114605569"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522831341025
+                    },
+                    "name": "World of Warships"
+                }
+            },
+            {
+                "user": {
+                    "id": "267769907670679552"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "269144761103810561"
+                },
+                "status": "dnd",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "276318520092917760"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "276238239914786817"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "348025248181911552"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "254976945291264001"
+                },
+                "status": "dnd",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "242257112208506881"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522838316462
+                    },
+                    "name": "PLAYERUNKNOWN'S BATTLEGROUNDS"
+                }
+            },
+            {
+                "user": {
+                    "id": "269872089836552212"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522846819398
+                    },
+                    "name": "Diablo 3"
+                }
+            },
+            {
+                "user": {
+                    "id": "247744346462486528"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522786833456
+                    },
+                    "name": "Steam"
+                }
+            },
+            {
+                "user": {
+                    "id": "374499317966438400"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "263625440097206286"
+                },
+                "status": "idle",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522790679521
+                    },
+                    "name": "World of Tanks"
+                }
+            },
+            {
+                "user": {
+                    "id": "269563815769669632"
+                },
+                "status": "idle",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "269927114302685184"
+                },
+                "status": "online",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "237304727711383552"
+                },
+                "status": "dnd",
+                "game": null
+            },
+            {
+                "user": {
+                    "id": "246305474662760450"
+                },
+                "status": "online",
+                "game": {
+                    "type": 0,
+                    "timestamps": {
+                        "start": 1522844522148
+                    },
+                    "name": "Overwatch"
+                }
+            },
+            {
+                "user": {
+                    "id": "143008978874531840"
+                },
+                "status": "idle",
+                "game": null
+            }
+        ],
+        "owner_id": "269144761103810561",
+        "name": "Imbaland",
+        "mfa_level": 0,
+        "members": [
+            {
+                "user": {
+                    "username": "kronos",
+                    "id": "271591975399063553",
+                    "discriminator": "6399",
+                    "avatar": "25b189d04645d67727832b69c11e79fa"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-11-19T07:40:43.550000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Luciferius",
+                    "id": "255082434884927509",
+                    "discriminator": "9709",
+                    "avatar": "25d733eb8bf718fac8844148b5f7abe9"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "301043360536199168",
+                    "333965334963027970",
+                    "387273646663532544",
+                    "411093326666661888"
+                ],
+                "nick": "/\\ |-| Г /\\ }|{ 0 | | |{ /\\",
+                "mute": false,
+                "joined_at": "2017-04-28T12:52:48.023000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Duck in the house",
+                    "id": "269871761787453440",
+                    "discriminator": "7527",
+                    "avatar": "a598b58132983d7819448099cc34ee9d"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "mute": false,
+                "joined_at": "2017-01-14T16:54:15.899000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Your KGB Curator",
+                    "id": "145635313157537792",
+                    "discriminator": "0094",
+                    "avatar": "579213e5a1d1ac57573e8e8309741c9b"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-02-02T06:16:00.664000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "SHOT152",
+                    "id": "267753732505075712",
+                    "discriminator": "5683",
+                    "avatar": "b9894e6e6e1c30e7e19924b7cbab2dd8"
+                },
+                "roles": [
+                    "411093326666661888",
+                    "270845668619190273"
+                ],
+                "nick": "Сёть",
+                "mute": false,
+                "joined_at": "2017-11-26T19:59:00.813000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Mayonez",
+                    "id": "389184868342562836",
+                    "discriminator": "2978",
+                    "avatar": "fb7a8f80ba392de63792e20cca1eb298"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-12-10T09:05:30.206000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "TMHtUTFS",
+                    "id": "255085035151949824",
+                    "discriminator": "3468",
+                    "avatar": "ef24d1186cbde89deece0a0689e11f1a"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043360536199168"
+                ],
+                "nick": "Кот, выглядывающий из-за балки",
+                "mute": false,
+                "joined_at": "2017-01-15T20:14:16.973000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Gin",
+                    "id": "274902576263331842",
+                    "discriminator": "2516",
+                    "avatar": "5b18ce87f9adc95dbee1a824377df1d0"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "318382381960790016",
+                    "403106989678264333",
+                    "411093326666661888"
+                ],
+                "nick": "Валшебник",
+                "mute": false,
+                "joined_at": "2017-02-01T11:45:24.417000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "ShasO_Ber",
+                    "id": "303741951335989250",
+                    "discriminator": "0768",
+                    "avatar": "db318626e4607a537b3da826192814ac"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-04-18T04:02:30.002000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "EHOT_I_K",
+                    "id": "311084622891188225",
+                    "discriminator": "4662",
+                    "avatar": "3fed1d4787a8d9ebebe4b451eb3981c5"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-05-08T10:20:21.714000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Gun",
+                    "id": "308508073624862721",
+                    "discriminator": "0001",
+                    "avatar": "a_386f530babdbb77a93a475e05bad8f06"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-11-24T17:23:51.748000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Axaxs (Алексей)",
+                    "id": "165990678315139072",
+                    "discriminator": "6939",
+                    "avatar": "60294028bc7396dd4a64dedb85829b37"
+                },
+                "roles": [],
+                "nick": "Aleksa Vasenko",
+                "mute": false,
+                "joined_at": "2018-02-10T16:29:10.883000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Dayermee",
+                    "id": "268691111692730369",
+                    "discriminator": "5406",
+                    "avatar": "47787c6e20b6aef5391849641ea2cd2d"
+                },
+                "roles": [],
+                "nick": "Dayerme",
+                "mute": false,
+                "joined_at": "2017-06-05T12:33:40.284000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Zagatoos",
+                    "id": "184354974749163520",
+                    "discriminator": "5353",
+                    "avatar": "6e7e21a3347e4bfd786137ea17393fc9"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": "Какой-то правый чел",
+                "mute": false,
+                "joined_at": "2017-11-24T22:55:12.384000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "АНУС ТВОЙ",
+                    "id": "361929050945617933",
+                    "discriminator": "0037",
+                    "avatar": "0b0e7489317323d79c7084ac724d73a1"
+                },
+                "roles": [],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-04-02T12:54:31.526175+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "ᅠᅠᅠᅠᅠᅠᅠᅠᅠᅠᅠᅠ",
+                    "id": "254970861189070848",
+                    "discriminator": "5332",
+                    "avatar": "f0e50dee11116af3b1d3279caa5241fb"
+                },
+                "roles": [
+                    "301042304880345088",
+                    "270845668619190273",
+                    "301059825637392384",
+                    "301058554821869569",
+                    "301043143292354570",
+                    "323193132441272331",
+                    "301043360536199168",
+                    "269213289978920960"
+                ],
+                "nick": "PROP★DOON",
+                "mute": false,
+                "joined_at": "2017-01-13T14:01:27.740000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Gangsterello",
+                    "id": "276681008273948672",
+                    "discriminator": "8020",
+                    "avatar": "26a7cc70b47fda3be0af198aadec813b"
+                },
+                "roles": [],
+                "nick": "Дон Дигидон",
+                "mute": false,
+                "joined_at": "2017-02-08T17:24:55.708000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Cave Johnson",
+                    "id": "267999355334688768",
+                    "discriminator": "0851",
+                    "avatar": "192106f1fea36f5a6f95eae28f0de5cd"
+                },
+                "roles": [],
+                "nick": "Q2F2ZSBKb2huc29uDQo=",
+                "mute": false,
+                "joined_at": "2018-04-04T10:42:50.687159+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Кешка",
+                    "id": "272433283826974721",
+                    "discriminator": "8297",
+                    "avatar": "b202dd61ca51ad84f56a7aeff480962e"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "324135440561078274"
+                ],
+                "mute": false,
+                "joined_at": "2017-04-28T12:51:09.339000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Sky1ine",
+                    "id": "268098618131480577",
+                    "discriminator": "4104",
+                    "avatar": "c2b676ee4c982d2385add906fca7f180"
+                },
+                "roles": [
+                    "301043143292354570"
+                ],
+                "mute": false,
+                "joined_at": "2017-06-18T08:59:33.593000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Rheinmetall borsig waffenträger",
+                    "id": "267990702259044352",
+                    "discriminator": "1725",
+                    "avatar": "adfd745badaf721a9bad5fff148ae778"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-05-09T13:19:11.112000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "zuchok",
+                    "id": "409023180326567947",
+                    "discriminator": "3094",
+                    "avatar": null
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2018-02-02T16:41:16.822000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "TheBelial",
+                    "id": "281438528179798016",
+                    "discriminator": "3282",
+                    "avatar": "6e9c1405bada4fde6bd9a197c0d7a065"
+                },
+                "roles": [],
+                "nick": "Гуся :D",
+                "mute": false,
+                "joined_at": "2017-02-15T14:57:02.846000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Lukas Rossander  †",
+                    "id": "290227027955417089",
+                    "discriminator": "0649",
+                    "avatar": "2dcfc5959eea923cc3f9ae38dff21bb2"
+                },
+                "roles": [
+                    "324135440561078274"
+                ],
+                "mute": false,
+                "joined_at": "2017-03-11T20:59:06.403000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Krohalevsky",
+                    "id": "285046862224949249",
+                    "discriminator": "1604",
+                    "avatar": "140714544986000b6fbf5469592d7506"
+                },
+                "roles": [],
+                "nick": "Nigger Mumbu",
+                "mute": false,
+                "joined_at": "2017-02-25T13:59:40.647000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "S_J*Grajdannik",
+                    "id": "269914596658249739",
+                    "discriminator": "6414",
+                    "avatar": "a96529e9c44341dcc7d570372c5d7929"
+                },
+                "roles": [
+                    "332104185677873152",
+                    "270845668619190273",
+                    "401269447928578070"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-01-14T19:46:01.596000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "ROMVN",
+                    "id": "266438286506065930",
+                    "discriminator": "6200",
+                    "avatar": "ba65905c9847ab2fd97ee907101b071c"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": "МистерСтранный",
+                "mute": false,
+                "joined_at": "2017-01-25T20:27:25.840000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "DRHyperTony",
+                    "id": "395515894572515329",
+                    "discriminator": "2655",
+                    "avatar": "5ceb388e1d94947859337979afb9a6f3"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2018-01-12T16:36:01.012000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "MясикQ",
+                    "id": "226418463470518272",
+                    "discriminator": "0855",
+                    "avatar": "5027271bff79e5108a1b4460334f2a54"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570"
+                ],
+                "nick": "фейспалм",
+                "mute": false,
+                "joined_at": "2017-10-28T11:47:33.230000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "_AMX_(Максим/Макс)",
+                    "id": "281996662799597570",
+                    "discriminator": "8668",
+                    "avatar": "7c88e87c341012e612706766d3c047a6"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2018-01-15T00:24:56.213000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "SIPLIQ",
+                    "id": "321852198432538625",
+                    "discriminator": "5020",
+                    "avatar": "40f5d258f923cbba00e76c6b911c9586"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "mute": false,
+                "joined_at": "2017-08-25T21:12:26.286000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Kartofel_Killer",
+                    "id": "299598891412881420",
+                    "discriminator": "2663",
+                    "avatar": "949125ddf1d6fb1d5b608e71c4949241"
+                },
+                "roles": [
+                    "301042304880345088",
+                    "301058554821869569"
+                ],
+                "mute": false,
+                "joined_at": "2017-04-09T19:22:59.293000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "EPECb [OLEG1]",
+                    "id": "355782085249859585",
+                    "discriminator": "9433",
+                    "avatar": "719e4bb377e71993847d8db1e858c9ba"
+                },
+                "roles": [],
+                "nick": "ЕРЕСb [OLEG1]",
+                "mute": false,
+                "joined_at": "2017-12-08T17:04:16.391000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "юрий",
+                    "id": "269880218074873856",
+                    "discriminator": "2566",
+                    "avatar": "e810cbbefd0c0444d77d7b02f5cd8f8f"
+                },
+                "roles": [],
+                "nick": "Юрий Орлофф",
+                "mute": false,
+                "joined_at": "2017-01-14T17:27:56.929000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Senior_Magisian[0LEG1]",
+                    "id": "382655926450257921",
+                    "discriminator": "3055",
+                    "avatar": "ea602b05093d57ca1d49ab571d6ad70d"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570"
+                ],
+                "nick": "Дмитрий Магисян",
+                "mute": false,
+                "joined_at": "2017-11-27T01:02:39.811000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Just_a_Man",
+                    "id": "253547826301239306",
+                    "discriminator": "7208",
+                    "avatar": null
+                },
+                "roles": [],
+                "nick": "Заготовка перфоратора",
+                "mute": false,
+                "joined_at": "2017-01-14T17:21:54.079000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "King555",
+                    "id": "313302324665909259",
+                    "discriminator": "4193",
+                    "avatar": "0cd1e75085a753f61cad967f100fe85b"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301059825637392384",
+                    "323193132441272331",
+                    "332188255824904193"
+                ],
+                "nick": "Bender Rodríguez",
+                "mute": false,
+                "joined_at": "2017-05-14T13:12:04.913000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Mike Rosoft",
+                    "id": "157537831718223872",
+                    "discriminator": "6475",
+                    "avatar": "e7d3fcbe555d39e51e3b2d82f1b00c2b"
+                },
+                "roles": [
+                    "301042304880345088",
+                    "270845668619190273",
+                    "269565043446644739"
+                ],
+                "nick": "Mack Intosh",
+                "mute": false,
+                "joined_at": "2017-05-28T13:59:16.177000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "MrRerered",
+                    "id": "272570478789525515",
+                    "discriminator": "3623",
+                    "avatar": "54353c89400bd0b52ec458270bab1ecc"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "411093326666661888"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-05-02T21:15:24.447000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Uncle Zen",
+                    "id": "276411014029770754",
+                    "discriminator": "5330",
+                    "avatar": "f3e6247f7e460c5813198cfaf36a4b5b"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-02-03T14:18:33.726000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Marvin",
+                    "id": "341500172515278859",
+                    "discriminator": "8455",
+                    "bot": true,
+                    "avatar": "1888f192aa92e3de15f795df27c8475e"
+                },
+                "roles": [
+                    "269213289978920960",
+                    "272021218838708235"
+                ],
+                "nick": "MΛRVIN",
+                "mute": false,
+                "joined_at": "2017-07-31T08:45:31.254000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Punz",
+                    "id": "270791717190369283",
+                    "discriminator": "7187",
+                    "avatar": "01f3f46668c92c4ae51c405e4c1c984c"
+                },
+                "roles": [
+                    "318382381960790016",
+                    "302834696449163265",
+                    "269565043446644739",
+                    "270845668619190273",
+                    "301043143292354570",
+                    "403106989678264333"
+                ],
+                "nick": "Панз",
+                "mute": false,
+                "joined_at": "2017-01-17T06:09:31.361000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "панда",
+                    "id": "270730226110038017",
+                    "discriminator": "2863",
+                    "avatar": "76bb64512f1ca00cdf9402934e35236c"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "301058554821869569",
+                    "318382381960790016",
+                    "403106989678264333"
+                ],
+                "nick": "панда ёптарожденный",
+                "mute": false,
+                "joined_at": "2017-01-17T02:14:52.162000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Myxa_Ha_CtekJle (Ivan)",
+                    "id": "277504576545095690",
+                    "discriminator": "1887",
+                    "avatar": "92a3ff048135bb82eafab8a004eb8b4a"
+                },
+                "roles": [
+                    "301058554821869569"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-03-15T15:36:01.551271+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "HolyFen1x(Георгий)",
+                    "id": "271742847391105024",
+                    "discriminator": "7573",
+                    "avatar": null
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-05-09T14:37:03.363000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Саныч",
+                    "id": "369537067681710080",
+                    "discriminator": "9421",
+                    "avatar": "f1e7c1c8098f6925ff366d4776a39e38"
+                },
+                "roles": [],
+                "nick": "Mr.Hagrid",
+                "mute": false,
+                "joined_at": "2018-03-15T15:24:18.989247+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "mafa",
+                    "id": "412932741366284288",
+                    "discriminator": "9507",
+                    "avatar": "7424d46587f47c664cc992e6a15f2c63"
+                },
+                "roles": [],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-04-02T17:12:09.893883+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "DispenseR",
+                    "id": "303240726857121793",
+                    "discriminator": "0976",
+                    "avatar": "c90bedd9c710e99852d801c332cdae24"
+                },
+                "roles": [
+                    "309707282437111809",
+                    "301043143292354570",
+                    "269565043446644739",
+                    "270845668619190273"
+                ],
+                "nick": "DispenseuR",
+                "mute": false,
+                "joined_at": "2017-04-20T20:22:21.622000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Macarena_Po_Koleno (Серега)",
+                    "id": "268824010974822412",
+                    "discriminator": "8743",
+                    "avatar": "506382bd89e4ebd5bf81178976c8a12d"
+                },
+                "roles": [
+                    "301043143292354570"
+                ],
+                "nick": "Макаронный Бог",
+                "mute": false,
+                "joined_at": "2017-01-18T18:59:37.025000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "tima123",
+                    "id": "266305287491682304",
+                    "discriminator": "5263",
+                    "avatar": null
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-01-14T21:53:28.167000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Посвящённый Чёрный Храмовник",
+                    "id": "338087552571539458",
+                    "discriminator": "3020",
+                    "avatar": "62903923c7ff87ec4458eae5006a217b"
+                },
+                "roles": [
+                    "301043360536199168",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-07-24T15:18:40.321000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Ramzan-Partizan",
+                    "id": "403918759611465748",
+                    "discriminator": "8816",
+                    "avatar": "0b6f567e9626d73babd99458030c18b8"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "403106989678264333"
+                ],
+                "nick": "Romzan-Partizan",
+                "mute": false,
+                "joined_at": "2018-01-19T14:31:01.236000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "H_A_Y_S",
+                    "id": "314020519382876162",
+                    "discriminator": "5041",
+                    "avatar": "f81aa520b5ece7988810b91b91b30df8"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-12-06T22:28:44.872000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Dead Boy",
+                    "id": "278877137623187456",
+                    "discriminator": "2257",
+                    "avatar": "afc1908c967b6db1cc505ab8cf6321f1"
+                },
+                "roles": [
+                    "324135440561078274"
+                ],
+                "mute": false,
+                "joined_at": "2018-01-24T15:25:30.610000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "401",
+                    "id": "269898264235474945",
+                    "discriminator": "9206",
+                    "avatar": "36d9bace68be99850c93e1d7d01f2c41"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "301043360536199168",
+                    "306744487789723648",
+                    "323193132441272331",
+                    "387273646663532544"
+                ],
+                "nick": "Quatre cent un",
+                "mute": false,
+                "joined_at": "2017-01-18T18:26:57.054000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Sasquadch",
+                    "id": "288720763479916544",
+                    "discriminator": "8554",
+                    "avatar": "4fab2897e42febb329b46e9528d67885"
+                },
+                "roles": [
+                    "301058554821869569"
+                ],
+                "mute": false,
+                "joined_at": "2017-03-07T17:13:32.433000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Максимилиан фон Бобершвейц",
+                    "id": "267742788387340289",
+                    "discriminator": "2594",
+                    "avatar": "95d09d15c7093050555ec5bd0c7c7459"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": "Маршал Хехегей",
+                "mute": false,
+                "joined_at": "2017-05-07T20:11:41.975000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Mimi Virus",
+                    "id": "237296628250312706",
+                    "discriminator": "0562",
+                    "avatar": "4f1e32bc5876c76366d362862ed9f590"
+                },
+                "roles": [
+                    "269213289978920960",
+                    "301043360536199168",
+                    "270845668619190273",
+                    "306744487789723648",
+                    "301058554821869569",
+                    "323193132441272331",
+                    "301059825637392384",
+                    "332104185677873152"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-04-28T12:49:37.932000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Trashman",
+                    "id": "142988168084324352",
+                    "discriminator": "3412",
+                    "avatar": "2825582ffa40647b3ab5d9cb7d32a6d5"
+                },
+                "roles": [
+                    "301059825637392384",
+                    "270845668619190273",
+                    "318382381960790016",
+                    "301058554821869569"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-07-23T20:17:21.307000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Ron1N",
+                    "id": "285504644652990465",
+                    "discriminator": "0006",
+                    "avatar": null
+                },
+                "roles": [
+                    "301042304880345088",
+                    "301058554821869569",
+                    "269565043446644739",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-02-28T17:51:43.842000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Qwazar",
+                    "id": "246698751987679233",
+                    "discriminator": "2154",
+                    "avatar": "6e30cea0d4581e0a7d85230f7e130fbf"
+                },
+                "roles": [
+                    "301042304880345088"
+                ],
+                "mute": false,
+                "joined_at": "2018-01-05T21:22:16.710000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Jober",
+                    "id": "270506092029673473",
+                    "discriminator": "0995",
+                    "avatar": "401842783a56c4f73aeb4f3becb5abcb"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-01-16T10:54:53.087000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Роман Д",
+                    "id": "276413173832220672",
+                    "discriminator": "2315",
+                    "avatar": "4eaae42ba67ada832f66174e02f3e021"
+                },
+                "roles": [],
+                "nick": "Ракамакафу Фристайло",
+                "mute": false,
+                "joined_at": "2017-02-01T18:07:30.933000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "DeRaNo (Алексей)",
+                    "id": "282574328871124993",
+                    "discriminator": "8209",
+                    "avatar": "377f855fed6dea177c087284128cbc5e"
+                },
+                "roles": [],
+                "nick": "Alexey \"из ДВ\"",
+                "mute": false,
+                "joined_at": "2017-04-20T12:49:00.629000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Agrafeuses",
+                    "id": "270619297984806913",
+                    "discriminator": "4292",
+                    "avatar": "3df567ffa74686dfd4c093289f89a80a"
+                },
+                "roles": [
+                    "301042304880345088",
+                    "301058554821869569",
+                    "269565043446644739",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-01-16T23:06:21.552000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "ZhopaBot",
+                    "id": "269449629517479937",
+                    "discriminator": "1377",
+                    "bot": true,
+                    "avatar": "e3049f79abb35d93be580516d686f3de"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "272021218838708235"
+                ],
+                "nick": "ЭЛ0%NМ",
+                "mute": false,
+                "joined_at": "2017-01-20T14:29:01.613000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "TheStorm",
+                    "id": "274576537142165524",
+                    "discriminator": "0002",
+                    "avatar": "a_2731199ca646aec23ac1f6794378280a"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": "Зеленый чай",
+                "mute": false,
+                "joined_at": "2018-01-21T16:22:17.368000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Ecl1ps",
+                    "id": "278191224949571584",
+                    "discriminator": "0345",
+                    "avatar": "e33e167eb5a28607aa873895c45f1322"
+                },
+                "roles": [
+                    "318382381960790016",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-03-21T18:45:25.937194+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "FEN",
+                    "id": "277729643396857856",
+                    "discriminator": "0616",
+                    "avatar": "be55d527373450539a469c8278f1af39"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2018-02-13T17:39:09.822000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "uwiqq",
+                    "id": "354178330284523521",
+                    "discriminator": "7160",
+                    "avatar": "2cc581b3b24ff1af20903a08cba19e8a"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-11-30T16:28:03.703000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "ʀᴇᴠᴇɴɢ3ʀ",
+                    "id": "321638900156071939",
+                    "discriminator": "8267",
+                    "avatar": "820cda6791914ca93c3fa75e2589cf35"
+                },
+                "roles": [],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-04-03T13:41:56.210524+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "UrsusSapiens",
+                    "id": "271550397980737537",
+                    "discriminator": "7377",
+                    "avatar": "617c07c044803d35e97c62de46f65d96"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "301058554821869569",
+                    "306744487789723648",
+                    "318382381960790016",
+                    "323193132441272331",
+                    "328544886905110538",
+                    "401316082864095242",
+                    "403106989678264333"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-01-21T16:16:45.326000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Ведьма OIVSIOLOQUE Milton",
+                    "id": "269848379666857994",
+                    "discriminator": "2294",
+                    "avatar": "239491255cade54a2ad75f08034093c9"
+                },
+                "roles": [
+                    "269213289978920960",
+                    "328544886905110538"
+                ],
+                "nick": "OIVSÖLOGUE",
+                "mute": false,
+                "joined_at": "2017-01-14T15:34:11.806000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Good Boy",
+                    "id": "329121622701375489",
+                    "discriminator": "0989",
+                    "avatar": "e6fe53edcd97f07fc502d7f6cb395dc8"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-06-27T04:59:09.835000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Еnot",
+                    "id": "268083654549307402",
+                    "discriminator": "5024",
+                    "avatar": "d7e4de849e9558ab17d7ae1cd7799e2d"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-10-11T19:05:03.349000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "SENESER",
+                    "id": "358221359672983553",
+                    "discriminator": "5904",
+                    "avatar": "30b0c204c717903639203643e081ff97"
+                },
+                "roles": [],
+                "nick": "КУКУРУЗНЫЙ МОНСТР",
+                "mute": false,
+                "joined_at": "2018-03-28T01:48:52.027278+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Hots",
+                    "id": "272694762216357888",
+                    "discriminator": "7591",
+                    "avatar": "52c96151052a4f41da2a49aa915b2a36"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "301043360536199168",
+                    "301058554821869569",
+                    "323193132441272331",
+                    "324135440561078274",
+                    "403106989678264333"
+                ],
+                "nick": "Forsy",
+                "mute": false,
+                "joined_at": "2017-01-22T11:53:58.975000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "duha1000 (Андрей)",
+                    "id": "277156877845135370",
+                    "discriminator": "4008",
+                    "avatar": null
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-06-12T19:03:08.903000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Кентаныч",
+                    "id": "285084639738200064",
+                    "discriminator": "9159",
+                    "avatar": "abc111798297eee8e9a173d50b54bb42"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "318382381960790016"
+                ],
+                "mute": false,
+                "joined_at": "2017-03-13T13:12:03.105000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "4yva4ok",
+                    "id": "311065037022167041",
+                    "discriminator": "4364",
+                    "avatar": "9e710b1797331a78b2bfae3d5a987b24"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-05-08T09:01:44.407000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "MrTrouble",
+                    "id": "326849208357486594",
+                    "discriminator": "1991",
+                    "avatar": "a_1e80c0b5bb295bf36002cf8b307acfdc"
+                },
+                "roles": [
+                    "301042304880345088",
+                    "301058554821869569",
+                    "269565043446644739",
+                    "318382381960790016",
+                    "270845668619190273",
+                    "301059825637392384"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-08-13T17:38:05.405000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Квентин Трэмбли",
+                    "id": "278942953274343424",
+                    "discriminator": "8404",
+                    "avatar": "c27873a126ce8dd9104e94563c415d60"
+                },
+                "roles": [],
+                "nick": "Квентин Трэмбли",
+                "mute": false,
+                "joined_at": "2017-02-08T17:40:10.663000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "artem_Unit",
+                    "id": "287320285550608395",
+                    "discriminator": "2349",
+                    "avatar": "016543680a9d423eeaf7b1bd8e14a90f"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-11-18T19:55:27.444000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Аскарбин Кислота",
+                    "id": "273910851759505408",
+                    "discriminator": "3742",
+                    "avatar": "db462bcff72b6892096d1a03b3ec6e68"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "323192343778033666"
+                ],
+                "nick": "Аскарбин Кислота",
+                "mute": false,
+                "joined_at": "2017-01-25T20:24:12.061000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Sleep",
+                    "id": "276618262870228992",
+                    "discriminator": "0666",
+                    "avatar": "9b39b98d9a0e69b8819f4aa4f4a961bc"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-02-02T07:42:43.173000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "BladeOfSteel",
+                    "id": "198697730992898048",
+                    "discriminator": "0998",
+                    "avatar": "2b6ebe0adf5fab7439e0f4e1d746fba9"
+                },
+                "roles": [],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-03-18T19:53:32.980861+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Pashko_",
+                    "id": "260749249447329792",
+                    "discriminator": "9652",
+                    "avatar": "8a2808553679c09627fb67c76f5dc1cd"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-08-15T13:59:47.800000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Angel Ariki",
+                    "id": "269871814010732546",
+                    "discriminator": "6293",
+                    "avatar": "a8886107529bcc4a83bbca7d12caf35b"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "301043360536199168",
+                    "301059825637392384",
+                    "302834696449163265",
+                    "306744487789723648",
+                    "318382381960790016",
+                    "332188255824904193",
+                    "387273646663532544",
+                    "401320204807700480",
+                    "403106989678264333",
+                    "411093326666661888"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-01-15T14:52:06.891000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "John Mac'Allister",
+                    "id": "256143757114605569",
+                    "discriminator": "9235",
+                    "avatar": "610cd286b556b6fcc37e90d600e26f9d"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043360536199168",
+                    "323193132441272331"
+                ],
+                "mute": false,
+                "joined_at": "2017-02-28T20:51:33.249000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "MoRRoM",
+                    "id": "254350106420183040",
+                    "discriminator": "8802",
+                    "avatar": "fbed7c0f4f7929f1359f5fe7c34a8b3d"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043360536199168"
+                ],
+                "mute": false,
+                "joined_at": "2017-01-18T17:10:08.078000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "drobbob(Сергей Серебряков)",
+                    "id": "294805254225264640",
+                    "discriminator": "3465",
+                    "avatar": "ad4678c4408d0ac20bb2506e78fb4274"
+                },
+                "roles": [],
+                "nick": "Мжвяк",
+                "mute": false,
+                "joined_at": "2018-02-25T19:15:58.857000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Yurka Aferist",
+                    "id": "319001071944990740",
+                    "discriminator": "5539",
+                    "avatar": "656463aaed9f5f62b198e71287866f18"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "387273646663532544"
+                ],
+                "nick": "Легче Меньше Больше Кек",
+                "mute": false,
+                "joined_at": "2017-05-30T06:39:23.277000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Хозяин",
+                    "id": "273860590231879690",
+                    "discriminator": "8327",
+                    "avatar": null
+                },
+                "roles": [],
+                "nick": "Negatt1ve",
+                "mute": false,
+                "joined_at": "2017-01-25T17:04:26.331000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "nomad",
+                    "id": "267769907670679552",
+                    "discriminator": "2269",
+                    "avatar": "11410ca819a7bfe73c59ef1750c69a00"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "318382381960790016"
+                ],
+                "nick": "Нраица",
+                "mute": false,
+                "joined_at": "2017-06-09T11:59:36.377000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Scofield 39_tonn",
+                    "id": "252864973540163584",
+                    "discriminator": "1556",
+                    "avatar": "b1db643114a46a628006df96ef578e7f"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043360536199168"
+                ],
+                "nick": "Йося Блажко-Желтоочечковичк V",
+                "mute": false,
+                "joined_at": "2017-01-18T18:47:57.763000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Pipon",
+                    "id": "312208683176034310",
+                    "discriminator": "3878",
+                    "avatar": "f36845296063bc6435f7953e71a769cd"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "269565043446644739"
+                ],
+                "nick": "Мишка (настоящий)",
+                "mute": false,
+                "joined_at": "2017-05-11T12:46:09.592000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Walter",
+                    "id": "281368972341936130",
+                    "discriminator": "1292",
+                    "avatar": "7f3175f715a2c0bcd973e5f0467f31f7"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "mute": false,
+                "joined_at": "2017-04-29T20:17:08.183000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Deathtechnikk",
+                    "id": "397025970076254226",
+                    "discriminator": "8415",
+                    "avatar": "f2dd523b2c783f4246cbbe204494661a"
+                },
+                "roles": [
+                    "318382381960790016",
+                    "301058554821869569",
+                    "323193132441272331",
+                    "411093326666661888",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-03-18T09:49:20.175790+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "HappierThanYou",
+                    "id": "257710032983031808",
+                    "discriminator": "5328",
+                    "avatar": "00e5ae0099c824a9fee53986ad5991e1"
+                },
+                "roles": [
+                    "301043360536199168"
+                ],
+                "nick": "Командор Сэмюэль Ваймс",
+                "mute": false,
+                "joined_at": "2017-09-16T18:40:23.621000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Attix",
+                    "id": "269509999514877952",
+                    "discriminator": "1497",
+                    "avatar": "04da6721d23e955db069547a4f4ee37a"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": "Attix[ONEGI]",
+                "mute": false,
+                "joined_at": "2017-01-21T17:05:08.661000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Тыква бюрократ",
+                    "id": "270260241713594368",
+                    "discriminator": "2708",
+                    "avatar": "9ff514fac4562c2ad05eefeb1261fc9b"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "nick": "Тыква Бюрократ",
+                "mute": false,
+                "joined_at": "2017-10-15T17:36:41.591000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Pixelhead",
+                    "id": "108158609669562368",
+                    "discriminator": "9867",
+                    "avatar": null
+                },
+                "roles": [
+                    "301042304880345088",
+                    "301058554821869569",
+                    "269565043446644739",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-03-02T21:54:53.089000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "shizzard",
+                    "id": "269144761103810561",
+                    "discriminator": "1337",
+                    "avatar": "d84d52bad1159c063d043a074b3a1703"
+                },
+                "roles": [
+                    "269213127835516929",
+                    "269565043446644739",
+                    "270845668619190273",
+                    "301042304880345088",
+                    "301058554821869569",
+                    "332188255824904193",
+                    "335395823196045313",
+                    "387273646663532544",
+                    "403106989678264333"
+                ],
+                "nick": "Катерин I",
+                "mute": false,
+                "joined_at": "2017-01-12T21:03:05.094000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Ghost31312",
+                    "id": "279239268982063106",
+                    "discriminator": "4700",
+                    "avatar": "b2b3407ed048c68f26d85c5278fa27d7"
+                },
+                "roles": [
+                    "324135440561078274"
+                ],
+                "mute": false,
+                "joined_at": "2018-01-21T18:31:11.770000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Rostislav Paschenko",
+                    "id": "276318520092917760",
+                    "discriminator": "5046",
+                    "avatar": null
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-02-01T12:59:18.697000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Roman Reforman",
+                    "id": "276238239914786817",
+                    "discriminator": "3180",
+                    "avatar": "51cd9d5d9506106660ef8f7b320ee6ec"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "301043143292354570",
+                    "301058554821869569",
+                    "301059825637392384",
+                    "323193132441272331",
+                    "400230534103564288",
+                    "403106989678264333"
+                ],
+                "nick": "Loman ⚓ Фыпь",
+                "mute": false,
+                "joined_at": "2017-02-01T06:33:14.578000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Ушёл служить, ведь я МУЖИК!",
+                    "id": "268683227621752844",
+                    "discriminator": "4788",
+                    "avatar": "4ed781b2568df478d64b87ad1120361c"
+                },
+                "roles": [
+                    "301043360536199168"
+                ],
+                "mute": false,
+                "joined_at": "2017-03-31T16:54:00.610000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "OldComrade",
+                    "id": "276721136253927428",
+                    "discriminator": "8093",
+                    "avatar": "d341e0ecdec6cb91619c01badbb9541a"
+                },
+                "roles": [
+                    "301042304880345088",
+                    "301058554821869569",
+                    "269565043446644739",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-02-02T15:07:19.587000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Raikoru",
+                    "id": "348025248181911552",
+                    "discriminator": "6028",
+                    "avatar": "2b10944b1c11130857a449e9344b1935"
+                },
+                "roles": [],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-03-31T18:49:12.621652+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Дмитрий Иванов",
+                    "id": "269915081536569344",
+                    "discriminator": "4916",
+                    "avatar": "26bc7dee1c85e222c601e80d4326c27e"
+                },
+                "roles": [],
+                "nick": "Dmitrii",
+                "mute": false,
+                "joined_at": "2017-01-14T19:47:03.323000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Барабум Барабумов",
+                    "id": "271323062593519622",
+                    "discriminator": "6948",
+                    "avatar": "fadd14b3679e41cd552274eec75cd66a"
+                },
+                "roles": [
+                    "270845668619190273"
+                ],
+                "mute": false,
+                "joined_at": "2017-01-18T17:01:47.376000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Dreamcatcher",
+                    "id": "254976945291264001",
+                    "discriminator": "5609",
+                    "avatar": "bc53df15a5a9aecba0ac8d1c46923eb7"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "306744487789723648",
+                    "318382381960790016",
+                    "332102374175014912",
+                    "403106989678264333"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2017-01-14T15:48:07.450000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Бэтмен",
+                    "id": "289498697979658240",
+                    "discriminator": "7537",
+                    "avatar": "e03cc651c8a355b90e6d914daa55b73f"
+                },
+                "roles": [
+                    "270845668619190273",
+                    "411093326666661888"
+                ],
+                "nick": "Бэтмен [Повелитель Хлебушков]",
+                "mute": false,
+                "joined_at": "2018-01-18T05:08:38.898000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Rihard Kraus",
+                    "id": "242257112208506881",
+                    "discriminator": "3888",
+                    "avatar": "073c6745e4a2db7f62e958aa917ffe67"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-09-30T19:35:25.568000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Кирилл Кибо",
+                    "id": "269872089836552212",
+                    "discriminator": "7106",
+                    "avatar": null
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-01-14T16:55:38.327000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Зло",
+                    "id": "235047978669178880",
+                    "discriminator": "7275",
+                    "avatar": "62885be635026a9b5cae418028525cdc"
+                },
+                "roles": [
+                    "269213289978920960",
+                    "301663960132747264",
+                    "387273646663532544",
+                    "270845668619190273",
+                    "403106989678264333",
+                    "318382381960790016"
+                ],
+                "nick": "Злой полицейский",
+                "mute": false,
+                "joined_at": "2017-01-12T21:41:17.934000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Bunbuk1",
+                    "id": "370181604628234249",
+                    "discriminator": "8480",
+                    "avatar": null
+                },
+                "roles": [
+                    "301043143292354570"
+                ],
+                "mute": false,
+                "joined_at": "2017-10-18T12:09:59.154000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "losecntrl",
+                    "id": "247744346462486528",
+                    "discriminator": "6404",
+                    "avatar": "08b471438b5a5e5b97bdabea10b28326"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-01-15T07:11:16.281000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Sunnersbye",
+                    "id": "374499317966438400",
+                    "discriminator": "4741",
+                    "avatar": "6a4eb79d1a0498773f084c26ad4ebd57"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-12-08T17:05:37.712000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "MarvinDev",
+                    "id": "425393271205003265",
+                    "discriminator": "9246",
+                    "bot": true,
+                    "avatar": "66f6c6d211a06b90227f378fa3456181"
+                },
+                "roles": [
+                    "272021218838708235",
+                    "425394683682750474"
+                ],
+                "nick": "M★RVIN-Devel",
+                "mute": false,
+                "joined_at": "2018-03-19T20:46:36.028573+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Lampard95(Альфир)",
+                    "id": "263625440097206286",
+                    "discriminator": "0194",
+                    "avatar": "ac2248b88fe6e4802d55d0d960096937"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-01-14T18:51:44.001000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "wizard",
+                    "id": "269563815769669632",
+                    "discriminator": "0848",
+                    "avatar": "ca1e39c25e4b077027022213e5d012dc"
+                },
+                "roles": [
+                    "269565043446644739",
+                    "270845668619190273",
+                    "301042304880345088",
+                    "301043143292354570"
+                ],
+                "nick": "Посол «Анархляндии»",
+                "mute": false,
+                "joined_at": "2017-01-13T20:31:06.995000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Cloaca_b",
+                    "id": "261814270247960578",
+                    "discriminator": "5299",
+                    "avatar": "8a32ddf2cde74ce0e6d6fc5721fb7d6f"
+                },
+                "roles": [
+                    "301058554821869569"
+                ],
+                "mute": false,
+                "joined_at": "2017-02-01T17:55:14.373000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "наглость2счастье",
+                    "id": "269927114302685184",
+                    "discriminator": "0470",
+                    "avatar": "ab7f247c012d0d9ee0ee938e30fb0f98"
+                },
+                "roles": [
+                    "306744487789723648",
+                    "270845668619190273",
+                    "318382381960790016",
+                    "301059825637392384",
+                    "335395823196045313",
+                    "402786904967348235",
+                    "335835989836824576"
+                ],
+                "nick": "наглось втолое сцасте",
+                "mute": false,
+                "joined_at": "2017-01-21T16:57:01.991000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Lifad",
+                    "id": "237304727711383552",
+                    "discriminator": "0885",
+                    "avatar": "f83616052afa019390e11fcb30629d5d"
+                },
+                "roles": [
+                    "269213289978920960",
+                    "301663960132747264",
+                    "411093326666661888",
+                    "270845668619190273",
+                    "328544886905110538",
+                    "323193132441272331",
+                    "403106989678264333"
+                ],
+                "nick": "Меh",
+                "mute": false,
+                "joined_at": "2017-01-12T21:48:02.921000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "0_Ultimatum_0",
+                    "id": "246305474662760450",
+                    "discriminator": "7565",
+                    "avatar": "476bb975367f9af51d1514c77c4aa4a2"
+                },
+                "roles": [],
+                "mute": false,
+                "joined_at": "2017-01-14T16:52:34.080000+00:00",
+                "deaf": false
+            },
+            {
+                "user": {
+                    "username": "Dmorok",
+                    "id": "143008978874531840",
+                    "discriminator": "5445",
+                    "avatar": "65a3f38dbf99055267956d5202a181fc"
+                },
+                "roles": [
+                    "318382381960790016",
+                    "301058554821869569",
+                    "270845668619190273"
+                ],
+                "nick": null,
+                "mute": false,
+                "joined_at": "2018-02-11T14:59:45.556000+00:00",
+                "deaf": false
+            }
+        ],
+        "member_count": 574,
+        "large": true,
+        "joined_at": "2017-07-31T08:45:31.254000+00:00",
+        "id": "269209661973069825",
+        "icon": "e8c62c129baf423d5bf5d9ffb888b304",
+        "features": [],
+        "explicit_content_filter": 0,
+        "emojis": [
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "imba",
+                "managed": false,
+                "id": "269223210950590464",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "fuckyeah",
+                "managed": false,
+                "id": "269245345039515658",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "wooo",
+                "managed": false,
+                "id": "269245795134472206",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "omg",
+                "managed": false,
+                "id": "269248955030831113",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "wg",
+                "managed": false,
+                "id": "269249887781126144",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "slow",
+                "managed": false,
+                "id": "269256247113547777",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "serb",
+                "managed": false,
+                "id": "269256453187960835",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "trollface",
+                "managed": false,
+                "id": "269256528479911936",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "balkenkreuz",
+                "managed": false,
+                "id": "269257549738541056",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "stark",
+                "managed": false,
+                "id": "270611553009532947",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "doc",
+                "managed": false,
+                "id": "270613910929801216",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "glasses",
+                "managed": false,
+                "id": "270891487930089474",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "shizz",
+                "managed": false,
+                "id": "271250016192954368",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "wow",
+                "managed": false,
+                "id": "273508795840331777",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "angry",
+                "managed": false,
+                "id": "273667290468319232",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "trollfail",
+                "managed": false,
+                "id": "273667291533672450",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "forsatan",
+                "managed": false,
+                "id": "275791435972870145",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "kappapride",
+                "managed": false,
+                "id": "277397116748562432",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "kappa",
+                "managed": false,
+                "id": "277398448926359563",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "fu",
+                "managed": false,
+                "id": "278505146462502913",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "cry",
+                "managed": false,
+                "id": "278507775338872832",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "why",
+                "managed": false,
+                "id": "278507775603245057",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "notsure",
+                "managed": false,
+                "id": "278508514652061710",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "wine",
+                "managed": false,
+                "id": "278508515138732032",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "what",
+                "managed": false,
+                "id": "278509243747794945",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "dalek",
+                "managed": false,
+                "id": "278779217645404170",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "supercat",
+                "managed": false,
+                "id": "282062359814733824",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "sir",
+                "managed": false,
+                "id": "283565107282444289",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "everything_bad",
+                "managed": false,
+                "id": "298806206682759168",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "dino",
+                "managed": false,
+                "id": "299917103153020928",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "thorin",
+                "managed": false,
+                "id": "307145275510620160",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "captain_obvious",
+                "managed": false,
+                "id": "320153896599420928",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "okay",
+                "managed": false,
+                "id": "336490353764990976",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "bulbfather",
+                "managed": false,
+                "id": "362535422514954240",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "siegfail",
+                "managed": false,
+                "id": "362944264621129728",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "punz",
+                "managed": false,
+                "id": "363260162670067712",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "lul",
+                "managed": false,
+                "id": "385640480576241684",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "deusvult",
+                "managed": false,
+                "id": "387566983656374273",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "witcher",
+                "managed": false,
+                "id": "389728697927598080",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "milliQ",
+                "managed": false,
+                "id": "389767109049319425",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "Q_",
+                "managed": false,
+                "id": "389767109254709250",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "kiloQ",
+                "managed": false,
+                "id": "389767109321949184",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "microQ",
+                "managed": false,
+                "id": "389767109544247296",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "balance",
+                "managed": false,
+                "id": "393725823355453442",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "elder",
+                "managed": false,
+                "id": "400305876075937792",
+                "animated": true
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "sirm",
+                "managed": false,
+                "id": "406375125441839109",
+                "animated": false
+            },
+            {
+                "roles": [],
+                "require_colons": true,
+                "name": "loading",
+                "managed": false,
+                "id": "410778534135463938",
+                "animated": true
+            }
+        ],
+        "default_message_notifications": 1,
+        "channels": [
+            {
+                "type": 0,
+                "topic": "",
+                "position": 0,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 805763152,
+                        "allow": 65537
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 805763153,
+                        "allow": 65536
+                    },
+                    {
+                        "type": "role",
+                        "id": "269213127835516929",
+                        "deny": 0,
+                        "allow": 0
+                    }
+                ],
+                "name": "welcome",
+                "last_message_id": "269826707815530507",
+                "id": "269209661973069825"
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 5,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 805306385,
+                        "allow": 66060288
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 835715089,
+                        "allow": 35652608
+                    }
+                ],
+                "parent_id": "361119489477181442",
+                "name": "Дворянский квартал",
+                "id": "269209661973069827",
+                "bitrate": 64000
+            },
+            {
+                "type": 0,
+                "topic": "",
+                "position": 1,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 805763153,
+                        "allow": 66560
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 805500945,
+                        "allow": 328768
+                    },
+                    {
+                        "type": "role",
+                        "id": "269213127835516929",
+                        "deny": 16384,
+                        "allow": 0
+                    }
+                ],
+                "name": "announcements",
+                "last_message_id": "430397442052194316",
+                "id": "269211844294475778"
+            },
+            {
+                "type": 0,
+                "topic": "Теплые ламповые беседы",
+                "position": 2,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 805441553,
+                        "allow": 125952
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 805498897,
+                        "allow": 330816
+                    },
+                    {
+                        "type": "role",
+                        "id": "269565043446644739",
+                        "deny": 805449745,
+                        "allow": 379968
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 805829713,
+                        "allow": 0
+                    },
+                    {
+                        "type": "role",
+                        "id": "270845668619190273",
+                        "deny": 805306385,
+                        "allow": 51200
+                    },
+                    {
+                        "type": "role",
+                        "id": "269213127835516929",
+                        "deny": 0,
+                        "allow": 4096
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "nsfw": false,
+                "name": "ontop",
+                "last_pin_timestamp": "2018-04-04T12:42:37.520509+00:00",
+                "last_message_id": "431081705743319051",
+                "id": "269219052239585281"
+            },
+            {
+                "type": 0,
+                "topic": "",
+                "position": 7,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 805306385,
+                        "allow": 523328
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 805829713,
+                        "allow": 0
+                    },
+                    {
+                        "type": "role",
+                        "id": "269565043446644739",
+                        "deny": 805314577,
+                        "allow": 515136
+                    },
+                    {
+                        "type": "role",
+                        "id": "272021218838708235",
+                        "deny": 0,
+                        "allow": 3072
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "nsfw": false,
+                "name": "top-secret-channel",
+                "last_message_id": "429624987909881867",
+                "id": "269242538861395978"
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 1,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 805306385,
+                        "allow": 66060288
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 0,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 3145728,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "name": "Таверна 'Енот Бульонский'",
+                "id": "269262697818750976",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 0,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "272021218838708235",
+                        "deny": 0,
+                        "allow": 3145728
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 835715089,
+                        "allow": 35652608
+                    },
+                    {
+                        "type": "role",
+                        "id": "269565043446644739",
+                        "deny": 805306385,
+                        "allow": 36701184
+                    },
+                    {
+                        "type": "role",
+                        "id": "332104185677873152",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "role",
+                        "id": "269213127835516929",
+                        "deny": 0,
+                        "allow": 36700160
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "name": "Дворец Элохима",
+                "id": "269564905147858945",
+                "bitrate": 64000
+            },
+            {
+                "type": 0,
+                "topic": "",
+                "position": 8,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1024,
+                        "allow": 0
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 805761105,
+                        "allow": 68608
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "nsfw": false,
+                "name": "gehenna",
+                "last_message_id": "429622913898119169",
+                "id": "274963874757869569"
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 12,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 806354961,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "323193132441272331",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 3145728,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Порт 'Красна Корюшка'",
+                "id": "276469346069643276",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 7,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 36700160,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "member",
+                        "id": "269871814010732546",
+                        "deny": 0,
+                        "allow": 36701184
+                    },
+                    {
+                        "type": "member",
+                        "id": "270791717190369283",
+                        "deny": 0,
+                        "allow": 36701184
+                    }
+                ],
+                "parent_id": "361119489477181442",
+                "name": "Коммуна 'Pünzel Ariki'",
+                "id": "277784920368087040",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 6,
+                "permission_overwrites": [
+                    {
+                        "type": "member",
+                        "id": "108158609669562368",
+                        "deny": 0,
+                        "allow": 53478400
+                    },
+                    {
+                        "type": "member",
+                        "id": "188728119731945472",
+                        "deny": 0,
+                        "allow": 36701184
+                    },
+                    {
+                        "type": "member",
+                        "id": "237296628250312706",
+                        "deny": 0,
+                        "allow": 3146752
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 36700160,
+                        "allow": 0
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "member",
+                        "id": "269563815769669632",
+                        "deny": 0,
+                        "allow": 53478400
+                    },
+                    {
+                        "type": "member",
+                        "id": "258623196436103169",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "member",
+                        "id": "303606400720961536",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "member",
+                        "id": "270619297984806913",
+                        "deny": 0,
+                        "allow": 53478401
+                    },
+                    {
+                        "type": "member",
+                        "id": "271550397980737537",
+                        "deny": 0,
+                        "allow": 53478400
+                    },
+                    {
+                        "type": "member",
+                        "id": "299598891412881420",
+                        "deny": 0,
+                        "allow": 36701184
+                    },
+                    {
+                        "type": "role",
+                        "id": "269213127835516929",
+                        "deny": 0,
+                        "allow": 1048576
+                    },
+                    {
+                        "type": "member",
+                        "id": "382537646712553483",
+                        "deny": 0,
+                        "allow": 3146752
+                    },
+                    {
+                        "type": "member",
+                        "id": "285504644652990465",
+                        "deny": 0,
+                        "allow": 53478400
+                    },
+                    {
+                        "type": "member",
+                        "id": "246698751987679233",
+                        "deny": 0,
+                        "allow": 53478400
+                    },
+                    {
+                        "type": "member",
+                        "id": "276721136253927428",
+                        "deny": 0,
+                        "allow": 53478400
+                    },
+                    {
+                        "type": "member",
+                        "id": "291334745097371648",
+                        "deny": 0,
+                        "allow": 36701184
+                    }
+                ],
+                "parent_id": "361119489477181442",
+                "name": "Орден ассасинов",
+                "id": "279952959264129025",
+                "bitrate": 64000
+            },
+            {
+                "type": 0,
+                "topic": "Чо поорать",
+                "position": 3,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 0,
+                        "allow": 60416
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 0,
+                        "allow": 379968
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 805829713,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "nsfw": false,
+                "name": "spicy-memes",
+                "last_pin_timestamp": "2018-02-20T11:38:55.690000+00:00",
+                "last_message_id": "431077529101795330",
+                "id": "296248793823838208"
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 3,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 835715089,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "319878580106428418",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 3145728,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "name": "Позорный столб",
+                "id": "300895617666908168",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 18,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 0,
+                        "allow": 16777216
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "301043143292354570",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 36700160,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Колхоз 'Красна Бульба'",
+                "id": "301044691787448323",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 8,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "301663960132747264",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    }
+                ],
+                "parent_id": "361119489477181442",
+                "name": "VIP-домик TWIX",
+                "id": "301698455837999106",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 19,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 0,
+                        "allow": 4194304
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "301058554821869569",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 3145728,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Завод перфораторов",
+                "id": "303151070425645066",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 2,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 0,
+                        "allow": 66060288
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 0,
+                        "allow": 53478400
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 3145728,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "name": "Трущобы",
+                "id": "303820807161905153",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 14,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 0,
+                        "allow": 16777216
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "318382381960790016",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 36700160,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Кафе 'Метелица'",
+                "id": "318382558511366145",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 9,
+                "permission_overwrites": [
+                    {
+                        "type": "member",
+                        "id": "157537831718223872",
+                        "deny": 0,
+                        "allow": 53477376
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 36700160,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "member",
+                        "id": "298932833043611650",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "member",
+                        "id": "269563815769669632",
+                        "deny": 0,
+                        "allow": 36700160
+                    },
+                    {
+                        "type": "member",
+                        "id": "303240726857121793",
+                        "deny": 0,
+                        "allow": 53477376
+                    }
+                ],
+                "parent_id": "361119489477181442",
+                "name": "Диспансер",
+                "id": "321356437068578817",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 15,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "323192343778033666",
+                        "deny": 0,
+                        "allow": 1048576
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Кинотеатр 'Родительский'",
+                "id": "323192598887923723",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 13,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269213289978920960",
+                        "deny": 0,
+                        "allow": 16777216
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    },
+                    {
+                        "type": "role",
+                        "id": "324135440561078274",
+                        "deny": 0,
+                        "allow": 1048576
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 1048576,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Клуб 'Has Been Planted'",
+                "id": "324137364186333189",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 11,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 1024
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "nsfw": false,
+                "name": "Парк артоводов",
+                "id": "324138247745961984",
+                "bitrate": 64000
+            },
+            {
+                "type": 0,
+                "topic": "Выпьем за любовь!",
+                "position": 4,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "270845668619190273",
+                        "deny": 0,
+                        "allow": 49152
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 3072,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "nsfw": false,
+                "name": "music",
+                "last_message_id": "430857003011670046",
+                "id": "329280870349406228"
+            },
+            {
+                "type": 0,
+                "topic": "git clone https://github.com/shizzard/marvin.git",
+                "position": 5,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 4096,
+                        "allow": 0
+                    },
+                    {
+                        "type": "role",
+                        "id": "277189846664085505",
+                        "deny": 523328,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "nsfw": true,
+                "name": "devporn",
+                "last_pin_timestamp": "2018-04-02T08:51:26.030490+00:00",
+                "last_message_id": "430694818671230976",
+                "id": "341496525613957120"
+            },
+            {
+                "user_limit": 0,
+                "type": 4,
+                "position": 1,
+                "permission_overwrites": [],
+                "parent_id": null,
+                "nsfw": false,
+                "name": "Пригород",
+                "id": "361119489477181442",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 4,
+                "position": 2,
+                "permission_overwrites": [],
+                "name": "Игровые каналы",
+                "id": "361120157793386507",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 4,
+                "position": 0,
+                "permission_overwrites": [],
+                "parent_id": null,
+                "nsfw": false,
+                "name": "Имбалэнд",
+                "id": "361120669439623168",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 10,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 35652608
+                    },
+                    {
+                        "type": "member",
+                        "id": "276238239914786817",
+                        "deny": 0,
+                        "allow": 66061312
+                    }
+                ],
+                "parent_id": "361119489477181442",
+                "name": "Цитадель Reforman",
+                "id": "398156623811444757",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 16,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "301042304880345088",
+                        "deny": 0,
+                        "allow": 1048576
+                    },
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 0
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Военная база 'Сосновка'",
+                "id": "400042456604737536",
+                "bitrate": 64000
+            },
+            {
+                "user_limit": 0,
+                "type": 2,
+                "position": 17,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 1048576,
+                        "allow": 0
+                    },
+                    {
+                        "type": "role",
+                        "id": "403106989678264333",
+                        "deny": 0,
+                        "allow": 1048576
+                    }
+                ],
+                "parent_id": "361120157793386507",
+                "name": "Озеро Лоун Стар",
+                "id": "404226582182363138",
+                "bitrate": 64000
+            },
+            {
+                "type": 0,
+                "topic": null,
+                "position": 6,
+                "permission_overwrites": [
+                    {
+                        "type": "role",
+                        "id": "269209661973069825",
+                        "deny": 805764177,
+                        "allow": 65536
+                    },
+                    {
+                        "type": "role",
+                        "id": "270845668619190273",
+                        "deny": 0,
+                        "allow": 66624
+                    },
+                    {
+                        "type": "role",
+                        "id": "269213127835516929",
+                        "deny": 0,
+                        "allow": 1024
+                    }
+                ],
+                "parent_id": "361120669439623168",
+                "nsfw": false,
+                "name": "центризбирком",
+                "last_message_id": "431067822311866369",
+                "id": "431064423772454922"
+            }
+        ],
+        "application_id": null,
+        "afk_timeout": 300,
+        "afk_channel_id": null
+    },
+    "s": 1,
+    "t": "GUILD_CREATE"
+}

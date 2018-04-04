@@ -77,6 +77,9 @@ cloak_validate(parent_id, Value) when is_binary(Value) andalso Value /= <<>> ->
 cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
+cloak_validate(topic, null) ->
+    {ok, undefined};
+
 cloak_validate(topic, Value) when is_binary(Value) ->
     {ok, Value};
 
