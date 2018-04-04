@@ -21,7 +21,7 @@
     description = undefined :: description() | undefined,
     url = undefined :: url() | undefined,
     timestamp = undefined :: timestamp() | undefined,
-    color :: color(),
+    color = undefined :: color() | undefined,
     footer = undefined :: footer() | undefined,
     image = undefined :: image() | undefined,
     thumbnail = undefined :: thumbnail() | undefined,

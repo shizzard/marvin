@@ -486,7 +486,7 @@ marvin_pdu2_object_embed() ->
         ?OPTIONAL({description, non_empty(proper_unicode:utf8(15))}),
         ?OPTIONAL({url, non_empty(proper_unicode:utf8(15))}),
         ?OPTIONAL({timestamp, non_empty(proper_unicode:utf8(15))}),
-        {color, marvin_pdu2_object_embed:color()},
+        ?OPTIONAL({color, marvin_pdu2_object_embed:color()}),
         ?OPTIONAL({footer, marvin_pdu2_object_embed_footer()}),
         ?OPTIONAL({image, marvin_pdu2_object_embed_image()}),
         ?OPTIONAL({thumbnail, marvin_pdu2_object_embed_thumbnail()}),

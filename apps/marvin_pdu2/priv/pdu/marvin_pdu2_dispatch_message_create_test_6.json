@@ -1,0 +1,38 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-04-04T15:04:12.329000+00:00",
+        "pinned": false,
+        "nonce": "431106722510143488",
+        "mentions": [],
+        "mention_roles": [],
+        "mention_everyone": false,
+        "id": "431106722958934016",
+        "embeds": [
+            {
+                "url": "https://cs8.pikabu.ru/post_img/2018/04/04/7/1522836843218387727.gif",
+                "type": "image",
+                "thumbnail": {
+                    "width": 320,
+                    "url": "https://cs8.pikabu.ru/post_img/2018/04/04/7/1522836843218387727.gif",
+                    "proxy_url": "https://images-ext-1.discordapp.net/external/y6P8Ysso1LFK_Jy-b7WLNo10JY662IgArd1QsbaD69c/https/cs8.pikabu.ru/post_img/2018/04/04/7/1522836843218387727.gif",
+                    "height": 181
+                }
+            }
+        ],
+        "edited_timestamp": null,
+        "content": "https://cs8.pikabu.ru/post_img/2018/04/04/7/1522836843218387727.gif",
+        "channel_id": "296248793823838208",
+        "author": {
+            "username": "shizzard",
+            "id": "269144761103810561",
+            "discriminator": "1337",
+            "avatar": "d84d52bad1159c063d043a074b3a1703"
+        },
+        "attachments": []
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}
