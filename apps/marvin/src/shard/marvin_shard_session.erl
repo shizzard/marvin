@@ -408,8 +408,7 @@ handle_call_incoming_event_dispatch_guild_create(Struct, S0) ->
         [S0#state.shard_name, GuildId]
     ),
     marvin_guild_monitor:maybe_start_guild(GuildId),
-    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
-    ok = marvin_guild:do_provision(GuildPid, Struct),
+    ok = marvin_guild:do_provision(GuildId, Struct),
     {reply, ok, S0}.
 
 
@@ -430,8 +429,7 @@ handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
         "Shard '~p' got presence update for guild '~s'/user '~s')",
         [S0#state.shard_name, GuildId, UserId]
     ),
-    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
-    ok = marvin_guild:presence_update(GuildPid, Struct),
+    ok = marvin_guild:presence_update(GuildId, Struct),
     {reply, ok, S0}.
 
 
