@@ -1,0 +1,12 @@
+{
+    "id": "file://pdu/request_guild_members",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/topics/gateway#request-guild-members",
+    "type": "object",
+    "required": ["guild_id", "query"],
+    "properties": {
+        "guild_id": {"$ref": "file://type/snowflake"},
+        "query": {"type": "string"},
+        "limit": {"type": "number", "inclusiveMinimum": 0},
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "id": "file://pdu/hello",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/topics/gateway#hello",
+    "type": "object",
+    "required": ["token", "session_id", "seq"],
+    "properties": {
+        "heartbeat_interval": {"type": "number", "exclusiveMinimum": 0},
+        "_trace": {"type": "array", "items": {"type": "string"}}
+    }
+}

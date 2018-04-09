@@ -1,0 +1,20 @@
+{
+    "id": "file://object/embed_author",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Schema for embed object",
+    "type": "object",
+    "properties": {
+        "url": {
+            "type": "string"
+        },
+        "proxy_icon_url": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "icon_url": {
+            "type": "string"
+        }
+    }
+}

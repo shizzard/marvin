@@ -1,0 +1,15 @@
+{
+    "id": "file://pdu/dispatch/READY",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/topics/gateway#ready",
+    "type": "object",
+    "required": ["v", "user", "private_channels", "guilds", "session_id", "_trace"],
+    "properties": {
+        "v": {"type": "number"},
+        "user": {"$ref": "file://object/user"},
+        "private_channels": {"type": "array", "items": {"$ref": "file://object/channel"}},
+        "guilds": {"type": "array", "items": {"$ref": "file://object/guild"}},
+        "session_id": {"type": "string"},
+        "_trace": {"type": "array", "items": {"type": "string"}}
+    }
+}

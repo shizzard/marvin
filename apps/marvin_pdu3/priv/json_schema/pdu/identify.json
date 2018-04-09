@@ -1,0 +1,22 @@
+{
+    "id": "file://pdu/identify",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/topics/gateway#identify",
+    "type": "object",
+    "required": ["token", "properties"],
+    "properties": {
+        "token": {"type": "string"},
+        "properties": {
+            "type": "object",
+            "properties": {
+                "$os": {"type": "string"},
+                "$browser": {"type": "string"},
+                "$device": {"type": "string"},
+            }
+        },
+        "compress": {"type": "boolean"},
+        "large_threshold": {"type": "number", "inclusiveMinimum": 50, "inclusiveMaximum": 250},
+        "shard": {"type": "array", "items": {"type": "number", "inclusiveMinimum": 0}, "minItems": 2, "maxItems": 2},
+        "presence": {"$ref": "file://pdu/status_update"}
+    }
+}

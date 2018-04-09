@@ -1,0 +1,72 @@
+{
+    "id": "file://discord_gateway",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/topics/gateway#payloads",
+    "type": "object",
+    "required": ["op", "d"],
+    "properties": {
+        "op": {"type": "number", "inclusiveMinimum": 0, "inclusiveMaximum": 11},
+        "d": {
+            "type": "object",
+            "oneOf": [
+                {"$ref": "file://pdu/dispatch/READY"},
+                {"$ref": "file://pdu/dispatch/RESUMED"},
+                {"$ref": "file://pdu/dispatch/CHANNEL_CREATE"},
+                {"$ref": "file://pdu/dispatch/CHANNEL_UPDATE"},
+                {"$ref": "file://pdu/dispatch/CHANNEL_DELETE"},
+                {"$ref": "file://pdu/dispatch/GUILD_CREATE"},
+                {"$ref": "file://pdu/dispatch/GUILD_UPDATE"},
+                {"$ref": "file://pdu/dispatch/GUILD_DELETE"},
+                {"$ref": "file://pdu/dispatch/GUILD_BAN_ADD"},
+                {"$ref": "file://pdu/dispatch/GUILD_BAN_REMOVE"},
+                {"$ref": "file://pdu/dispatch/GUILD_EMOJIS_UPDATE"},
+                {"$ref": "file://pdu/dispatch/GUILD_INTEGRATIONS_UPDATE"},
+                {"$ref": "file://pdu/dispatch/GUILD_MEMBER_ADD"},
+                {"$ref": "file://pdu/dispatch/GUILD_MEMBER_REMOVE"},
+                {"$ref": "file://pdu/dispatch/GUILD_MEMBER_UPDATE"},
+                {"$ref": "file://pdu/dispatch/GUILD_MEMBERS_CHUNK"},
+                {"$ref": "file://pdu/dispatch/GUILD_ROLE_CREATE"},
+                {"$ref": "file://pdu/dispatch/GUILD_ROLE_UPDATE"},
+                {"$ref": "file://pdu/dispatch/GUILD_ROLE_DELETE"},
+                {"$ref": "file://pdu/dispatch/MESSAGE_CREATE"},
+                {"$ref": "file://pdu/dispatch/MESSAGE_UPDATE"},
+                {"$ref": "file://pdu/dispatch/MESSAGE_DELETE"},
+                {"$ref": "file://pdu/dispatch/MESSAGE_DELETE_BULK"},
+                {"$ref": "file://pdu/dispatch/MESSAGE_REACTION_ADD"},
+                {"$ref": "file://pdu/dispatch/MESSAGE_REACTION_REMOVE"},
+                {"$ref": "file://pdu/dispatch/MESSAGE_REACTION_REMOVE_ALL"},
+                {"$ref": "file://pdu/dispatch/PRESENCE_UPDATE"},
+                {"$ref": "file://pdu/dispatch/TYPING_START"},
+                {"$ref": "file://pdu/dispatch/USER_UPDATE"},
+                {"$ref": "file://pdu/dispatch/VOICE_STATE_UPDATE"},
+                {"$ref": "file://pdu/dispatch/VOICE_SERVER_UPDATE"},
+                {"$ref": "file://pdu/heartbeat"},
+                {"$ref": "file://pdu/identify"},
+                {"$ref": "file://pdu/status_update"},
+                {"$ref": "file://pdu/voice_state_update"},
+                {"$ref": "file://pdu/voice_server_ping"},
+                {"$ref": "file://pdu/resume"},
+                {"$ref": "file://pdu/reconnect"},
+                {"$ref": "file://pdu/request_guild_members"},
+                {"$ref": "file://pdu/invalid_session"},
+                {"$ref": "file://pdu/hello"},
+                {"$ref": "file://pdu/heartbeat_ack"}
+            ]
+        },
+        "s": {"type": "number", "exclusiveMinimum": 0},
+        "t": {
+            "type": "enum",
+            "oneOf": [
+                "READY", "RESUMED", "CHANNEL_CREATE", "CHANNEL_UPDATE", "CHANNEL_DELETE",
+                "GUILD_CREATE", "GUILD_UPDATE", "GUILD_DELETE", "GUILD_BAN_ADD",
+                "GUILD_BAN_REMOVE", "GUILD_EMOJIS_UPDATE", "GUILD_INTEGRATIONS_UPDATE",
+                "GUILD_MEMBER_ADD", "GUILD_MEMBER_REMOVE", "GUILD_MEMBER_UPDATE",
+                "GUILD_MEMBERS_CHUNK", "GUILD_ROLE_CREATE", "GUILD_ROLE_UPDATE",
+                "GUILD_ROLE_DELETE", "MESSAGE_CREATE", "MESSAGE_UPDATE", "MESSAGE_DELETE",
+                "MESSAGE_DELETE_BULK", "MESSAGE_REACTION_ADD", "MESSAGE_REACTION_REMOVE",
+                "MESSAGE_REACTION_REMOVE_ALL", "PRESENCE_UPDATE", "TYPING_START",
+                "USER_UPDATE", "VOICE_STATE_UPDATE", "VOICE_SERVER_UPDATE"
+            ]
+        }
+    }
+}

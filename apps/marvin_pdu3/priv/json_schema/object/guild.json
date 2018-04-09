@@ -1,0 +1,62 @@
+{
+    "id": "file://object/guild",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/resources/guild#guild-object",
+    "type": "object",
+    "required": ["id", "name", "icon", "splash", "owner_id", "region", "afk_channel_id",
+        "afk_timeout", "verification_level", "default_message_notifications",
+        "explicit_content_filter", "roles", "emojis", "features", "mfa_level",
+        "application_id", "system_channel_id"
+    ],
+    "properties": {
+        "id": {"$ref": "file://type/snowflake"},
+        "name": {"type": "string", "minLength": 2, "maxLength": 100},
+        "icon": {"oneOf": [
+            {"type": "null"},
+            {"type": "string"}
+        ]},
+        "splash": {"oneOf": [
+            {"type": "null"},
+            {"type": "string"}
+        ]},
+        "owner": {"type": "boolean"},
+        "owner_id": {"$ref": "file://type/snowflake"},
+        "permissions": {"$ref": "file://type/permission"},
+        "region": {"type": "string"},
+        "afk_channel_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"},
+        ]},
+        "afk_timeout": {"type": "number", "inclusiveMinimum": 0},
+        "embed_enabled": {"type": "boolean"},
+        "embed_channel_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"},
+        ]},
+        "verification_level": {"type": "number", "inclusiveMinimum": 0, "inclusiveMaximum": 4},
+        "default_message_notifications": {"type": "number", "inclusiveMinimum": 0, "inclusiveMaximum": 1},
+        "explicit_content_filter": {"type": "number", "inclusiveMinimum": 0, "inclusiveMaximum": 2},
+        "roles": {"type": "array", "items": {"$ref": "file://object/role"}},
+        "emojis": {"type": "array", "items": {"$ref": "file://object/emoji"}},
+        "features": {"type": "array", "items": {"type": "string"}},
+        "mfa_level": {"type": "number", "inclusiveMinimum": 0, "inclusiveMaximum": 1},
+        "application_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"}
+        ]},
+        "widget_enabled": {"type": "boolean"},
+        "widget_channel_id": {"$ref": "file://type/snowflake"},
+        "system_channel_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"}
+        ]},
+        "joined_at": {"type": "string"},
+        "large": {"type": "boolean"},
+        "unavailable": {"type": "boolean"},
+        "member_count": {"type": "number", "inclusiveMinimum": 0},
+        "voice_states": {"type": "array", "items": {"$ref": "file://object/voice_state"}},
+        "members": {"type": "array", "items": {"$ref": "file://object/member"}},
+        "channels": {"type": "array", "items": {"$ref": "file://object/channel"}},
+        "presences": {"type": "array", "items": {"$ref": "file://object/presence"}}
+    }
+}

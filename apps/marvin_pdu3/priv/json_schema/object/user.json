@@ -1,0 +1,23 @@
+{
+    "id": "file://object/user",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/resources/user#user-object",
+    "type": "object",
+    "required": ["id", "type"],
+    "properties": {
+        "id": {"$ref": "file://type/snowflake"},
+        "username": {"type": "string"},
+        "discriminator": {"type": "string", "minLength": 4, "maxLength": 4},
+        "avatar": {"oneOf": [
+            {"type": "null"},
+            {"type": "string"}
+        ]},
+        "bot": {"type": "boolean"},
+        "mfa_enabled": {"type": "boolean"},
+        "verified": {"type": "boolean"},
+        "email": {"oneOf": [
+            {"type": "null"},
+            {"type": "boolean"}
+        ]},
+    }
+}

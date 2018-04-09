@@ -1,0 +1,28 @@
+{
+    "id": "file://object/embed",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Schema for embed object",
+    "type": "object",
+    "properties": {
+        "url": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        },
+        "title": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "color": {
+            "type": "number",
+            "inclusiveMinimum": 0,
+            "inclusiveMaximum": 16777215
+        },
+        "author": {
+            "$ref": "file://object/embed_author"
+        }
+    }
+}

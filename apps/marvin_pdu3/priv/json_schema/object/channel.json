@@ -1,0 +1,44 @@
+{
+    "id": "file://object/channel",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/resources/channel#channel-object",
+    "type": "object",
+    "required": ["id", "type"],
+    "properties": {
+        "id": {"$ref": "file://type/snowflake"},
+        "type": {"type": "number", "inclusiveMinimum": 0, "inclusiveMaximum": 4},
+        "guild_id": {"$ref": "file://type/snowflake"},
+        "position": {"type": "number", "inclusiveMinimum": 0},
+        "permission_overwrites": {"type": "array", "items": {"$ref": "file://object/permission_overwrite"}},
+        "name": {"type": "string", "minLength": 2, "maxLength": 100},
+        "topic": {"oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 0, "maxLength": 1024}
+        ]},
+        "nsfw": {"type": "boolean"},
+        "last_message_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"}
+        ]},
+        "bitrate": {"type": "number", "inclusiveMinimum": 0},
+        "user_limit": {"type": "number", "inclusiveMinimum": 0},
+        "recipients": {"type": "array", "items": {"$ref": "file://object/user"}},
+        "last_message_id": {"oneOf": [
+            {"type": "null"},
+            {"type": "string"}
+        ]},
+        "owner_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"}
+        ]},
+        "application_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"}
+        ]},
+        "parent_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"}
+        ]},
+        "last_pin_timestamp": {"type": "string"}
+    }
+}

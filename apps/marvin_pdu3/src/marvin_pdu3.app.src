@@ -1,0 +1,7 @@
+{application, marvin_pdu3, [
+    {description, "Marvin PDUs v3"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {env, []}
+]}.

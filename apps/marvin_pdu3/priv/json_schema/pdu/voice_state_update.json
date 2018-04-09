@@ -1,0 +1,16 @@
+{
+    "id": "file://pdu/voice_state_update",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/topics/gateway#update-voice-state",
+    "type": "object",
+    "required": ["guild_id", "channel_id", "self_mute", "self_deaf"],
+    "properties": {
+        "guild_id": {"$ref": "file://type/snowflake"},
+        "channel_id": {"oneOf": [
+            {"type": "null"},
+            {"$ref": "file://type/snowflake"}
+        ]},
+        "self_mute": {"type": "boolean"},
+        "self_deaf": {"type": "boolean"}
+    }
+}

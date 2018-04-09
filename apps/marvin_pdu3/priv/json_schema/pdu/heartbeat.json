@@ -1,0 +1,7 @@
+{
+    "id": "file://pdu/heartbeat",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "https://discordapp.com/developers/docs/topics/gateway#heartbeat",
+    "type": "number",
+    "exclusiveMinimum": 0
+}
