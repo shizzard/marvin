@@ -1,7 +1,10 @@
 -module(marvin_pdu2_object_channel).
 -compile({parse_transform, cloak_transform}).
 
--export([export/1]).
+-export([
+    export/1, channel_type_guild_text/0, channel_type_dm/0,
+    channel_type_guild_voice/0, channel_type_group_dm/0, channel_type_guild_category/0
+]).
 
 -record(?MODULE, {
     id :: id(),
@@ -52,6 +55,13 @@
     id/0, guild_id/0, type/0, parent_id/0, name/0, topic/0, last_message_id/0, position/0,
     user_limit/0, recipients/0, owner_id/0, icon/0, bitrate/0, permission_overwrites/0, last_pin_timestamp/0, t/0
 ]).
+
+
+channel_type_guild_text() -> ?channel_type_guild_text.
+channel_type_dm() -> ?channel_type_dm.
+channel_type_guild_voice() -> ?channel_type_guild_voice.
+channel_type_group_dm() -> ?channel_type_group_dm.
+channel_type_guild_category() -> ?channel_type_guild_category.
 
 
 cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->

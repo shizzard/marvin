@@ -53,7 +53,10 @@ pdu_mods() ->
         marvin_pdu2_dispatch_ready,
         marvin_pdu2_dispatch_resumed,
         marvin_pdu2_dispatch_guild_create,
-        marvin_pdu2_dispatch_presence_update
+        marvin_pdu2_dispatch_presence_update,
+        marvin_pdu2_dispatch_message_create,
+        marvin_pdu2_dispatch_guild_members_chunk,
+        marvin_pdu2_request_guild_members
     ].
 
 object_mods() ->
@@ -267,6 +270,19 @@ marvin_pdu2_dispatch_message_create() ->
         {pinned, marvin_pdu2_dispatch_message_create:pinned()},
         ?OPTIONAL({webhook_id, non_empty(proper_unicode:utf8(20))}),
         {type, marvin_pdu2_dispatch_message_create:type()}
+    ]).
+
+marvin_pdu2_dispatch_guild_members_chunk() ->
+    ?MAP([
+        {guild_id, non_empty(proper_unicode:utf8(20))},
+        {members, list(marvin_pdu2_object_member())}
+    ]).
+
+marvin_pdu2_request_guild_members() ->
+    ?MAP([
+        {guild_id, non_empty(proper_unicode:utf8(20))},
+        {query, non_empty(proper_unicode:utf8(5))},
+        {limit, marvin_pdu2_request_guild_members:limit()}
     ]).
 
 

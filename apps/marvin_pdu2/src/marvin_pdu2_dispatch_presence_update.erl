@@ -25,7 +25,7 @@
 -type nick() :: unicode:unicode_binary().
 -type roles() :: [marvin_pdu2_object_role:id()].
 -type game() :: marvin_pdu2_object_game:t().
--type guild_id() :: marvin_pdu2_object_guild_unavailable:t().
+-type guild_id() :: marvin_pdu2:snowflake().
 -type status() :: unicode:unicode_binary().
 -type t() :: #?MODULE{}.
 

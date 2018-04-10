@@ -5,7 +5,9 @@
 -export([handle_call_do_provision_chain/1]).
 
 
+
 %% Interface
+
 
 
 -spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_create:t(), S0 :: state()}) ->
@@ -15,10 +17,9 @@
     }).
 
 handle_call_do_provision_chain({Struct, S0}) ->
-    S1 = lists:foldl(
-        fun set_emoji/2, S0,
-        marvin_pdu2_dispatch_guild_create:emojis(Struct)
-    ),
+    Emojis = marvin_pdu2_dispatch_guild_create:emojis(Struct),
+    marvin_log:info("Guild '~s' emojis: ~p total", [S0#state.guild_id, length(Emojis)]),
+    S1 = lists:foldl(fun set_emoji/2, S0, Emojis),
     {ok, {Struct, S1}}.
 
 

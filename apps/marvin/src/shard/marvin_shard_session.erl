@@ -182,6 +182,10 @@ handle_call_incoming_event(Event, S0) ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_create]),
                     handle_call_incoming_event_dispatch_guild_create(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_guild_members_chunk ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_members_chunk]),
+                    handle_call_incoming_event_dispatch_guild_members_chunk(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_presence_update ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_presence_update]),
@@ -401,14 +405,38 @@ handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(Ids) -
         State :: state()
     ).
 
-handle_call_incoming_event_dispatch_guild_create(Struct, S0) ->
+handle_call_incoming_event_dispatch_guild_create(Struct, #state{
+    tx_pid = TxPid
+} = S0) ->
     GuildId = marvin_pdu2_dispatch_guild_create:id(Struct),
     marvin_log:info(
         "Shard '~p' is provisioning the guild '~s'",
         [S0#state.shard_name, GuildId]
     ),
     marvin_guild_monitor:maybe_start_guild(GuildId),
+    {ok, RequestGuildMembers} = get_pdu_request_guild_members(GuildId, S0),
+    ok = marvin_shard_tx:send_sync(TxPid, RequestGuildMembers),
     ok = marvin_guild:do_provision(GuildId, Struct),
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_guild_members_chunk(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_guild_members_chunk(Struct, S0) ->
+    GuildId = marvin_pdu2_dispatch_guild_members_chunk:guild_id(Struct),
+    marvin_log:info(
+        "Shard '~p' is provisioning members for the guild '~s'",
+        [S0#state.shard_name, GuildId]
+    ),
+    ok = marvin_guild:do_provision_guild_members(GuildId, Struct),
     {reply, ok, S0}.
 
 
@@ -426,7 +454,7 @@ handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
     GuildId = marvin_pdu2_dispatch_presence_update:guild_id(Struct),
     UserId = marvin_pdu2_dispatch_presence_update:user(Struct),
     marvin_log:info(
-        "Shard '~p' got presence update for guild '~s'/user '~s')",
+        "Shard '~p' got presence update for guild '~s'/user '~s'",
         [S0#state.shard_name, GuildId, UserId]
     ),
     ok = marvin_guild:presence_update(GuildId, Struct),
@@ -491,7 +519,7 @@ get_pdu_identify(#state{
     Library = <<LibraryName/binary, "/", LibraryVersion/binary>>,
     Shard = [ShardId, marvin_gateway_meta:get_shards_count()],
     marvin_log:debug(
-        "Shard '~p' is identifying against discord server as ~s",
+        "Shard '~p' is identifying against discord server as '~s'",
         [S0#state.shard_name, Library]
     ),
     marvin_pdu2:render(marvin_pdu2_identify:new(#{
@@ -506,6 +534,22 @@ get_pdu_identify(#state{
             '$referrer' => LibraryWeb,
             '$referring_domain' => LibraryWeb
         }
+    })).
+
+
+
+-spec get_pdu_request_guild_members(GuildId :: marvin_pdu2:snowflake(), State :: state()) ->
+    marvin_helper_type:ok_return(OkRet :: binary()).
+
+get_pdu_request_guild_members(GuildId, S0) ->
+    marvin_log:debug(
+        "Shard '~p' is requesting guild members for guild '~s'",
+        [S0#state.shard_name, GuildId]
+    ),
+    marvin_pdu2:render(marvin_pdu2_request_guild_members:new(#{
+        guild_id => GuildId,
+        query => <<>>,
+        limit => 0
     })).
 
 

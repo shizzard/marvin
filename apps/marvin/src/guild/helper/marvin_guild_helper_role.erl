@@ -5,7 +5,9 @@
 -export([handle_call_do_provision_chain/1]).
 
 
+
 %% Interface
+
 
 
 -spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_create:t(), S0 :: state()}) ->
@@ -15,10 +17,9 @@
     }).
 
 handle_call_do_provision_chain({Struct, S0}) ->
-    S1 = lists:foldl(
-        fun set_role/2, S0,
-        marvin_pdu2_dispatch_guild_create:roles(Struct)
-    ),
+    Roles = marvin_pdu2_dispatch_guild_create:roles(Struct),
+    marvin_log:info("Guild '~s' roles: ~p total", [S0#state.guild_id, length(Roles)]),
+    S1 = lists:foldl(fun set_role/2, S0, Roles),
     {ok, {Struct, S1}}.
 
 

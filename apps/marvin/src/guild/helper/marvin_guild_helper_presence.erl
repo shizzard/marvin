@@ -9,7 +9,9 @@
 ]).
 
 
+
 %% Interface
+
 
 
 -spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_create:t(), S0 :: state()}) ->
@@ -19,10 +21,9 @@
     }).
 
 handle_call_do_provision_chain({Struct, S0}) ->
-    S1 = lists:foldl(
-        fun do_update_member_presence_from_object/2, S0,
-        marvin_pdu2_dispatch_guild_create:presences(Struct)
-    ),
+    Presences = marvin_pdu2_dispatch_guild_create:presences(Struct),
+    marvin_log:info("Guild '~s' presences: ~p total", [S0#state.guild_id, length(Presences)]),
+    S1 = lists:foldl(fun do_update_member_presence_from_object/2, S0, Presences),
     do_report_presence_state(S1),
     {ok, {Struct, S1}}.
 

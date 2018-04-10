@@ -87,13 +87,13 @@
 -type t() :: #?MODULE{}.
 
 -export_type([
-    id/0,  name/0,  icon/0,  splash/0,  owner/0,  owner_id/0,  permissions/0,
-    region/0,  afk_channel_id/0,  afk_timeout/0,  embed_enabled/0,
-    embed_channel_id/0,  verification_level/0,  default_message_notifications/0,
-    explicit_content_filter/0,  roles/0,  emojis/0,  features/0,  mfa_level/0,
-    application_id/0,  widget_enabled/0,  widget_channel_id/0,
-    system_channel_id/0,  joined_at/0,  large/0,  unavailable/0,
-    member_count/0,  voice_states/0,  members/0,  channels/0,  presences/0, t/0
+    id/0, name/0, icon/0, splash/0, owner/0, owner_id/0, permissions/0,
+    region/0, afk_channel_id/0, afk_timeout/0, embed_enabled/0,
+    embed_channel_id/0, verification_level/0, default_message_notifications/0,
+    explicit_content_filter/0, roles/0, emojis/0, features/0, mfa_level/0,
+    application_id/0, widget_enabled/0, widget_channel_id/0,
+    system_channel_id/0, joined_at/0, large/0, unavailable/0,
+    member_count/0, voice_states/0, members/0, channels/0, presences/0, t/0
 ]).
 
 
