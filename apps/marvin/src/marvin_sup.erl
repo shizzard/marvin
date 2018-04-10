@@ -22,7 +22,7 @@ start_link() ->
 
 
 init([]) ->
-    {ok, {{one_for_one, 5, 10}, [
+    {ok, {{one_for_one, 2, 10}, [
         {marvin_guild_sup, {
             marvin_guild_sup, start_link, []
         }, permanent, 5000, supervisor, [marvin_guild_sup]},

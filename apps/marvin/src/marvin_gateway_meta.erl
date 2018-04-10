@@ -105,6 +105,10 @@ handle_event(info, ?gun_response(_ConnPid, StreamRef, nofin, 200, Data), on_gath
         next_gather_after = IntervalSec * 1000
     }};
 
+handle_event(info, ?gun_response(_ConnPid, _StreamRef, nofin, 401, _), on_gather_meta_headers, _S0) ->
+    marvin_log:error("Error while gathering meta: access token seems to be invalid", []),
+    {stop, invalid_token};
+
 handle_event(info, ?gun_data(_ConnPid, StreamRef, nofin, Data), on_gather_meta_body, #state{
     gun_stream_reference = StreamRef
 } = S0) when is_binary(Data) ->
