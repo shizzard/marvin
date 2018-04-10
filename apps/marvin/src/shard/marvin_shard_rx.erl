@@ -19,7 +19,8 @@
     {gun_ws_upgrade, ConnPid, Ret, Headers}).
 -define(start_tx(), {start_tx}).
 -define(report_operational(), {report_operational}).
--define(gun_ws(WssPid, Type, Data), {gun_ws, WssPid, {Type, Data}}).
+-define(gun_ws_data(WssPid, Type, Data), {gun_ws, WssPid, {Type, Data}}).
+-define(gun_ws_close(WssPid, Code, Data), {gun_ws, WssPid,{close, Code, Data}}).
 -define(gun_down(WssPid, Proto, Reason, KilledStreams, UnprocessedStreams),
     {gun_down, WssPid, Proto, Reason, KilledStreams, UnprocessedStreams}).
 
@@ -127,7 +128,7 @@ handle_event(state_timeout, ?report_operational(), on_pre_operational, #state{
 % Handling text websocket data, passing it to parent `marvin_shard_session`.
 % Keeping state and data.
 
-handle_event(info, ?gun_ws(WssPid, text, Data), on_operational, #state{
+handle_event(info, ?gun_ws_data(WssPid, text, Data), on_operational, #state{
     session_pid = SessionPid,
     wss_pid = WssPid
 } = S0) ->
@@ -138,7 +139,7 @@ handle_event(info, ?gun_ws(WssPid, text, Data), on_operational, #state{
 % Handling binary websocket data, dropping it.
 % Keeping state and data.
 
-handle_event(info, ?gun_ws(WssPid, binary, Data), on_operational, #state{
+handle_event(info, ?gun_ws_data(WssPid, binary, Data), on_operational, #state{
     wss_pid = WssPid
 } = S0) ->
     marvin_log:debug(
@@ -151,15 +152,27 @@ handle_event(info, ?gun_ws(WssPid, binary, Data), on_operational, #state{
 % Resending it back to `self()` to handle in 'on_operational' state.
 % NB: this may cause infinite data passing to `self()`.
 
-handle_event(info, ?gun_ws(WssPid, Type, Data), WrongState, #state{
+handle_event(info, ?gun_ws_data(WssPid, Type, Data), WrongState, #state{
     wss_pid = WssPid
 } = S0) ->
     marvin_log:debug(
         "Shard '~p' got incoming event of type '~p' while in state '~p', forwarding",
         [S0#state.shard_name, Type, WrongState]
     ),
-    self() ! ?gun_ws(WssPid, Type, Data),
+    self() ! ?gun_ws_data(WssPid, Type, Data),
     keep_state_and_data;
+
+% Handling websocket connection closed.
+% Exiting to pass control to supervision tree.
+
+handle_event(info, ?gun_ws_close(WssPid, Code, Data), State, #state{
+    wss_pid = WssPid
+} = S0) ->
+    marvin_log:debug(
+        "Shard '~p' got gun connection close with code '~p'/data '~s' while in state '~p', giving up",
+        [S0#state.shard_name, Code, Data, State]
+    ),
+    {stop, gun_close};
 
 % Handling websocket connection down.
 % Exiting to pass control to supervision tree.

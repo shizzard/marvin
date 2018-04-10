@@ -129,7 +129,8 @@ handle_info_start_connection(#state{
     shard_id = ShardId,
     wss_url = WssUrl
 } = S0) ->
-    {ok, _RxPid} = marvin_shard_sup:start_shard_rx(ShardId, self(), WssUrl),
+    {ok, RxPid} = marvin_shard_sup:start_shard_rx(ShardId, self(), WssUrl),
+    true = erlang:link(RxPid),
     {noreply, S0}.
 
 
