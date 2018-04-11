@@ -454,7 +454,7 @@ handle_call_incoming_event_dispatch_guild_members_chunk(Struct, S0) ->
 handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
     GuildId = marvin_pdu2_dispatch_presence_update:guild_id(Struct),
     UserId = marvin_pdu2_dispatch_presence_update:user(Struct),
-    marvin_log:info(
+    marvin_log:debug(
         "Shard '~p' got presence update for guild '~s'/user '~s'",
         [S0#state.shard_name, GuildId, UserId]
     ),
@@ -474,11 +474,19 @@ handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
 
 handle_call_incoming_event_dispatch_message_create(Struct, S0) ->
     ChannelId = marvin_pdu2_dispatch_message_create:channel_id(Struct),
-    UserId = marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Struct)),
-    marvin_log:info(
-        "Shard '~p' got message create for channel '~s'/user '~s')",
-        [S0#state.shard_name, ChannelId, UserId]
-    ),
+    case marvin_channel_registry:lookup(ChannelId) of
+        {ok, GuildId} ->
+            marvin_log:debug(
+                "Shard '~p' got message create for guild '~s'/channel '~s'",
+                [S0#state.shard_name, GuildId, ChannelId]
+            ),
+            ok = marvin_guild:message_create(GuildId, Struct);
+        {error, not_found} ->
+            marvin_log:debug(
+                "Shard '~p' got message create for unknown channel '~s'",
+                [S0#state.shard_name, ChannelId]
+            )
+    end,
     {reply, ok, S0}.
 
 

@@ -34,9 +34,11 @@ handle_call_do_provision_chain({Struct, S0}) ->
 -spec set_channel_category(ChannelStruct :: marvin_pdu2_object_channel:t(), S0 :: state()) ->
     Ret :: state().
 
-set_channel_category(ChannelStruct, #state{channel_category_state = ChannelStateEts} = S0) ->
-    ets:insert(ChannelStateEts, #channel{
-        channel_id = marvin_pdu2_object_channel:id(ChannelStruct),
-        channel = ChannelStruct
-    }),
+set_channel_category(ChannelStruct, #state{
+    channel_category_state = ChannelStateEts,
+    guild_id = GuildId
+} = S0) ->
+    ChannelId = marvin_pdu2_object_channel:id(ChannelStruct),
+    marvin_channel_registry:register(GuildId, ChannelId),
+    ets:insert(ChannelStateEts, #channel{channel_id = ChannelId, channel = ChannelStruct}),
     S0.
