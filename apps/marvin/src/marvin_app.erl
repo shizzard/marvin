@@ -42,6 +42,12 @@ declare_metrics() ->
         {help, "Shard session incoming events per shard/type"},
         {labels, [shard_id, event_type]}
     ]),
+    prometheus_histogram:new([
+        {name, marvin_shard_session_pdu_parse_seconds},
+        {help, "Gateway metadata PDU parse duration in seconds"},
+        {buckets, prometheus_buckets:new({exponential, 0.00001, 2, 15})},
+        {labels, [shard_id, event_type]}
+    ]),
     %% marvin_guild
     prometheus_gauge:new([
         {name, marvin_guild_presence_state},

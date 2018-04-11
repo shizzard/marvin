@@ -162,8 +162,15 @@ handle_call_incoming_event(Event, S0) ->
         "Shard '~p' got incoming event (~p bytes)",
         [S0#state.shard_name, byte_size(Event)]
     ),
+    ParseStartTime = erlang:monotonic_time(),
     case marvin_pdu2:parse(Event) of
         {ok, Struct} ->
+            marvin_log:info("Parse time: ~p", [erlang:monotonic_time() - ParseStartTime]),
+            prometheus_histogram:observe(
+                marvin_shard_session_pdu_parse_seconds,
+                [S0#state.shard_name, marvin_pdu2:prot_mod(Struct)],
+                erlang:monotonic_time() - ParseStartTime
+            ),
             case marvin_pdu2:prot_mod(Struct) of
                 marvin_pdu2_hello ->
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_hello]),
@@ -201,6 +208,11 @@ handle_call_incoming_event(Event, S0) ->
                     handle_call_incoming_event_generic(Struct, S1)
             end;
         {error, Reason} ->
+            prometheus_histogram:observe(
+                marvin_shard_session_pdu_parse_seconds,
+                [S0#state.shard_name, error],
+                erlang:monotonic_time() - ParseStartTime
+            ),
             marvin_log:error("Incoming PDU failed to parse due to reason: ~p, ignoring", [Reason]),
             {reply, ok, S0}
     end.
