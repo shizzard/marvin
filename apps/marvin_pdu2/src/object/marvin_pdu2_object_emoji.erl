@@ -1,7 +1,7 @@
 -module(marvin_pdu2_object_emoji).
 -compile({parse_transform, cloak_transform}).
 
--export([export/1]).
+-export([export/1, format/1]).
 
 -record(?MODULE, {
     id = undefined :: id(),
@@ -21,6 +21,13 @@
 -type t() :: #?MODULE{}.
 
 -export_type([id/0, name/0, roles/0, require_colons/0, managed/0, animated/0, t/0]).
+
+
+format(#?MODULE{id = Id, name = Name, animated = true}) ->
+    <<"<a:", Name/binary, ":", Id/binary, ">">>;
+
+format(#?MODULE{id = Id, name = Name, animated = false}) ->
+    <<"<:", Name/binary, ":", Id/binary, ">">>.
 
 
 cloak_validate(id, null) ->

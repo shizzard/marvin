@@ -56,6 +56,7 @@ pdu_mods() ->
         marvin_pdu2_dispatch_presence_update,
         marvin_pdu2_dispatch_message_create,
         marvin_pdu2_dispatch_guild_members_chunk,
+        marvin_pdu2_dispatch_voice_state_update,
         marvin_pdu2_request_guild_members
     ].
 
@@ -276,6 +277,20 @@ marvin_pdu2_dispatch_guild_members_chunk() ->
     ?MAP([
         {guild_id, non_empty(proper_unicode:utf8(20))},
         {members, list(marvin_pdu2_object_member())}
+    ]).
+
+marvin_pdu2_dispatch_voice_state_update() ->
+    ?MAP([
+        {user_id, non_empty(proper_unicode:utf8(20))},
+        ?OPTIONAL({guild_id, non_empty(proper_unicode:utf8(20))}),
+        {channel_id, ?NULLABLE(non_empty(proper_unicode:utf8(20)))},
+        {session_id, non_empty(proper_unicode:utf8(20))},
+        {suppress, marvin_pdu2_object_voice_state:suppress()},
+        {self_video, marvin_pdu2_object_voice_state:self_video()},
+        {self_mute, marvin_pdu2_object_voice_state:self_mute()},
+        {self_deaf, marvin_pdu2_object_voice_state:self_deaf()},
+        {mute, marvin_pdu2_object_voice_state:mute()},
+        {deaf, marvin_pdu2_object_voice_state:deaf()}
     ]).
 
 marvin_pdu2_request_guild_members() ->

@@ -121,14 +121,14 @@ handle_call(?do_provision_guild_members(Struct), _GenReplyTo, S0) ->
     {reply, ok, S1};
 
 handle_call(?presence_update(Struct), _GenReplyTo, S0) ->
-    marvin_log:info("Guild '~s' got presence update", [S0#state.guild_id]),
+    marvin_log:debug("Guild '~s' got presence update", [S0#state.guild_id]),
     {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_presence_update', [
         fun marvin_guild_helper_presence:handle_call_presence_update_chain/1
     ], {Struct, S0}),
     {reply, ok, S1};
 
 handle_call(?message_create(Struct), _GenReplyTo, S0) ->
-    marvin_log:info("Guild '~s' got presence update", [S0#state.guild_id]),
+    marvin_log:debug("Guild '~s' got message", [S0#state.guild_id]),
     {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_message_create', [
         fun marvin_guild_helper_message:handle_call_message_create_chain/1
     ], {Struct, S0}),

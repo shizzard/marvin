@@ -39,6 +39,10 @@
  {<<"recon">>,
   {git,"https://github.com/ferd/recon.git",
        {ref,"fcc1a7db6d367234171ab24a3d1762f94e57ff22"}},
+  0},
+ {<<"shotgun">>,
+  {git,"https://github.com/inaka/shotgun.git",
+       {ref,"39f8745a9a8c83e757f777d276f9c887886b2666"}},
   0}]}.
 [
 {pkg_hash,[

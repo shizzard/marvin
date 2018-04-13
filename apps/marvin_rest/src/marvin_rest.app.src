@@ -1,0 +1,8 @@
+{application, marvin_rest, [
+    {description, "Marvin REST API client"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {mod, {marvin_rest_app, []}},
+    {applications, [kernel, stdlib, lager]},
+    {env, []}
+]}.

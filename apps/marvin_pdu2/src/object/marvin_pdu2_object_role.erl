@@ -1,7 +1,7 @@
 -module(marvin_pdu2_object_role).
 -compile({parse_transform, cloak_transform}).
 
--export([export/1]).
+-export([export/1, format/1]).
 
 -record(?MODULE, {
     id :: id(),
@@ -28,6 +28,10 @@
     id/0, name/0, permissions/0, position/0, color/0,
     mentionable/0, managed/0, hoist/0, t/0
 ]).
+
+
+format(#?MODULE{id = Id}) ->
+    <<"<@&", Id/binary, ">">>.
 
 
 cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->

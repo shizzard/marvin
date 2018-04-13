@@ -168,7 +168,7 @@ handle_event(info, ?gun_ws_data(WssPid, Type, Data), WrongState, #state{
 handle_event(info, ?gun_ws_close(WssPid, Code, Data), State, #state{
     wss_pid = WssPid
 } = S0) ->
-    marvin_log:debug(
+    marvin_log:error(
         "Shard '~p' got gun connection close with code '~p'/data '~s' while in state '~p', giving up",
         [S0#state.shard_name, Code, Data, State]
     ),
@@ -180,7 +180,7 @@ handle_event(info, ?gun_ws_close(WssPid, Code, Data), State, #state{
 handle_event(info, ?gun_down(WssPid, _Proto, Reason, _KilledStreams, _UnprocessedStreams), State, #state{
     wss_pid = WssPid
 } = S0) ->
-    marvin_log:debug(
+    marvin_log:error(
         "Shard '~p' got gun connection down with reason '~p' while in state '~p', giving up",
         [S0#state.shard_name, Reason, State]
     ),
