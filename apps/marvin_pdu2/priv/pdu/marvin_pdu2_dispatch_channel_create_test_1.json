@@ -1,0 +1,15 @@
+{
+    "op": 0,
+    "d": {
+        "type": 4,
+        "position": 3,
+        "permission_overwrites": [],
+        "parent_id": null,
+        "nsfw": false,
+        "name": "Поляна",
+        "id": "434363244443074570",
+        "guild_id": "269209661973069825"
+    },
+    "s": 1,
+    "t": "CHANNEL_CREATE"
+}

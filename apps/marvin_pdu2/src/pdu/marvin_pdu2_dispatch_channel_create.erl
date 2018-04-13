@@ -1,4 +1,4 @@
--module(marvin_pdu2_object_channel).
+-module(marvin_pdu2_dispatch_channel_create).
 -compile({parse_transform, cloak_transform}).
 
 -export([

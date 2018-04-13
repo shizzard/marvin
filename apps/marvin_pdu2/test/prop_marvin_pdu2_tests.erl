@@ -53,6 +53,7 @@ pdu_mods() ->
         marvin_pdu2_dispatch_ready,
         marvin_pdu2_dispatch_resumed,
         marvin_pdu2_dispatch_guild_create,
+        marvin_pdu2_dispatch_channel_create,
         marvin_pdu2_dispatch_presence_update,
         marvin_pdu2_dispatch_message_create,
         marvin_pdu2_dispatch_guild_members_chunk,
@@ -242,6 +243,15 @@ marvin_pdu2_dispatch_guild_create() ->
         {presences, list(marvin_pdu2_object_presence())}
     ]).
 
+
+marvin_pdu2_dispatch_channel_create() ->
+    oneof([
+        marvin_pdu2_object_channel_text(),
+        marvin_pdu2_object_channel_dm(),
+        marvin_pdu2_object_channel_voice(),
+        marvin_pdu2_object_channel_category()
+    ]).
+
 marvin_pdu2_dispatch_presence_update() ->
     ?MAP([
         {user, ?MAP([{<<"id">>, non_empty(proper_unicode:utf8(20))}])},
@@ -368,8 +378,8 @@ marvin_pdu2_object_channel() ->
     oneof([
         marvin_pdu2_object_channel_text(),
         marvin_pdu2_object_channel_dm(),
-        marvin_pdu2_object_channel_voice()
-        % marvin_pdu2_object_channel_category()
+        marvin_pdu2_object_channel_voice(),
+        marvin_pdu2_object_channel_category()
     ]).
 
 marvin_pdu2_object_channel_text() ->
@@ -377,11 +387,12 @@ marvin_pdu2_object_channel_text() ->
         {id, non_empty(proper_unicode:utf8(20))},
         ?OPTIONAL({guild_id, non_empty(proper_unicode:utf8(20))}),
         {type, 0},
-        {parent_id, non_empty(proper_unicode:utf8(20))},
+        {parent_id, ?NULLABLE(non_empty(proper_unicode:utf8(20)))},
         {name, non_empty(proper_unicode:utf8(20))},
         {topic, non_empty(proper_unicode:utf8(20))},
         {last_message_id, non_empty(proper_unicode:utf8(20))},
         {position, marvin_pdu2_object_channel:position()},
+        {nsfw, marvin_pdu2_object_channel:nsfw()},
         {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
     ]).
 
@@ -398,11 +409,23 @@ marvin_pdu2_object_channel_voice() ->
         {id, non_empty(proper_unicode:utf8(20))},
         ?OPTIONAL({guild_id, non_empty(proper_unicode:utf8(20))}),
         {type, 2},
-        {parent_id, non_empty(proper_unicode:utf8(20))},
+        {parent_id, ?NULLABLE(non_empty(proper_unicode:utf8(20)))},
         {name, non_empty(proper_unicode:utf8(20))},
         {position, marvin_pdu2_object_channel:position()},
-        {user_limit, marvin_pdu2_object_channel:user_limit()},
+        ?OPTIONAL({user_limit, marvin_pdu2_object_channel:user_limit()}),
         {bitrate, marvin_pdu2_object_channel:bitrate()},
+        {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
+    ]).
+
+marvin_pdu2_object_channel_category() ->
+    ?MAP([
+        {id, non_empty(proper_unicode:utf8(20))},
+        ?OPTIONAL({guild_id, non_empty(proper_unicode:utf8(20))}),
+        {type, 4},
+        {parent_id, ?NULLABLE(non_empty(proper_unicode:utf8(20)))},
+        {name, non_empty(proper_unicode:utf8(20))},
+        {position, marvin_pdu2_object_channel:position()},
+        {nsfw, marvin_pdu2_object_channel:nsfw()},
         {permission_overwrites, list(marvin_pdu2_object_permission_overwrite())}
     ]).
 
