@@ -165,7 +165,6 @@ handle_call_incoming_event(Event, S0) ->
     ParseStartTime = erlang:monotonic_time(),
     case marvin_pdu2:parse(Event) of
         {ok, Struct} ->
-            marvin_log:info("Parse time: ~p", [erlang:monotonic_time() - ParseStartTime]),
             prometheus_histogram:observe(
                 marvin_shard_session_pdu_parse_seconds,
                 [S0#state.shard_name, marvin_pdu2:prot_mod(Struct)],
@@ -175,6 +174,9 @@ handle_call_incoming_event(Event, S0) ->
                 marvin_pdu2_hello ->
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_hello]),
                     handle_call_incoming_event_hello(marvin_pdu2:d(Struct), S0);
+                marvin_pdu2_invalid_session ->
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_hello]),
+                    handle_call_incoming_event_invalid_session(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_dispatch_resumed ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_resumed]),
@@ -310,6 +312,21 @@ handle_call_incoming_event_hello(Struct, #state{
     {reply, ok, S0#state{
         heart_pid = HeartPid
     }}.
+
+
+
+-spec handle_call_incoming_event_invalid_session(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_stop_simple(State :: state()).
+
+handle_call_incoming_event_invalid_session(_Struct, S0) ->
+    marvin_log:error(
+        "Shard '~p' invalid session event, performing controlled crash",
+        [S0#state.shard_name]
+    ),
+    {stop, invalid_session, ok, S0}.
 
 
 
