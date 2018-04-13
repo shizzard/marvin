@@ -1,0 +1,48 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "topic": "",
+        "position": 11,
+        "permission_overwrites": [
+            {
+                "type": "role",
+                "id": "269213289978920960",
+                "deny": 805306385,
+                "allow": 523328
+            },
+            {
+                "type": "role",
+                "id": "269209661973069825",
+                "deny": 805829713,
+                "allow": 0
+            },
+            {
+                "type": "role",
+                "id": "269565043446644739",
+                "deny": 805314577,
+                "allow": 515136
+            },
+            {
+                "type": "role",
+                "id": "272021218838708235",
+                "deny": 0,
+                "allow": 3072
+            },
+            {
+                "type": "role",
+                "id": "431467987854295080",
+                "deny": 65536,
+                "allow": 314432
+            }
+        ],
+        "parent_id": "361120669439623168",
+        "nsfw": false,
+        "name": "top-secret-channel",
+        "last_message_id": "433598109369499648",
+        "id": "269242538861395978",
+        "guild_id": "269209661973069825"
+    },
+    "s": 1,
+    "t": "CHANNEL_UPDATE"
+}
