@@ -32,6 +32,10 @@
   {git,"https://github.com/deadtrickster/prometheus.erl.git",
        {ref,"e340556c8c88a573d86da5981b21bf591647adfb"}},
   0},
+ {<<"quickrand">>,
+  {git,"https://github.com/okeuday/quickrand.git",
+       {ref,"336c0d94a6a384f307183b3c14fc2112656dac37"}},
+  1},
  {<<"ranch">>,
   {git,"https://github.com/ninenines/ranch",
        {ref,"55c2a9d623454f372a15e99721a37093d8773b48"}},
@@ -43,6 +47,10 @@
  {<<"shotgun">>,
   {git,"https://github.com/inaka/shotgun.git",
        {ref,"39f8745a9a8c83e757f777d276f9c887886b2666"}},
+  0},
+ {<<"uuid">>,
+  {git,"https://github.com/okeuday/uuid.git",
+       {ref,"aadf1be200d318f2fdf2f996b58852a4a49244f0"}},
   0}]}.
 [
 {pkg_hash,[

@@ -9,7 +9,7 @@
     prot_mod :: atom()
 }).
 
--export([parse/1, render/1, nullify/1]).
+-export([parse/1, render/1, nullify/1, export/1]).
 
 
 %% Defines
@@ -139,6 +139,10 @@ render(Struct) ->
 
 nullify(undefined) -> null;
 nullify(Term) -> Term.
+
+
+export(Map) ->
+    maps:from_list([{Key, Value} || {Key, Value} <- maps:to_list(Map), Value /= undefined]).
 
 
 %% Internals

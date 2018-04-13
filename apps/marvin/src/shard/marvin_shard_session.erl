@@ -192,6 +192,18 @@ handle_call_incoming_event(Event, S0) ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_create]),
                     handle_call_incoming_event_dispatch_guild_create(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_channel_create ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_channel_create]),
+                    handle_call_incoming_event_dispatch_channel_create(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_channel_update ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_channel_update]),
+                    handle_call_incoming_event_dispatch_channel_update(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_channel_delete ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_channel_delete]),
+                    handle_call_incoming_event_dispatch_channel_delete(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_guild_members_chunk ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_members_chunk]),
@@ -451,6 +463,87 @@ handle_call_incoming_event_dispatch_guild_create(Struct, #state{
     {ok, RequestGuildMembers} = get_pdu_request_guild_members(GuildId, S0),
     ok = marvin_shard_tx:send_sync(TxPid, RequestGuildMembers),
     ok = marvin_guild:do_provision(GuildId, Struct),
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_channel_create(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_channel_create(Struct, S0) ->
+    case marvin_pdu2_dispatch_channel_create:guild_id(Struct) of
+        undefined ->
+            marvin_log:debug(
+                "Shard '~p' is got channel of type '~p' create event for unknown guild",
+                [S0#state.shard_name, marvin_pdu2_dispatch_channel_create:type(Struct)]
+            );
+        GuildId ->
+            marvin_log:debug(
+                "Shard '~p' is got channel create event for guild '~s'",
+                [S0#state.shard_name, GuildId]
+            ),
+            ok = marvin_guild:channel_create(GuildId, Struct)
+    end,
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_channel_update(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_channel_update(Struct, S0) ->
+    case marvin_pdu2_dispatch_channel_update:guild_id(Struct) of
+        undefined ->
+            marvin_log:debug(
+                "Shard '~p' is got channel of type '~p' update event for unknown guild",
+                [S0#state.shard_name, marvin_pdu2_dispatch_channel_update:type(Struct)]
+            );
+        GuildId ->
+            marvin_log:debug(
+                "Shard '~p' is got channel update event for guild '~s'",
+                [S0#state.shard_name, GuildId]
+            ),
+            ok = marvin_guild:channel_update(GuildId, Struct)
+    end,
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_channel_delete(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_channel_delete(Struct, S0) ->
+    case marvin_pdu2_dispatch_channel_delete:guild_id(Struct) of
+        undefined ->
+            marvin_log:debug(
+                "Shard '~p' is got channel of type '~p' delete event for unknown guild",
+                [S0#state.shard_name, marvin_pdu2_dispatch_channel_delete:type(Struct)]
+            );
+        GuildId ->
+            marvin_log:debug(
+                "Shard '~p' is got channel delete event for guild '~s'",
+                [S0#state.shard_name, GuildId]
+            ),
+            ok = marvin_guild:channel_delete(GuildId, Struct)
+    end,
     {reply, ok, S0}.
 
 

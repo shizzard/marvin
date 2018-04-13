@@ -6,6 +6,7 @@
 
 -export([
     do_provision/2, do_provision_guild_members/2, presence_update/2, voice_state_update/2, message_create/2,
+    channel_create/2, channel_update/2, channel_delete/2,
     start_link/1, init/1,
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
@@ -16,6 +17,9 @@
 -define(presence_update(Struct), {presence_update, Struct}).
 -define(voice_state_update(Struct), {voice_state_update, Struct}).
 -define(message_create(Struct), {message_create, Struct}).
+-define(channel_create(Struct), {channel_create, Struct}).
+-define(channel_update(Struct), {channel_update, Struct}).
+-define(channel_delete(Struct), {channel_delete, Struct}).
 
 
 
@@ -76,6 +80,33 @@ voice_state_update(GuildId, Struct) ->
 message_create(GuildId, Struct) ->
     {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
     gen_server:call(GuildPid, ?message_create(Struct)).
+
+
+
+-spec channel_create(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_channel_create:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+channel_create(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?channel_create(Struct)).
+
+
+
+-spec channel_update(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_channel_update:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+channel_update(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?channel_update(Struct)).
+
+
+
+-spec channel_delete(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_channel_delete:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+channel_delete(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?channel_delete(Struct)).
 
 
 
@@ -151,6 +182,33 @@ handle_call(?message_create(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got message", [S0#state.guild_id]),
     {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_message_create', [
         fun marvin_guild_helper_message:handle_call_message_create_chain/1
+    ], {Struct, S0}),
+    {reply, ok, S1};
+
+handle_call(?channel_create(Struct), _GenReplyTo, S0) ->
+    marvin_log:debug("Guild '~s' got channel create event", [S0#state.guild_id]),
+    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_channel_create', [
+        fun marvin_guild_helper_channel_text:handle_call_channel_create_chain/1,
+        fun marvin_guild_helper_channel_voice:handle_call_channel_create_chain/1,
+        fun marvin_guild_helper_channel_category:handle_call_channel_create_chain/1
+    ], {Struct, S0}),
+    {reply, ok, S1};
+
+handle_call(?channel_update(Struct), _GenReplyTo, S0) ->
+    marvin_log:debug("Guild '~s' got channel update event", [S0#state.guild_id]),
+    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_channel_update', [
+        fun marvin_guild_helper_channel_text:handle_call_channel_update_chain/1,
+        fun marvin_guild_helper_channel_voice:handle_call_channel_update_chain/1,
+        fun marvin_guild_helper_channel_category:handle_call_channel_update_chain/1
+    ], {Struct, S0}),
+    {reply, ok, S1};
+
+handle_call(?channel_delete(Struct), _GenReplyTo, S0) ->
+    marvin_log:debug("Guild '~s' got channel delete event", [S0#state.guild_id]),
+    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_channel_delete', [
+        fun marvin_guild_helper_channel_text:handle_call_channel_delete_chain/1,
+        fun marvin_guild_helper_channel_voice:handle_call_channel_delete_chain/1,
+        fun marvin_guild_helper_channel_category:handle_call_channel_delete_chain/1
     ], {Struct, S0}),
     {reply, ok, S1};
 

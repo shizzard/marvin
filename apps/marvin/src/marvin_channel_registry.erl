@@ -87,7 +87,7 @@ handle_call(?register(GuildId, ChannelId), _GenReplyTo, S0) ->
 
 handle_call(?unregister(GuildId, ChannelId), _GenReplyTo, S0) ->
     marvin_log:debug("Channel '~s' unregistered for guild '~s'", [ChannelId, GuildId]),
-    true = ets:insert(?MODULE, ChannelId),
+    true = ets:delete(?MODULE, ChannelId),
     {reply, ok, S0};
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
