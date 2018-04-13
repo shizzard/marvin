@@ -5,7 +5,7 @@
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
-    do_provision/2, do_provision_guild_members/2, presence_update/2, message_create/2,
+    do_provision/2, do_provision_guild_members/2, presence_update/2, voice_state_update/2, message_create/2,
     start_link/1, init/1,
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
@@ -14,6 +14,7 @@
 -define(do_provision(Struct), {do_provision, Struct}).
 -define(do_provision_guild_members(Struct), {do_provision_guild_members, Struct}).
 -define(presence_update(Struct), {presence_update, Struct}).
+-define(voice_state_update(Struct), {voice_state_update, Struct}).
 -define(message_create(Struct), {message_create, Struct}).
 
 
@@ -60,6 +61,15 @@ presence_update(GuildId, Struct) ->
 
 
 
+-spec voice_state_update(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_voice_state_update:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+voice_state_update(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?voice_state_update(Struct)).
+
+
+
 -spec message_create(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_message_create:t()) ->
     Ret :: marvin_helper_type:ok_return().
 
@@ -91,6 +101,9 @@ init([GuildId]) ->
             set, protected, {keypos, 2}, {read_concurrency, true}
         ]),
         member_state = ets:new(marvin_guild_member_state, [
+            set, protected, {keypos, 2}, {read_concurrency, true}
+        ]),
+        voice_state = ets:new(marvin_guild_voice_state, [
             set, protected, {keypos, 2}, {read_concurrency, true}
         ])
     }}.
@@ -124,6 +137,13 @@ handle_call(?presence_update(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got presence update", [S0#state.guild_id]),
     {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_presence_update', [
         fun marvin_guild_helper_presence:handle_call_presence_update_chain/1
+    ], {Struct, S0}),
+    {reply, ok, S1};
+
+handle_call(?voice_state_update(Struct), _GenReplyTo, S0) ->
+    marvin_log:debug("Guild '~s' got voice state update", [S0#state.guild_id]),
+    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_voice_state_update', [
+        fun marvin_guild_helper_voice_state:handle_call_voice_state_update_chain/1
     ], {Struct, S0}),
     {reply, ok, S1};
 

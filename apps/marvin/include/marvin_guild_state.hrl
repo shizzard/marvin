@@ -8,6 +8,7 @@
     channel_voice_state :: ets:tid(),
     channel_category_state :: ets:tid(),
     member_state :: ets:tid(),
+    voice_state :: ets:tid(),
     members_online = 0 :: non_neg_integer(),
     members_idle = 0 :: non_neg_integer(),
     members_dnd = 0 :: non_neg_integer()
@@ -37,4 +38,9 @@
 -record(member, {
     member_id :: marvin_pdu2:snowflake(),
     member :: marvin_pdu2_object_member:t()
+}).
+
+-record(voice_state, {
+    user_id :: marvin_pdu2:snowflake(),
+    channel_id :: marvin_pdu2:snowflake()
 }).

@@ -200,6 +200,10 @@ handle_call_incoming_event(Event, S0) ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_presence_update]),
                     handle_call_incoming_event_dispatch_presence_update(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_voice_state_update ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_voice_state_update]),
+                    handle_call_incoming_event_dispatch_voice_state_update(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_message_create ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_message_create]),
@@ -488,6 +492,34 @@ handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
         [S0#state.shard_name, GuildId, UserId]
     ),
     ok = marvin_guild:presence_update(GuildId, Struct),
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_voice_state_update(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_voice_state_update(Struct, S0) ->
+    UserId = marvin_pdu2_dispatch_voice_state_update:user_id(Struct),
+    case marvin_pdu2_dispatch_voice_state_update:guild_id(Struct) of
+        undefined ->
+            marvin_log:info(
+                "Shard '~p' got voice state update for undefined guild/user '~s'",
+                [S0#state.shard_name, UserId]
+            );
+        GuildId ->
+            marvin_log:debug(
+                "Shard '~p' got voice state update for guild '~s'/user '~s'",
+                [S0#state.shard_name, GuildId, UserId]
+            ),
+            ok = marvin_guild:voice_state_update(GuildId, Struct)
+    end,
     {reply, ok, S0}.
 
 
