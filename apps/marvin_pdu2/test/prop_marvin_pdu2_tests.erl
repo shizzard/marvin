@@ -55,6 +55,7 @@ pdu_mods() ->
         marvin_pdu2_dispatch_guild_create,
         marvin_pdu2_dispatch_channel_create,
         marvin_pdu2_dispatch_channel_update,
+        marvin_pdu2_dispatch_channel_delete,
         marvin_pdu2_dispatch_presence_update,
         marvin_pdu2_dispatch_message_create,
         marvin_pdu2_dispatch_guild_members_chunk,
@@ -253,6 +254,14 @@ marvin_pdu2_dispatch_channel_create() ->
     ]).
 
 marvin_pdu2_dispatch_channel_update() ->
+    oneof([
+        marvin_pdu2_object_channel_text(),
+        marvin_pdu2_object_channel_dm(),
+        marvin_pdu2_object_channel_voice(),
+        marvin_pdu2_object_channel_category()
+    ]).
+
+marvin_pdu2_dispatch_channel_delete() ->
     oneof([
         marvin_pdu2_object_channel_text(),
         marvin_pdu2_object_channel_dm(),
