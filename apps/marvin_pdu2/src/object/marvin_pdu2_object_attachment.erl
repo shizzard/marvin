@@ -2,13 +2,7 @@
 -compile({parse_transform, cloak_transform}).
 
 -export([export/1]).
-% id  snowflake   attachment id
-% filename    string  name of file attached
-% size    integer size of file in bytes
-% url string  source url of file
-% proxy_url   string  a proxied url of file
-% height  ?integer    height of file (if image)
-% width   ?integer    width of file (if image)
+
 -record(?MODULE, {
     id :: id(),
     filename :: filename(),

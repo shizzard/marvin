@@ -1,0 +1,7 @@
+{application, marvin_plugin, [
+    {description, "Marvin plugins"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {env, []}
+]}.

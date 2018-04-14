@@ -5,15 +5,15 @@
 
 -record(?MODULE, {
     content :: content(),
-    nonce = undefined :: nonce(),
-    tts = undefined :: tts(),
-    embed = undefined :: embed()
+    nonce = undefined :: nonce() | undefined,
+    tts = undefined :: tts() | undefined,
+    embed = undefined :: embed() | undefined
 }).
 
 -type content() :: unicode:unicode_binary().
 -type nonce() :: marvin_pdu2:snowflake().
 -type tts() :: boolean().
--type embed() :: boolean().
+-type embed() :: marvin_pdu2_object_embed:t().
 -type t() :: #?MODULE{}.
 
 -export_type([content/0, nonce/0, tts/0, embed/0, t/0]).

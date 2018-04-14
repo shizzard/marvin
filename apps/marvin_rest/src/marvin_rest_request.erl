@@ -39,7 +39,7 @@ method(#?MODULE{method = Value}) ->
 
 
 -spec url(Req :: t()) ->
-    Ret :: atom().
+    Ret :: binary().
 
 url(#?MODULE{url = Value}) ->
     Value.
@@ -47,7 +47,7 @@ url(#?MODULE{url = Value}) ->
 
 
 -spec body(Req :: t()) ->
-    Ret :: atom().
+    Ret :: binary().
 
 body(#?MODULE{body = Value}) ->
     Value.

@@ -141,8 +141,16 @@ nullify(undefined) -> null;
 nullify(Term) -> Term.
 
 
+%% Specified as term()
+%% https://github.com/manopapad/proper/issues/118
+-spec export(Map :: term()) ->
+    Ret :: term().
+
 export(Map) ->
-    maps:from_list([{Key, Value} || {Key, Value} <- maps:to_list(Map), Value /= undefined]).
+    maps:filter(fun
+        (_, undefined) -> false;
+        (_, _) -> true
+    end, Map).
 
 
 %% Internals

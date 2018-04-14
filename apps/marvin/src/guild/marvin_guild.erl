@@ -5,6 +5,7 @@
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
+    get_context/1,
     do_provision/2, do_provision_guild_members/2, presence_update/2, voice_state_update/2, message_create/2,
     channel_create/2, channel_update/2, channel_delete/2,
     start_link/1, init/1,
@@ -12,6 +13,7 @@
     terminate/2, code_change/3
 ]).
 
+-define(get_context(), {get_context}).
 -define(do_provision(Struct), {do_provision, Struct}).
 -define(do_provision_guild_members(Struct), {do_provision_guild_members, Struct}).
 -define(presence_update(Struct), {presence_update, Struct}).
@@ -32,6 +34,12 @@
 
 start_link(GuildId) ->
     gen_server:start_link(?MODULE, [GuildId], []).
+
+
+
+get_context(GuildId) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?get_context()).
 
 
 
@@ -111,8 +119,10 @@ channel_delete(GuildId, Struct) ->
 
 
 init([GuildId]) ->
+    {ok, GuildConfig} = marvin_guild_config:load(GuildId),
     {ok, #state{
         guild_id = GuildId,
+        guild_config = GuildConfig,
         presence_state = ets:new(marvin_guild_presence_state, [
             set, protected, {keypos, 2}, {read_concurrency, true}
         ]),
@@ -144,6 +154,9 @@ init([GuildId]) ->
 %% Internals
 
 
+
+handle_call(?get_context(), _GenReplyTo, S0) ->
+    {reply, S0, S0};
 
 handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
     marvin_log:info("Guild '~s' is being provisioned", [S0#state.guild_id]),
