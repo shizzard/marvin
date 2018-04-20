@@ -2,7 +2,7 @@
 
 -include("marvin_guild_state.hrl").
 
--export([handle_call_do_provision_chain/1]).
+-export([w_do_provision/2]).
 
 
 
@@ -10,30 +10,13 @@
 
 
 
--spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_create:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_guild_create:t(),
-        S1 :: state()
-    }).
+-spec w_do_provision(Roles :: [marvin_pdu2_object_role:t()], Ctx :: marvin_guild_context:t()) ->
+    marvin_helper_type:ok_return().
 
-handle_call_do_provision_chain({Struct, S0}) ->
-    Roles = marvin_pdu2_dispatch_guild_create:roles(Struct),
-    marvin_log:info("Guild '~s' roles: ~p total", [S0#state.guild_id, length(Roles)]),
-    S1 = lists:foldl(fun set_role/2, S0, Roles),
-    {ok, {Struct, S1}}.
-
-
-
-%% Internals
-
-
-
--spec set_role(RoleStruct :: marvin_pdu2_object_role:t(), S0 :: state()) ->
-    Ret :: state().
-
-set_role(RoleStruct, #state{role_state = RoleStateEts} = S0) ->
-    ets:insert(RoleStateEts, #role{
-        role_id = marvin_pdu2_object_role:id(RoleStruct),
-        role = RoleStruct
-    }),
-    S0.
+w_do_provision(Roles, Ctx) ->
+    marvin_log:info("Guild '~s' roles: ~p total", [marvin_guild_context:guild_id(Ctx), length(Roles)]),
+    ets:insert(marvin_guild_context:role_state(Ctx), [#role{
+        role_id = marvin_pdu2_object_role:id(Role),
+        role = Role
+    } || Role <- Roles]),
+    ok.

@@ -2,7 +2,7 @@
 
 -include("marvin_guild_state.hrl").
 
--export([handle_call_do_provision_chain/1]).
+-export([w_do_provision/2]).
 
 
 
@@ -10,30 +10,13 @@
 
 
 
--spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_create:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_guild_create:t(),
-        S1 :: state()
-    }).
+-spec w_do_provision(Emojis :: [marvin_pdu2_object_emoji:t()], Ctx :: marvin_guild_context:t()) ->
+    marvin_helper_type:ok_return().
 
-handle_call_do_provision_chain({Struct, S0}) ->
-    Emojis = marvin_pdu2_dispatch_guild_create:emojis(Struct),
-    marvin_log:info("Guild '~s' emojis: ~p total", [S0#state.guild_id, length(Emojis)]),
-    S1 = lists:foldl(fun set_emoji/2, S0, Emojis),
-    {ok, {Struct, S1}}.
-
-
-
-%% Internals
-
-
-
--spec set_emoji(EmojiStruct :: marvin_pdu2_object_emoji:t(), S0 :: state()) ->
-    Ret :: state().
-
-set_emoji(EmojiStruct, #state{emoji_state = EmojiStateEts} = S0) ->
-    ets:insert(EmojiStateEts, #emoji{
-        emoji_id = marvin_pdu2_object_emoji:id(EmojiStruct),
-        emoji = EmojiStruct
-    }),
-    S0.
+w_do_provision(Emojis, Ctx) ->
+    marvin_log:info("Guild '~s' emojis: ~p total", [marvin_guild_context:guild_id(Ctx), length(Emojis)]),
+    ets:insert(marvin_guild_context:emoji_state(Ctx), [#emoji{
+        emoji_id = marvin_pdu2_object_emoji:id(Emoji),
+        emoji = Emoji
+    } || Emoji <- Emojis]),
+    ok.

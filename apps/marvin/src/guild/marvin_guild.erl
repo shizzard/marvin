@@ -155,75 +155,91 @@ init([GuildId]) ->
 
 
 
+context_from_state(#state{
+    guild_id = GuildId,
+    owner_id = OwnerId,
+    presence_state = PresenceState,
+    role_state = RoleState,
+    emoji_state = EmojiState,
+    channel_text_state = ChannelTextState,
+    channel_voice_state = ChannelVoiceState,
+    channel_category_state = ChannelCategoryState,
+    member_state = MemberState,
+    voice_state = VoiceState
+}) ->
+    marvin_guild_context:new(#{
+        guild_id => GuildId,
+        owner_id => OwnerId,
+        presence_state => PresenceState,
+        role_state => RoleState,
+        emoji_state => EmojiState,
+        channel_text_state => ChannelTextState,
+        channel_voice_state => ChannelVoiceState,
+        channel_category_state => ChannelCategoryState,
+        member_state => MemberState,
+        voice_state => VoiceState
+    }).
+
+
+
 handle_call(?get_context(), _GenReplyTo, S0) ->
-    {reply, S0, S0};
+    {reply, context_from_state(S0), S0};
 
 handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
     marvin_log:info("Guild '~s' is being provisioned", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_do_provision', [
-        fun marvin_guild_helper_presence:handle_call_do_provision_chain/1,
-        fun marvin_guild_helper_role:handle_call_do_provision_chain/1,
-        fun marvin_guild_helper_emoji:handle_call_do_provision_chain/1,
-        fun marvin_guild_helper_channel_text:handle_call_do_provision_chain/1,
-        fun marvin_guild_helper_channel_voice:handle_call_do_provision_chain/1,
-        fun marvin_guild_helper_channel_category:handle_call_do_provision_chain/1
-    ], {Struct, S0#state{owner_id = marvin_pdu2_dispatch_guild_create:owner_id(Struct)}}),
+    S1 = S0#state{owner_id = marvin_pdu2_dispatch_guild_create:owner_id(Struct)},
+    Ctx = context_from_state(S1),
+    ok = marvin_guild_helper_presence:w_do_provision(marvin_pdu2_dispatch_guild_create:presences(Struct), Ctx),
+    ok = marvin_guild_helper_role:w_do_provision(marvin_pdu2_dispatch_guild_create:roles(Struct), Ctx),
+    ok = marvin_guild_helper_emoji:w_do_provision(marvin_pdu2_dispatch_guild_create:emojis(Struct), Ctx),
+    ok = marvin_guild_helper_channel_text:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
+    ok = marvin_guild_helper_channel_voice:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
+    ok = marvin_guild_helper_channel_category:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
     {reply, ok, S1};
 
 handle_call(?do_provision_guild_members(Struct), _GenReplyTo, S0) ->
     marvin_log:info("Guild '~s' is being provisioned with members", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_do_provision_guild_members', [
-        fun marvin_guild_helper_members:handle_call_do_provision_chain/1
-    ], {Struct, S0}),
-    {reply, ok, S1};
+    ok = marvin_guild_helper_members:w_do_provision(marvin_pdu2_dispatch_guild_members_chunk:members(Struct), context_from_state(S0)),
+    {reply, ok, S0};
 
 handle_call(?presence_update(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got presence update", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_presence_update', [
-        fun marvin_guild_helper_presence:handle_call_presence_update_chain/1
-    ], {Struct, S0}),
-    {reply, ok, S1};
+    ok = marvin_guild_helper_presence:w_presence_update(Struct, context_from_state(S0)),
+    {reply, ok, S0};
 
 handle_call(?voice_state_update(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got voice state update", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_voice_state_update', [
-        fun marvin_guild_helper_voice_state:handle_call_voice_state_update_chain/1
-    ], {Struct, S0}),
-    {reply, ok, S1};
+    ok = marvin_guild_helper_voice_state:w_voice_state_update(Struct, context_from_state(S0)),
+    {reply, ok, S0};
 
 handle_call(?message_create(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got message", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_message_create', [
-        fun marvin_guild_helper_message:handle_call_message_create_chain/1
-    ], {Struct, S0}),
-    {reply, ok, S1};
+    ok = marvin_guild_helper_message:w_message_create(Struct, context_from_state(S0)),
+    {reply, ok, S0};
 
 handle_call(?channel_create(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got channel create event", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_channel_create', [
-        fun marvin_guild_helper_channel_text:handle_call_channel_create_chain/1,
-        fun marvin_guild_helper_channel_voice:handle_call_channel_create_chain/1,
-        fun marvin_guild_helper_channel_category:handle_call_channel_create_chain/1
-    ], {Struct, S0}),
-    {reply, ok, S1};
+    Ctx = context_from_state(S0),
+    ok = marvin_guild_helper_channel_text:w_channel_create(Struct, Ctx),
+    ok = marvin_guild_helper_channel_voice:w_channel_create(Struct, Ctx),
+    ok = marvin_guild_helper_channel_category:w_channel_create(Struct, Ctx),
+    {reply, ok, S0};
 
 handle_call(?channel_update(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got channel update event", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_channel_update', [
-        fun marvin_guild_helper_channel_text:handle_call_channel_update_chain/1,
-        fun marvin_guild_helper_channel_voice:handle_call_channel_update_chain/1,
-        fun marvin_guild_helper_channel_category:handle_call_channel_update_chain/1
-    ], {Struct, S0}),
-    {reply, ok, S1};
+    Ctx = context_from_state(S0),
+    ok = marvin_guild_helper_channel_text:w_channel_update(Struct, Ctx),
+    ok = marvin_guild_helper_channel_voice:w_channel_update(Struct, Ctx),
+    ok = marvin_guild_helper_channel_category:w_channel_update(Struct, Ctx),
+    {reply, ok, S0};
 
 handle_call(?channel_delete(Struct), _GenReplyTo, S0) ->
     marvin_log:debug("Guild '~s' got channel delete event", [S0#state.guild_id]),
-    {ok, {Struct, S1}} = marvin_helper_chain:chain('marvin_guild:handle_call_channel_delete', [
-        fun marvin_guild_helper_channel_text:handle_call_channel_delete_chain/1,
-        fun marvin_guild_helper_channel_voice:handle_call_channel_delete_chain/1,
-        fun marvin_guild_helper_channel_category:handle_call_channel_delete_chain/1
-    ], {Struct, S0}),
-    {reply, ok, S1};
+    Ctx = context_from_state(S0),
+    ok = marvin_guild_helper_channel_text:w_channel_delete(Struct, Ctx),
+    ok = marvin_guild_helper_channel_voice:w_channel_delete(Struct, Ctx),
+    ok = marvin_guild_helper_channel_category:w_channel_delete(Struct, Ctx),
+    {reply, ok, S0};
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
     marvin_log:warn("Unexpected call: ~p", [Unexpected]),

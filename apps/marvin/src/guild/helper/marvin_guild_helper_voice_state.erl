@@ -3,9 +3,9 @@
 -include("marvin_guild_state.hrl").
 
 -export([
-    handle_call_voice_state_update_chain/1,
-    get_participant_channel/2,
-    get_channel_participants/2
+    w_voice_state_update/2,
+    r_get_participant_channel/2,
+    r_get_channel_participants/2
 ]).
 
 
@@ -14,49 +14,42 @@
 
 
 
--spec handle_call_voice_state_update_chain({Struct :: marvin_pdu2_dispatch_voice_state_update:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_voice_state_update:t(),
-        S1 :: state()
-    }).
+-spec w_voice_state_update(VoiceStateUpdate :: marvin_pdu2_dispatch_voice_state_update:t(), Ctx :: marvin_guild_context:t()) ->
+    marvin_helper_type:ok_return().
 
-handle_call_voice_state_update_chain({Struct, #state{
-    voice_state = PresenceStateEts
-} = S0}) ->
-    UserId = marvin_pdu2_dispatch_voice_state_update:user_id(Struct),
-    ChannelId = marvin_pdu2_dispatch_voice_state_update:channel_id(Struct),
-    OldChannelId = get_participant_channel(UserId, S0),
+w_voice_state_update(VoiceStateUpdate, Ctx) ->
+    UserId = marvin_pdu2_dispatch_voice_state_update:user_id(VoiceStateUpdate),
+    ChannelId = marvin_pdu2_dispatch_voice_state_update:channel_id(VoiceStateUpdate),
+    OldChannelId = r_get_participant_channel(UserId, Ctx),
     case {OldChannelId, ChannelId} of
         {undefined, ChannelId} ->
-            marvin_log:info(
+            marvin_log:debug(
                 "Guild '~s' voice channel: user '~s' joined to channel '~s'",
-                [S0#state.guild_id, UserId, ChannelId]
+                [marvin_guild_context:guild_id(Ctx), UserId, ChannelId]
             ),
-            ets:insert(PresenceStateEts, #voice_state{user_id = UserId, channel_id = ChannelId});
+            ets:insert(marvin_guild_context:voice_state(Ctx), #voice_state{user_id = UserId, channel_id = ChannelId});
         {OldChannelId, undefined} ->
-            marvin_log:info(
+            marvin_log:debug(
                 "Guild '~s' voice channel: user '~s' left channel '~s'",
-                [S0#state.guild_id, UserId, OldChannelId]
+                [marvin_guild_context:guild_id(Ctx), UserId, OldChannelId]
             ),
-            ets:delete(PresenceStateEts, UserId);
+            ets:delete(marvin_guild_context:voice_state(Ctx), UserId);
         {OldChannelId, ChannelId} ->
-            marvin_log:info(
+            marvin_log:debug(
                 "Guild '~s' voice channel: user '~s' moved from channel '~s' to channel '~s'",
-                [S0#state.guild_id, UserId, OldChannelId, ChannelId]
+                [marvin_guild_context:guild_id(Ctx), UserId, OldChannelId, ChannelId]
             ),
-            ets:insert(PresenceStateEts, #voice_state{user_id = UserId, channel_id = ChannelId})
+            ets:insert(marvin_guild_context:voice_state(Ctx), #voice_state{user_id = UserId, channel_id = ChannelId})
     end,
-    {ok, {Struct, S0}}.
+    ok.
 
 
 
--spec get_participant_channel(UserId :: marvin_pdu2:snowflake(), S0 :: state()) ->
+-spec r_get_participant_channel(UserId :: marvin_pdu2:snowflake(), Ctx :: marvin_guild_context:t()) ->
     Ret :: marvin_pdu2_object_voice_state:status().
 
-get_participant_channel(UserId, #state{
-    voice_state = PresenceStateEts
-}) ->
-    case ets:lookup(PresenceStateEts, UserId) of
+r_get_participant_channel(UserId, Ctx) ->
+    case ets:lookup(marvin_guild_context:voice_state(Ctx), UserId) of
         [] ->
             undefined;
         [#voice_state{user_id = UserId, channel_id = ChannelId}] ->
@@ -65,15 +58,13 @@ get_participant_channel(UserId, #state{
 
 
 
--spec get_channel_participants(ChannelId :: marvin_pdu2:snowflake(), S0 :: state()) ->
+-spec r_get_channel_participants(ChannelId :: marvin_pdu2:snowflake(), Ctx :: marvin_guild_context:t()) ->
     Ret :: [marvin_pdu2:snowflake()].
 
-get_channel_participants(ChannelId, #state{
-    voice_state = PresenceStateEts
-}) ->
+r_get_channel_participants(ChannelId, Ctx) ->
     [
         VoiceState#voice_state.user_id
-        || VoiceState <- ets:tab2list(PresenceStateEts),
+        || VoiceState <- ets:tab2list(marvin_guild_context:voice_state(Ctx)),
         ChannelId == VoiceState#voice_state.channel_id
     ].
 

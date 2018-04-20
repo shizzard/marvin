@@ -3,9 +3,9 @@
 -include("marvin_guild_state.hrl").
 
 -export([
-    handle_call_do_provision_chain/1,
-    handle_call_presence_update_chain/1,
-    get_member_status/2
+    w_do_provision/2,
+    w_presence_update/2,
+    r_get_member_status/2
 ]).
 
 
@@ -14,44 +14,35 @@
 
 
 
--spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_create:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_guild_create:t(),
-        S1 :: state()
-    }).
+-spec w_do_provision(Presences :: [marvin_pdu2_object_presence:t()], Ctx :: marvin_guild_context:t()) ->
+    marvin_helper_type:ok_return().
 
-handle_call_do_provision_chain({Struct, S0}) ->
-    Presences = marvin_pdu2_dispatch_guild_create:presences(Struct),
-    marvin_log:info("Guild '~s' presences: ~p total", [S0#state.guild_id, length(Presences)]),
-    S1 = lists:foldl(fun do_update_member_presence_from_object/2, S0, Presences),
-    do_report_presence_state(S1),
-    {ok, {Struct, S1}}.
+w_do_provision(Presences, Ctx) ->
+    marvin_log:info("Guild '~s' presences: ~p total", [marvin_guild_context:guild_id(Ctx), length(Presences)]),
+    lists:foldl(fun w_do_provision_fold/2, Ctx, Presences),
+    do_report_presence_state(Ctx),
+    ok.
 
 
 
--spec handle_call_presence_update_chain({Struct :: marvin_pdu2_dispatch_presence_update:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_presence_update:t(),
-        S1 :: state()
-    }).
+-spec w_presence_update(Presence :: marvin_pdu2_dispatch_presence_update:t(), Ctx :: marvin_guild_context:t()) ->
+    marvin_helper_type:ok_return().
 
-handle_call_presence_update_chain({Struct, S0}) ->
-    UserId = marvin_pdu2_dispatch_presence_update:user(Struct),
-    Status = marvin_pdu2_dispatch_presence_update:status(Struct),
-    OldStatus = get_member_status(UserId, S0),
-    S1 = do_update_member_presence(UserId, OldStatus, Status, S0),
-    do_report_presence_state(S1),
-    {ok, {Struct, S1}}.
+w_presence_update(Presence, Ctx) ->
+    UserId = marvin_pdu2_dispatch_presence_update:user(Presence),
+    Status = marvin_pdu2_dispatch_presence_update:status(Presence),
+    OldStatus = r_get_member_status(UserId, Ctx),
+    do_update_member_presence(UserId, OldStatus, Status, Ctx),
+    do_report_presence_state(Ctx),
+    ok.
 
 
 
--spec get_member_status(UserId :: marvin_pdu2:snowflake(), S0 :: state()) ->
+-spec r_get_member_status(UserId :: marvin_pdu2:snowflake(), Ctx :: marvin_guild_context:t()) ->
     Ret :: marvin_pdu2_object_presence:status().
 
-get_member_status(UserId, #state{
-    presence_state = PresenceStateEts
-}) ->
-    case ets:lookup(PresenceStateEts, UserId) of
+r_get_member_status(UserId, Ctx) ->
+    case ets:lookup(marvin_guild_context:presence_state(Ctx), UserId) of
         [] ->
             <<"offline">>;
         [#presence{user_id = UserId, status = Status}] ->
@@ -64,14 +55,18 @@ get_member_status(UserId, #state{
 
 
 
--spec do_update_member_presence_from_object(Struct :: marvin_pdu2_object_presence:t(), S0 :: state()) ->
-    Ret :: state().
+-spec w_do_provision_fold(
+    Presence :: marvin_pdu2_object_presence:t(),
+    Ctx :: marvin_guild_context:t()
+) ->
+    Ret :: marvin_guild_context:t().
 
-do_update_member_presence_from_object(Struct, S0) ->
-    UserId = marvin_pdu2_object_presence:user(Struct),
-    Status = marvin_pdu2_object_presence:status(Struct),
-    OldStatus = get_member_status(UserId, S0),
-    do_update_member_presence(UserId, OldStatus, Status, S0).
+w_do_provision_fold(Presence, Ctx) ->
+    UserId = marvin_pdu2_object_presence:user(Presence),
+    Status = marvin_pdu2_object_presence:status(Presence),
+    OldStatus = r_get_member_status(UserId, Ctx),
+    do_update_member_presence(UserId, OldStatus, Status, Ctx),
+    Ctx.
 
 
 
@@ -79,78 +74,47 @@ do_update_member_presence_from_object(Struct, S0) ->
     UserId :: marvin_pdu2_object_user:id(),
     OldStatus :: marvin_pdu2_object_presence:status(),
     Status :: marvin_pdu2_object_presence:status(),
-    S0 :: state()
+    Ctx :: marvin_guild_context:t()
 ) ->
-    Ret :: state().
-
-do_update_member_presence(UserId, OldStatus, Status, #state{
-    presence_state = PresenceStateEts,
-    members_online = MembersOnline,
-    members_idle = MembersIdle,
-    members_dnd = MembersDnd
-} = S0) ->
-    case {OldStatus, Status} of
-        {<<"online">>, <<"online">>} ->
-            S0;
-        {<<"idle">>, <<"online">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_online = MembersOnline + 1, members_idle = MembersIdle - 1};
-        {<<"dnd">>, <<"online">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_online = MembersOnline + 1, members_dnd = MembersDnd - 1};
-        {<<"offline">>, <<"online">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_online = MembersOnline + 1};
-
-        {<<"online">>, <<"idle">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_idle = MembersIdle + 1, members_online = MembersOnline - 1};
-        {<<"idle">>, <<"idle">>} ->
-            S0;
-        {<<"dnd">>, <<"idle">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_idle = MembersIdle + 1, members_dnd = MembersDnd - 1};
-        {<<"offline">>, <<"idle">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_idle = MembersIdle + 1};
-
-        {<<"online">>, <<"dnd">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_dnd = MembersDnd + 1, members_online = MembersOnline - 1};
-        {<<"idle">>, <<"dnd">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_dnd = MembersDnd + 1, members_idle = MembersIdle - 1};
-        {<<"dnd">>, <<"dnd">>} ->
-            S0;
-        {<<"offline">>, <<"dnd">>} ->
-            ets:insert(PresenceStateEts, #presence{user_id = UserId, status = Status}),
-            S0#state{members_dnd = MembersDnd + 1};
-
-        {<<"online">>, <<"offline">>} ->
-            ets:delete(PresenceStateEts, UserId),
-            S0#state{members_online = MembersOnline - 1};
-        {<<"idle">>, <<"offline">>} ->
-            ets:delete(PresenceStateEts, UserId),
-            S0#state{members_idle = MembersIdle - 1};
-        {<<"dnd">>, <<"offline">>} ->
-            ets:delete(PresenceStateEts, UserId),
-            S0#state{members_dnd = MembersDnd - 1};
-        {<<"offline">>, <<"offline">>} ->
-            S0
-    end.
-
-
-
--spec do_report_presence_state(S0 :: state()) ->
     marvin_helper_type:ok_return().
 
-do_report_presence_state(#state{
-    guild_id = GuildId,
-    members_online = MembersOnline,
-    members_idle = MembersIdle,
-    members_dnd = MembersDnd
-}) ->
-    prometheus_gauge:set(marvin_guild_presence_state, [GuildId, online], MembersOnline),
-    prometheus_gauge:set(marvin_guild_presence_state, [GuildId, idle], MembersIdle),
-    prometheus_gauge:set(marvin_guild_presence_state, [GuildId, dnd], MembersDnd),
+do_update_member_presence(UserId, OldStatus, Status, Ctx) ->
+    case {OldStatus, Status} of
+        {_, <<"offline">>} ->
+            ets:delete(marvin_guild_context:presence_state(Ctx), UserId);
+        {_, _} ->
+            ets:insert(marvin_guild_context:presence_state(Ctx), #presence{user_id = UserId, status = Status})
+    end,
     ok.
+
+
+
+-spec do_report_presence_state(Ctx :: marvin_guild_context:t()) ->
+    marvin_helper_type:ok_return().
+
+do_report_presence_state(Ctx) ->
+    {Online, Idle, Dnd} = lists:foldl(
+        fun do_report_presence_state_fold/2, {0,0,0},
+        ets:tab2list(marvin_guild_context:presence_state(Ctx))
+    ),
+    prometheus_gauge:set(marvin_guild_presence_state, [marvin_guild_context:guild_id(Ctx), online], Online),
+    prometheus_gauge:set(marvin_guild_presence_state, [marvin_guild_context:guild_id(Ctx), idle], Idle),
+    prometheus_gauge:set(marvin_guild_presence_state, [marvin_guild_context:guild_id(Ctx), dnd], Dnd),
+    ok.
+
+
+
+-spec do_report_presence_state_fold(
+    PresenceState :: #presence{},
+    {Online :: non_neg_integer(), Idle :: non_neg_integer(), Dnd :: non_neg_integer()}
+) ->
+    Ret :: {Online :: non_neg_integer(), Idle :: non_neg_integer(), Dnd :: non_neg_integer()}.
+
+do_report_presence_state_fold(#presence{status = <<"online">>}, {Online, Idle, Dnd}) ->
+    {Online + 1, Idle, Dnd};
+
+do_report_presence_state_fold(#presence{status = <<"idle">>}, {Online, Idle, Dnd}) ->
+    {Online, Idle + 1, Dnd};
+
+do_report_presence_state_fold(#presence{status = <<"dnd">>}, {Online, Idle, Dnd}) ->
+    {Online, Idle, Dnd + 1}.

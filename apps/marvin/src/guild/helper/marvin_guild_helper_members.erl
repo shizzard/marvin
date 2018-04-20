@@ -2,7 +2,7 @@
 
 -include("marvin_guild_state.hrl").
 
--export([handle_call_do_provision_chain/1]).
+-export([w_do_provision/2]).
 
 
 
@@ -10,30 +10,13 @@
 
 
 
--spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_members_chunk:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_guild_members_chunk:t(),
-        S1 :: state()
-    }).
+-spec w_do_provision(Members :: [marvin_pdu2_object_member:t()], Ctx :: marvin_guild_context:t()) ->
+    marvin_helper_type:ok_return().
 
-handle_call_do_provision_chain({Struct, S0}) ->
-    Members = marvin_pdu2_dispatch_guild_members_chunk:members(Struct),
-    marvin_log:info("Guild '~s' members chunk: ~p total", [S0#state.guild_id, length(Members)]),
-    S1 = lists:foldl(fun set_member/2, S0, Members),
-    {ok, {Struct, S1}}.
-
-
-
-%% Internals
-
-
-
--spec set_member(Member :: marvin_pdu2_object_member:t(), S0 :: state()) ->
-    Ret :: state().
-
-set_member(Member, #state{member_state = MemberStateEts} = S0) ->
-    ets:insert(MemberStateEts, #member{
+w_do_provision(Members, Ctx) ->
+    marvin_log:info("Guild '~s' members chunk: ~p total", [marvin_guild_context:guild_id(Ctx), length(Members)]),
+    ets:insert(marvin_guild_context:member_state(Ctx), [#member{
         member_id = marvin_pdu2_object_user:id(marvin_pdu2_object_member:user(Member)),
         member = Member
-    }),
-    S0.
+    } || Member <- Members]),
+    ok.

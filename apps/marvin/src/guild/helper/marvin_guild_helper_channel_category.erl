@@ -3,8 +3,8 @@
 -include("marvin_guild_state.hrl").
 
 -export([
-    handle_call_do_provision_chain/1, handle_call_channel_create_chain/1,
-    handle_call_channel_update_chain/1, handle_call_channel_delete_chain/1
+    w_do_provision/2, w_channel_create/2,
+    w_channel_update/2, w_channel_delete/2
 ]).
 
 
@@ -13,93 +13,82 @@
 
 
 
--spec handle_call_do_provision_chain({Struct :: marvin_pdu2_dispatch_guild_create:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_guild_create:t(),
-        S1 :: state()
-    }).
+-spec w_do_provision(Channels :: [marvin_pdu2_object_channel:t()], Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_helper_type:ok_return().
 
-handle_call_do_provision_chain({Struct, S0}) ->
-    Channels = [
-        Channel || Channel <- marvin_pdu2_dispatch_guild_create:channels(Struct),
+w_do_provision(Channels, Ctx) ->
+    Categories = [
+        Channel || Channel <- Channels,
         marvin_pdu2_object_channel:channel_type_guild_category() == marvin_pdu2_object_channel:type(Channel)
     ],
-    marvin_log:info("Guild '~s' categories: ~p total", [S0#state.guild_id, length(Channels)]),
-    S1 = lists:foldl(fun set_channel_category/2, S0, Channels),
-    {ok, {Struct, S1}}.
+    marvin_log:info("Guild '~s' categories: ~p total", [marvin_guild_context:guild_id(Ctx), length(Categories)]),
+    lists:foreach(fun(Channel) -> set_channel_category(Channel, Ctx) end, Categories),
+    ok.
 
 
 
--spec handle_call_channel_create_chain({Struct :: marvin_pdu2_dispatch_channel_create:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_channel_create:t(),
-        S1 :: state()
-    }).
+-spec w_channel_create(ChannelEvent :: marvin_pdu2_dispatch_channel_create:t(), Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_helper_type:ok_return().
 
-handle_call_channel_create_chain({Struct, S0}) ->
+w_channel_create(ChannelEvent, Ctx) ->
     case {
-        marvin_pdu2_dispatch_channel_create:type(Struct),
+        marvin_pdu2_dispatch_channel_create:type(ChannelEvent),
         marvin_pdu2_dispatch_channel_create:channel_type_guild_category()
     } of
         {_Same, _Same} ->
             marvin_log:info(
                 "Guild '~s' got new category '~s'",
-                [S0#state.guild_id, marvin_pdu2_dispatch_channel_create:id(Struct)
+                [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_create:id(ChannelEvent)
             ]),
-            ChannelStruct = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_create:export(Struct)),
-            S1 = set_channel_category(ChannelStruct, S0),
-            {ok, {Struct, S1}};
+            Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_create:export(ChannelEvent)),
+            set_channel_category(Channel, Ctx),
+            ok;
         {_, _} ->
-            {ok, {Struct, S0}}
+            ok
     end.
 
 
--spec handle_call_channel_update_chain({Struct :: marvin_pdu2_dispatch_channel_update:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_channel_update:t(),
-        S1 :: state()
-    }).
 
-handle_call_channel_update_chain({Struct, S0}) ->
+-spec w_channel_update(ChannelEvent :: marvin_pdu2_dispatch_channel_update:t(), Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+w_channel_update(ChannelEvent, Ctx) ->
     case {
-        marvin_pdu2_dispatch_channel_update:type(Struct),
+        marvin_pdu2_dispatch_channel_update:type(ChannelEvent),
         marvin_pdu2_dispatch_channel_update:channel_type_guild_category()
     } of
         {_Same, _Same} ->
             marvin_log:info(
                 "Guild '~s' got updated category '~s'",
-                [S0#state.guild_id, marvin_pdu2_dispatch_channel_update:id(Struct)
+                [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_update:id(ChannelEvent)
             ]),
-            ChannelStruct = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_update:export(Struct)),
-            S1 = set_channel_category(ChannelStruct, S0),
-            {ok, {Struct, S1}};
+            Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_update:export(ChannelEvent)),
+            set_channel_category(Channel, Ctx),
+            ok;
         {_, _} ->
-            {ok, {Struct, S0}}
+            ok
     end.
 
 
 
--spec handle_call_channel_delete_chain({Struct :: marvin_pdu2_dispatch_channel_delete:t(), S0 :: state()}) ->
-    marvin_helper_type:ok_return(OkRet :: {
-        Struct :: marvin_pdu2_dispatch_channel_delete:t(),
-        S1 :: state()
-    }).
+-spec w_channel_delete(ChannelEvent :: marvin_pdu2_dispatch_channel_delete:t(), Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_helper_type:ok_return().
 
-handle_call_channel_delete_chain({Struct, S0}) ->
+w_channel_delete(ChannelEvent, Ctx) ->
     case {
-        marvin_pdu2_dispatch_channel_delete:type(Struct),
+        marvin_pdu2_dispatch_channel_delete:type(ChannelEvent),
         marvin_pdu2_dispatch_channel_delete:channel_type_guild_category()
     } of
         {_Same, _Same} ->
             marvin_log:info(
                 "Guild '~s' lost category '~s'",
-                [S0#state.guild_id, marvin_pdu2_dispatch_channel_delete:id(Struct)
+                [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_delete:id(ChannelEvent)
             ]),
-            ChannelId = marvin_pdu2_dispatch_channel_delete:id(Struct),
-            S1 = delete_channel_category(ChannelId, S0),
-            {ok, {Struct, S1}};
+            Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_delete:export(ChannelEvent)),
+            delete_channel_category(Channel, Ctx),
+            ok;
         {_, _} ->
-            {ok, {Struct, S0}}
+            ok
     end.
 
 
@@ -108,27 +97,22 @@ handle_call_channel_delete_chain({Struct, S0}) ->
 
 
 
--spec set_channel_category(ChannelStruct :: marvin_pdu2_object_channel:t(), S0 :: state()) ->
-    Ret :: state().
+-spec set_channel_category(Channel :: marvin_pdu2_object_channel:t(), Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_helper_type:ok_return().
 
-set_channel_category(ChannelStruct, #state{
-    channel_category_state = ChannelStateEts,
-    guild_id = GuildId
-} = S0) ->
-    ChannelId = marvin_pdu2_object_channel:id(ChannelStruct),
-    marvin_channel_registry:register(GuildId, ChannelId),
-    ets:insert(ChannelStateEts, #channel{channel_id = ChannelId, channel = ChannelStruct}),
-    S0.
+set_channel_category(Channel, Ctx) ->
+    ChannelId = marvin_pdu2_object_channel:id(Channel),
+    marvin_channel_registry:register(marvin_guild_context:guild_id(Ctx), ChannelId),
+    ets:insert(marvin_guild_context:channel_category_state(Ctx), #channel{channel_id = ChannelId, channel = Channel}),
+    ok.
 
 
 
--spec delete_channel_category(ChannelId :: marvin_pdu2:snowflake(), S0 :: state()) ->
-    Ret :: state().
+-spec delete_channel_category(Channel :: marvin_pdu2_object_channel:t(), Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_helper_type:ok_return().
 
-delete_channel_category(ChannelId, #state{
-    channel_category_state = ChannelStateEts,
-    guild_id = GuildId
-} = S0) ->
-    marvin_channel_registry:unregister(GuildId, ChannelId),
-    ets:delete(ChannelStateEts, ChannelId),
-    S0.
+delete_channel_category(Channel, Ctx) ->
+    ChannelId = marvin_pdu2_object_channel:id(Channel),
+    marvin_channel_registry:register(marvin_guild_context:guild_id(Ctx), ChannelId),
+    ets:delete(marvin_guild_context:channel_category_state(Ctx), ChannelId),
+    ok.
