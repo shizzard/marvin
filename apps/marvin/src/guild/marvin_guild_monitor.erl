@@ -8,12 +8,12 @@
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
 ]).
--export([maybe_start_guild/1, start_guild/1, stop_guild/1, get_guild/1]).
+-export([maybe_start_guild/2, start_guild/2, stop_guild/1, get_guild/1]).
 
 
 
 -define(registry_table_name, marvin_guild_monitor_registry).
--define(start_guild(GuildId), {start_guild, GuildId}).
+-define(start_guild(GuildId, MyId), {start_guild, GuildId, MyId}).
 -define(stop_guild(GuildId), {stop_guild, GuildId}).
 -define(monitor_down(MonRef, Pid, Info), {'DOWN', MonRef, process, Pid, Info}).
 
@@ -33,36 +33,36 @@
 
 
 
--spec maybe_start_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
+-spec maybe_start_guild(GuildId :: marvin_pdu2:snowflake(), MyId :: marvin_pdu2:snowflake()) ->
     marvin_helper_type:ok_return(OkRet :: pid()).
 
-maybe_start_guild(GuildId) ->
+maybe_start_guild(GuildId, MyId) ->
     case get_guild(GuildId) of
         {ok, Pid} ->
             {ok, Pid};
         {error, not_found} ->
-            start_guild(GuildId)
+            start_guild(GuildId, MyId)
     end.
 
 
 
--spec start_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
+-spec start_guild(GuildId :: marvin_pdu2:snowflake(), MyId :: marvin_pdu2:snowflake()) ->
     marvin_helper_type:ok_return(
         OkRet :: pid(),
         ErrorRet :: duplicate
     ).
 
-start_guild(GuildId) ->
+start_guild(GuildId, MyId) ->
     case get_guild(GuildId) of
         {ok, _Pid} ->
             {error, duplicate};
         {error, not_found} ->
-            gen_server:call(?MODULE, ?start_guild(GuildId))
+            gen_server:call(?MODULE, ?start_guild(GuildId, MyId))
     end.
 
 
 
--spec stop_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
+-spec stop_guild(GuildId :: marvin_pdu2:snowflake()) ->
     marvin_helper_type:ok_return().
 
 stop_guild(GuildId) ->
@@ -70,7 +70,7 @@ stop_guild(GuildId) ->
 
 
 
--spec get_guild(GuildId :: marvin_pdu2_object_guild:id()) ->
+-spec get_guild(GuildId :: marvin_pdu2:snowflake()) ->
     marvin_helper_type:generic_return(
         OkRet :: pid(),
         ErrorRet :: not_found
@@ -102,8 +102,8 @@ init([]) ->
 
 
 
-handle_call(?start_guild(GuildId), _GenReplyTo, S0) ->
-    handle_call_start_guild(GuildId, S0);
+handle_call(?start_guild(GuildId, MyId), _GenReplyTo, S0) ->
+    handle_call_start_guild(GuildId, MyId, S0);
 
 handle_call(?stop_guild(GuildId), _GenReplyTo, S0) ->
     handle_call_stop_guild(GuildId, S0);
@@ -143,14 +143,18 @@ code_change(_OldVsn, S0, _Extra) ->
 
 
 
--spec handle_call_start_guild(GuildId :: non_neg_integer(), State :: state()) ->
+-spec handle_call_start_guild(
+    GuildId :: marvin_pdu2:snowflake(),
+    MyId :: marvin_pdu2:snowflake(),
+    State :: state()
+) ->
     marvin_helper_type:gen_server_reply_simple(
         Ret :: marvin_helper_type:ok_return(OkRet :: pid()),
         State :: state()
     ).
 
-handle_call_start_guild(GuildId, S0) ->
-    {ok, Pid} = marvin_guild_sup:start_guild(GuildId),
+handle_call_start_guild(GuildId, MyId, S0) ->
+    {ok, Pid} = marvin_guild_sup:start_guild(GuildId, MyId),
     MonRef = erlang:monitor(process, Pid),
     true = ets:insert(?registry_table_name, #guild{
         guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef
@@ -160,7 +164,7 @@ handle_call_start_guild(GuildId, S0) ->
 
 
 -spec handle_call_stop_guild(
-    GuildId :: non_neg_integer(),
+    GuildId :: marvin_pdu2:snowflake(),
     State :: state()
 ) ->
     marvin_helper_type:gen_server_reply_simple(

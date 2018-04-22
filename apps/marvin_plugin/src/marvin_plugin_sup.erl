@@ -1,9 +1,11 @@
--module(marvin_guild_sup).
+-module(marvin_plugin_sup).
 -behaviour(supervisor).
 -include_lib("marvin_helper/include/marvin_specs_supervisor.hrl").
 
 -export([start_link/0, init/1]).
--export([start_guild/2, stop_guild/1]).
+-export([start_plugin/2, stop_plugin/2]).
+
+-define(plugin(PluginId, GuildId), {plugin, GuildId, PluginId}).
 
 
 
@@ -11,21 +13,26 @@
 
 
 
--spec start_guild(GuildId :: marvin_pdu2:snowflake(), MyId :: marvin_pdu2:snowflake()) ->
+-spec start_plugin(PluginId :: marvin_plugin:id(), GuildId :: non_neg_integer()) ->
     marvin_helper_type:ok_return(OkRet :: pid() | undefined) |
     marvin_helper_type:ok_return(OkRet1 :: pid() | undefined, OkRet2 :: term()) |
     marvin_helper_type:error_return(ErrorRet :: already_present | {already_started, Child :: pid() | undefined} | term()).
 
-start_guild(GuildId, MyId) ->
-    supervisor:start_child(?MODULE, [GuildId, MyId]).
+start_plugin(PluginId, GuildId) ->
+    supervisor:start_child(?MODULE, {
+        ?plugin(PluginId, GuildId), {
+            PluginId, start_link, [GuildId]
+        }, permanent, 15000, worker, [PluginId]
+    }).
 
 
 
--spec stop_guild(Pid :: pid()) ->
+-spec stop_plugin(PluginId :: marvin_plugin:id(), GuildId :: non_neg_integer()) ->
     marvin_helper_type:ok_return().
 
-stop_guild(Pid) ->
-    supervisor:terminate_child(?MODULE, Pid).
+stop_plugin(PluginId, GuildId) ->
+    supervisor:terminate_child(?MODULE, ?plugin(PluginId, GuildId)),
+    supervisor:delete_child(?MODULE, ?plugin(PluginId, GuildId)).
 
 
 
@@ -41,11 +48,7 @@ start_link() ->
 
 
 init([]) ->
-    {ok, {{simple_one_for_one, 5, 10}, [
-        {marvin_guild, {
-            marvin_guild, start_link, []
-        }, temporary, 15000, worker, [marvin_guild]}
-    ]}}.
+    {ok, {{one_for_one, 5, 10}, []}}.
 
 
 

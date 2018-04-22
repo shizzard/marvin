@@ -2,6 +2,7 @@
 -compile({parse_transform, cloak_transform}).
 
 -record(?MODULE, {
+    my_id :: marvin_pdu2:snowflake(),
     guild_id :: marvin_pdu2:snowflake(),
     owner_id :: marvin_pdu2:snowflake(),
     presence_state :: ets:tid(),

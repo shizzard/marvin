@@ -1,4 +1,5 @@
 -record(state, {
+    my_id :: marvin_pdu2:snowflake(),
     guild_id :: marvin_pdu2:snowflake(),
     guild_config :: marvin_guild_config:t(),
     owner_id :: marvin_pdu2:snowflake() | undefined,

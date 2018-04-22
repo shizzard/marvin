@@ -4,7 +4,7 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    plugin_id :: unicode:unicode_binary()
+    plugin_id :: atom()
 }).
 -type t() :: #?MODULE{}.
 -export_type([t/0]).

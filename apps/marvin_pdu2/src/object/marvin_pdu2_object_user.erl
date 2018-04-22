@@ -1,7 +1,7 @@
 -module(marvin_pdu2_object_user).
 -compile({parse_transform, cloak_transform}).
 
--export([export/1, format/1, format_username/1]).
+-export([export/1, is/2, format/1, format_username/1]).
 
 -record(?MODULE, {
     id :: id(),
@@ -28,6 +28,10 @@
     id/0, username/0, discriminator/0, avatar/0, bot/0,
     mfa_enabled/0, verified/0, email/0, t/0
 ]).
+
+
+is(#?MODULE{id = _UserId}, _UserId) -> true;
+is(#?MODULE{id = _AnotherUserId}, _UserId) -> false.
 
 
 format(#?MODULE{id = Id}) ->

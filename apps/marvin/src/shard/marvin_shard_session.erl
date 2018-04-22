@@ -398,6 +398,7 @@ handle_call_incoming_event_dispatch_ready(Struct, #state{
 } = S0) ->
     SessionId = marvin_pdu2_dispatch_ready:session_id(Struct),
     SelfUser = marvin_pdu2_dispatch_ready:user(Struct),
+    SelfUserId = marvin_pdu2_object_user:id(SelfUser),
     marvin_log:info(
         "Shard '~p' is ready with session '~s'",
         [S0#state.shard_name, SessionId]
@@ -408,7 +409,7 @@ handle_call_incoming_event_dispatch_ready(Struct, #state{
         'marvin_shard_session:handle_call_incoming_event_dispatch_ready', [
             fun handle_call_incoming_event_dispatch_ready_start_guilds_get_ids/1,
             fun handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds/1
-        ], Struct),
+        ], {SelfUserId, Struct}),
     {reply, ok, S0#state{
         session_id = SessionId,
         user = SelfUser
@@ -416,28 +417,33 @@ handle_call_incoming_event_dispatch_ready(Struct, #state{
 
 
 
--spec handle_call_incoming_event_dispatch_ready_start_guilds_get_ids(
+-spec handle_call_incoming_event_dispatch_ready_start_guilds_get_ids({
+    SelfUserId :: marvin_pdu2:snowflake(),
     Struct :: marvin_pdu2:t()
-) ->
-    Ret :: {ok, [GuildId :: non_neg_integer()]}.
+}) ->
+    Ret :: {ok, {
+        SelfUserId :: marvin_pdu2:snowflake(),
+        [GuildId :: non_neg_integer()]
+    }}.
 
-handle_call_incoming_event_dispatch_ready_start_guilds_get_ids(Struct) ->
-    {ok, lists:map(
+handle_call_incoming_event_dispatch_ready_start_guilds_get_ids({SelfUserId, Struct}) ->
+    {ok, {SelfUserId, lists:map(
         fun marvin_pdu2_object_guild_unavailable:id/1,
         marvin_pdu2_dispatch_ready:guilds(Struct)
-    )}.
+    )}}.
 
 
 
--spec handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(
+-spec handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds({
+    SelfUserId :: marvin_pdu2:snowflake(),
     Ids :: [GuildId :: non_neg_integer()]
-) ->
+}) ->
     Ret :: {ok, [Pid :: pid()]}.
 
-handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(Ids) ->
+handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds({SelfUserId, Ids}) ->
     {ok, lists:map(
         fun marvin_helper_chain:unwrap2/1,
-        lists:map(fun marvin_guild_monitor:maybe_start_guild/1, Ids)
+        [marvin_guild_monitor:maybe_start_guild(Id, SelfUserId) || Id <- Ids]
     )}.
 
 
@@ -452,14 +458,16 @@ handle_call_incoming_event_dispatch_ready_start_guilds_maybe_start_guilds(Ids) -
     ).
 
 handle_call_incoming_event_dispatch_guild_create(Struct, #state{
-    tx_pid = TxPid
+    tx_pid = TxPid,
+    user = SelfUser
 } = S0) ->
+    SelfUserId = marvin_pdu2_object_user:id(SelfUser),
     GuildId = marvin_pdu2_dispatch_guild_create:id(Struct),
     marvin_log:info(
         "Shard '~p' is provisioning the guild '~s'",
         [S0#state.shard_name, GuildId]
     ),
-    marvin_guild_monitor:maybe_start_guild(GuildId),
+    marvin_guild_monitor:maybe_start_guild(GuildId, SelfUserId),
     {ok, RequestGuildMembers} = get_pdu_request_guild_members(GuildId, S0),
     ok = marvin_shard_tx:send_sync(TxPid, RequestGuildMembers),
     ok = marvin_guild:do_provision(GuildId, Struct),

@@ -8,7 +8,7 @@
     get_context/1,
     do_provision/2, do_provision_guild_members/2, presence_update/2, voice_state_update/2, message_create/2,
     channel_create/2, channel_update/2, channel_delete/2,
-    start_link/1, init/1,
+    start_link/2, init/1,
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
 ]).
@@ -29,13 +29,16 @@
 
 
 
--spec start_link(GuildId :: non_neg_integer()) ->
+-spec start_link(GuildId :: marvin_pdu2:snowflake(), MyId :: marvin_pdu2:snowflake()) ->
     marvin_helper_type:ok_return(OkRet :: pid()).
 
-start_link(GuildId) ->
-    gen_server:start_link(?MODULE, [GuildId], []).
+start_link(GuildId, MyId) ->
+    gen_server:start_link(?MODULE, [GuildId, MyId], []).
 
 
+
+-spec get_context(GuildId :: marvin_pdu2:snowflake()) ->
+    Ret :: marvin_helper_type:ok_return(marvin_guild_context:t()).
 
 get_context(GuildId) ->
     {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
@@ -118,9 +121,10 @@ channel_delete(GuildId, Struct) ->
 
 
 
-init([GuildId]) ->
+init([GuildId, MyId]) ->
     {ok, GuildConfig} = marvin_guild_config:load(GuildId),
     {ok, #state{
+        my_id = MyId,
         guild_id = GuildId,
         guild_config = GuildConfig,
         presence_state = ets:new(marvin_guild_presence_state, [
@@ -156,6 +160,7 @@ init([GuildId]) ->
 
 
 context_from_state(#state{
+    my_id = MyId,
     guild_id = GuildId,
     owner_id = OwnerId,
     presence_state = PresenceState,
@@ -168,6 +173,7 @@ context_from_state(#state{
     voice_state = VoiceState
 }) ->
     marvin_guild_context:new(#{
+        my_id => MyId,
         guild_id => GuildId,
         owner_id => OwnerId,
         presence_state => PresenceState,
@@ -183,7 +189,7 @@ context_from_state(#state{
 
 
 handle_call(?get_context(), _GenReplyTo, S0) ->
-    {reply, context_from_state(S0), S0};
+    {reply, {ok, context_from_state(S0)}, S0};
 
 handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
     marvin_log:info("Guild '~s' is being provisioned", [S0#state.guild_id]),
