@@ -65,7 +65,7 @@ handle_possible_command(Message, Ctx) ->
 handle_possible_command_tokenize(Binary) ->
     case marvin_guild_command_lexer:string(unicode:characters_to_list(Binary)) of
         {ok, Tokens, _} -> {ok, Tokens};
-        {error, Reason} -> {error, Reason}
+        {error, Reason, _} -> {error, Reason}
     end.
 
 

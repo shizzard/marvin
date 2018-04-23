@@ -123,7 +123,7 @@ export(#?MODULE{
         <<"guild_id">> => GuildId,
         <<"role_admin">> => RoleAdmin,
         <<"role_moderator">> => RoleModerator,
-        <<"enabled_plugins">> => [marvin_plugin_config:export(EnabledPlugin) || EnabledPlugin <- EnabledPlugins]
+        <<"enabled_plugins">> => EnabledPlugins
     }).
 
 

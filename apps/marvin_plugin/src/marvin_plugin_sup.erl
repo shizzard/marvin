@@ -13,7 +13,7 @@
 
 
 
--spec start_plugin(PluginId :: marvin_plugin:id(), GuildId :: non_neg_integer()) ->
+-spec start_plugin(PluginId :: atom(), GuildId :: marvin_pdu2:snowflake()) ->
     marvin_helper_type:ok_return(OkRet :: pid() | undefined) |
     marvin_helper_type:ok_return(OkRet1 :: pid() | undefined, OkRet2 :: term()) |
     marvin_helper_type:error_return(ErrorRet :: already_present | {already_started, Child :: pid() | undefined} | term()).
