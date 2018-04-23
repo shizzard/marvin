@@ -1,6 +1,7 @@
 -module(marvin_guild_pubsub).
 -compile({parse_transform, cloak_transform}).
 
+-export([type_command/0, action_create/0]).
 -export([channel/3, subscribe/3, publish/4]).
 
 -record(?MODULE, {
@@ -15,6 +16,12 @@
 
 
 %% Interface
+
+
+
+type_command() -> <<"command">>.
+
+action_create() -> <<"create">>.
 
 
 

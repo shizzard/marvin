@@ -96,6 +96,16 @@ maybe_run_command(OriginalMessage, ParsedMessage, Ctx) ->
                         marvin_plugin_command:command(WinningCommand),
                         Score
                     ]),
+                    marvin_guild_pubsub:publish(
+                        marvin_guild_context:guild_id(Ctx),
+                        marvin_guild_pubsub:type_command(),
+                        marvin_guild_pubsub:action_create(),
+                        #{
+                            command => marvin_plugin_command:command(WinningCommand),
+                            original_message => OriginalMessage,
+                            parsed_message => ParsedMessage
+                        }
+                    ),
                     true
             end
     end.
