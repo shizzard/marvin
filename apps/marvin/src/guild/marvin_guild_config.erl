@@ -7,7 +7,7 @@
     guild_id :: marvin_pdu2:snowflake(),
     role_admin = undefined :: marvin_pdu2:snowflake(),
     role_moderator = undefined :: marvin_pdu2:snowflake(),
-    enabled_plugins = [] :: [marvin_plugin_config:t()]
+    enabled_plugins = [] :: [atom()]
 }).
 -type t() :: #?MODULE{}.
 -export_type([t/0]).
@@ -28,7 +28,7 @@ cloak_validate(role_moderator, Value) when is_binary(Value) andalso Value /= <<>
     {ok, Value};
 
 cloak_validate(enabled_plugins, Value) ->
-    {ok, [marvin_plugin_config:new(Item) || Item <- Value]};
+    {ok, Value};
 
 cloak_validate(_, _) ->
     {error, invalid}.

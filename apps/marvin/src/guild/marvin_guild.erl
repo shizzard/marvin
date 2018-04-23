@@ -123,10 +123,15 @@ channel_delete(GuildId, Struct) ->
 
 init([GuildId, MyId]) ->
     {ok, GuildConfig} = marvin_guild_config:load(GuildId),
+    PluginsList = marvin_guild_config:enabled_plugins(GuildConfig),
+    Plugins = maybe_start_plugins(GuildId, PluginsList),
+    Commands = collect_commands(PluginsList),
     {ok, #state{
         my_id = MyId,
         guild_id = GuildId,
         guild_config = GuildConfig,
+        plugins = Plugins,
+        commands = Commands,
         presence_state = ets:new(marvin_guild_presence_state, [
             set, protected, {keypos, 2}, {read_concurrency, true}
         ]),
@@ -159,10 +164,27 @@ init([GuildId, MyId]) ->
 
 
 
+maybe_start_plugins(GuildId, PluginsList) ->
+    maps:from_list(lists:map(fun(PluginId) ->
+        marvin_log:info("Guild '~s' is starting plugin ~p", [GuildId, PluginId]),
+        {ok, Pid} = marvin_plugin_sup:start_plugin(binary_to_atom(PluginId, latin1), GuildId),
+        {PluginId, Pid}
+    end, PluginsList)).
+
+
+
+collect_commands(PluginsList) ->
+    lists:flatten(lists:map(fun(PluginId) ->
+        (binary_to_atom(PluginId, latin1)):get_commands(any)
+    end, PluginsList)).
+
+
+
 context_from_state(#state{
     my_id = MyId,
     guild_id = GuildId,
     owner_id = OwnerId,
+    commands = Commands,
     presence_state = PresenceState,
     role_state = RoleState,
     emoji_state = EmojiState,
@@ -176,6 +198,7 @@ context_from_state(#state{
         my_id => MyId,
         guild_id => GuildId,
         owner_id => OwnerId,
+        commands => Commands,
         presence_state => PresenceState,
         role_state => RoleState,
         emoji_state => EmojiState,

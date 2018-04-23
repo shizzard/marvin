@@ -3,6 +3,8 @@
     guild_id :: marvin_pdu2:snowflake(),
     guild_config :: marvin_guild_config:t(),
     owner_id :: marvin_pdu2:snowflake() | undefined,
+    plugins :: map(),
+    commands :: [marvin_plugin_command:t()],
     presence_state :: ets:tid(),
     role_state :: ets:tid(),
     emoji_state :: ets:tid(),

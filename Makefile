@@ -52,8 +52,8 @@ run-release:
 	MARVIN_APP_LAGER_LOG_ROOT=log/ \
 	MARVIN_APP_GUILD_CONFIG_ROOT=`pwd`/data/guild/ \
 	MARVIN_APP_GUILD_CONFIG_FILENAME_TEMPLATE=guild_{{guild_id}}_config.json \
-	MARVIN_APP_GUILD_PLUGIN_CONFIG_ROOT=`pwd`/data/plugin/ \
-	MARVIN_APP_GUILD_PLUGIN_CONFIG_FILENAME_TEMPLATE=plugin_{{plugin_id}}_config.json \
+	MARVIN_APP_PLUGIN_CONFIG_ROOT=`pwd`/data/plugin/ \
+	MARVIN_APP_PLUGIN_CONFIG_FILENAME_TEMPLATE=plugin_{{plugin_id}}_{{guild_id}}_config.json \
 	_build/default/rel/marvin/bin/marvin console
 
 run-logtail:
