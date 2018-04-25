@@ -1,6 +1,7 @@
 -module(marvin_pdu2_object_permission_overwrite).
 -compile({parse_transform, cloak_transform}).
 
+-export([type_member/0, type_role/0]).
 -export([export/1]).
 
 -record(?MODULE, {
@@ -20,6 +21,10 @@
 -type t() :: #?MODULE{}.
 
 -export_type([id/0, type/0, deny/0, allow/0, t/0]).
+
+
+type_member() -> <<"member">>.
+type_role() -> <<"role">>.
 
 
 cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->

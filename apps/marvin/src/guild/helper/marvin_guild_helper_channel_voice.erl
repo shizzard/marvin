@@ -40,6 +40,13 @@ w_channel_create(ChannelEvent, Ctx) ->
                 "Guild '~s' got new voice channel '~s'",
                 [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_create:id(ChannelEvent)
             ]),
+            marvin_guild_pubsub:publish(
+                marvin_guild_context:guild_id(Ctx),
+                Ctx,
+                marvin_guild_pubsub:type_channel_voice(),
+                marvin_guild_pubsub:action_create(),
+                ChannelEvent
+            ),
             Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_create:export(ChannelEvent)),
             set_channel_voice(Channel, Ctx),
             ok;
@@ -62,6 +69,13 @@ w_channel_update(ChannelEvent, Ctx) ->
                 "Guild '~s' got updated voice channel '~s'",
                 [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_update:id(ChannelEvent)
             ]),
+            marvin_guild_pubsub:publish(
+                marvin_guild_context:guild_id(Ctx),
+                Ctx,
+                marvin_guild_pubsub:type_channel_voice(),
+                marvin_guild_pubsub:action_update(),
+                ChannelEvent
+            ),
             Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_update:export(ChannelEvent)),
             set_channel_voice(Channel, Ctx),
             ok;
@@ -84,6 +98,13 @@ w_channel_delete(ChannelEvent, Ctx) ->
                 "Guild '~s' lost voice channel '~s'",
                 [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_delete:id(ChannelEvent)
             ]),
+            marvin_guild_pubsub:publish(
+                marvin_guild_context:guild_id(Ctx),
+                Ctx,
+                marvin_guild_pubsub:type_channel_voice(),
+                marvin_guild_pubsub:action_delete(),
+                ChannelEvent
+            ),
             Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_delete:export(ChannelEvent)),
             delete_channel_voice(Channel, Ctx),
             ok;

@@ -2,7 +2,9 @@
 
 -include("marvin_guild_state.hrl").
 
--export([w_do_provision/2]).
+-export([w_do_provision/2, r_get_everyone/1]).
+
+-define(role_everyone, <<"@everyone">>).
 
 
 
@@ -20,3 +22,15 @@ w_do_provision(Roles, Ctx) ->
         role = Role
     } || Role <- Roles]),
     ok.
+
+
+
+-spec r_get_everyone(Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_pdu2_object_role:t().
+
+r_get_everyone(Ctx) ->
+    [Everyone] = [
+        Role#role.role || Role <- ets:tab2list(marvin_guild_context:role_state(Ctx)),
+        marvin_pdu2_object_role:name(Role#role.role) == ?role_everyone
+    ],
+    Everyone.

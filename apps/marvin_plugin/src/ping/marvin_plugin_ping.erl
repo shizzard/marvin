@@ -45,7 +45,10 @@ start_link(GuildId) ->
 
 init([GuildId]) ->
     {ok, PluginConfig} = marvin_plugin_config:load(list_to_binary(atom_to_list(?MODULE)), GuildId),
-    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_command(), marvin_guild_pubsub:action_create()),
+    [
+        marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_command(), marvin_plugin_command:short(Command))
+        || Command <- get_commands(any)
+    ],
     {ok, #state{
         config = PluginConfig,
         guild_id = GuildId

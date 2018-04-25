@@ -1,11 +1,14 @@
 -module(marvin_guild_pubsub).
 -compile({parse_transform, cloak_transform}).
 
--export([type_command/0, action_create/0]).
--export([channel/3, subscribe/3, publish/4]).
+-export([
+    type_command/0, type_channel_voice/0, type_voice_state/0,
+    action_create/0, action_update/0, action_delete/0
+]).
+-export([channel/3, subscribe/3, publish/5]).
 
 -record(?MODULE, {
-    guild_id :: marvin_pdu2:snowflake(),
+    guild_context :: marvin_guild_context:t(),
     type :: binary(),
     action :: binary(),
     payload :: term()
@@ -20,8 +23,12 @@
 
 
 type_command() -> <<"command">>.
+type_channel_voice() -> <<"channel_voice">>.
+type_voice_state() -> <<"voice_state">>.
 
 action_create() -> <<"create">>.
+action_update() -> <<"update">>.
+action_delete() -> <<"delete">>.
 
 
 
@@ -36,8 +43,8 @@ subscribe(GuildId, Type, Action) ->
 
 
 
-publish(GuildId, Type, Action, Payload) ->
+publish(GuildId, GuildCtx, Type, Action, Payload) ->
     PubsubChannel = channel(GuildId, Type, Action),
     ebus:pub(PubsubChannel, new(#{
-        guild_id => GuildId, type => Type, action => Action, payload => Payload
+        guild_context => GuildCtx, type => Type, action => Action, payload => Payload
     })).

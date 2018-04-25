@@ -11,7 +11,7 @@
     ratelimit_group :: atom(),
     method :: atom(),
     url :: binary(),
-    body :: binary()
+    body :: binary() | []
 }).
 -type t() :: #?MODULE{}.
 -export_type([t/0]).
@@ -63,13 +63,22 @@ body(#?MODULE{body = Value}) ->
 
 new(ReqImplModule, UrlParams, PduMap) ->
     {ok, ApiRootUrl} = marvin_config:get(marvin, [discord, api, root_url]),
-    PduMod = ReqImplModule:pdu(),
-    #?MODULE{
-        ratelimit_group = ReqImplModule:ratelimit_group(),
-        method = ReqImplModule:method(),
-        url = build_url(list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
-        body = jiffy:encode(PduMod:export(PduMod:new(PduMap)))
-    }.
+    case ReqImplModule:pdu() of
+        undefined ->
+            #?MODULE{
+                ratelimit_group = ReqImplModule:ratelimit_group(),
+                method = ReqImplModule:method(),
+                url = build_url(list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
+                body = []
+            };
+        PduMod ->
+            #?MODULE{
+                ratelimit_group = ReqImplModule:ratelimit_group(),
+                method = ReqImplModule:method(),
+                url = build_url(list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
+                body = jiffy:encode(PduMod:export(PduMod:new(PduMap)))
+            }
+    end.
 
 
 

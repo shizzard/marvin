@@ -5,7 +5,8 @@
 
 -record(?MODULE, {
     guild_id :: marvin_pdu2:snowflake(),
-    plugin_id :: binary()
+    plugin_id :: binary(),
+    data :: term()
 }).
 -type t() :: #?MODULE{}.
 -export_type([t/0]).
@@ -18,11 +19,13 @@
 
 export(#?MODULE{
     guild_id = GuildId,
-    plugin_id = PluginId
+    plugin_id = PluginId,
+    data = Data
 }) ->
     #{
         <<"guild_id">> => GuildId,
-        <<"plugin_id">> => PluginId
+        <<"plugin_id">> => PluginId,
+        <<"data">> => Data
     }.
 
 

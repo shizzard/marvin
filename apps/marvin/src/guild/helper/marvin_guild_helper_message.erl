@@ -6,7 +6,8 @@
     w_message_create/2
 ]).
 
--define(debug_hotword, <<"%DEBUG%">>).
+-define(debug_hotword, <<"%debug%">>).
+-define(lower_score_mark, 0.15).
 
 
 
@@ -63,7 +64,7 @@ handle_possible_command(Message, Ctx) ->
 
 
 handle_possible_command_tokenize(Binary) ->
-    case marvin_guild_command_lexer:string(unicode:characters_to_list(Binary)) of
+    case marvin_guild_command_lexer:string(string:lowercase(unicode:characters_to_list(Binary))) of
         {ok, Tokens, _} -> {ok, Tokens};
         {error, Reason, _} -> {error, Reason}
     end.
@@ -86,7 +87,7 @@ maybe_run_command(OriginalMessage, ParsedMessage, Ctx) ->
             ok = maybe_send_debug_info(OriginalMessage, Words, Scores),
             %% reverse sort here
             case lists:sort(fun({_, Score1}, {_, Score2}) -> Score1 >= Score2 end, Scores) of
-                [{_WinningCommand, 0.0} | _] ->
+                [{_WinningCommand, Score} | _] when Score =< ?lower_score_mark ->
                     marvin_log:info("Guild '~s' no winning command", [marvin_guild_context:guild_id(Ctx)]),
                     false;
                 [{WinningCommand, Score} | _] ->
@@ -98,8 +99,9 @@ maybe_run_command(OriginalMessage, ParsedMessage, Ctx) ->
                     ]),
                     marvin_guild_pubsub:publish(
                         marvin_guild_context:guild_id(Ctx),
+                        Ctx,
                         marvin_guild_pubsub:type_command(),
-                        marvin_guild_pubsub:action_create(),
+                        marvin_plugin_command:short(WinningCommand),
                         #{
                             command => marvin_plugin_command:command(WinningCommand),
                             original_message => OriginalMessage,
@@ -146,7 +148,7 @@ maybe_send_debug_info(OriginalMessage, Words, Scores) ->
 
 maybe_send_debug_info_format_score_as_field({Command, Score}) ->
     #{
-        name => <<(marvin_plugin_command:plugin_id(Command))/binary, "/", (marvin_plugin_command:command(Command))/binary>>,
+        name => marvin_plugin_command:short(Command),
         value => iolist_to_binary(io_lib:format("~.3f", [Score])),
-        inline => true
+        inline => false
     }.

@@ -41,6 +41,13 @@ w_voice_state_update(VoiceStateUpdate, Ctx) ->
             ),
             ets:insert(marvin_guild_context:voice_state(Ctx), #voice_state{user_id = UserId, channel_id = ChannelId})
     end,
+    marvin_guild_pubsub:publish(
+        marvin_guild_context:guild_id(Ctx),
+        Ctx,
+        marvin_guild_pubsub:type_voice_state(),
+        marvin_guild_pubsub:action_update(),
+        VoiceStateUpdate
+    ),
     ok.
 
 
