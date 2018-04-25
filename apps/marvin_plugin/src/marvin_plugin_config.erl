@@ -55,7 +55,7 @@ save(Config) ->
     Ret :: unicode:unicode_binary().
 
 get_config_filename(PluginId, GuildId) ->
-    {ok, PluginConfigRoot} = marvin_config:get(marvin, [guild, config_root]),
+    {ok, PluginConfigRoot} = marvin_config:get(marvin, [plugin, config_root]),
     {ok, PluginConfigFilenameTemplate} = marvin_config:get(marvin, [plugin, config_filename_template]),
     <<
         PluginConfigRoot/binary,
@@ -84,7 +84,7 @@ load_impl(PluginId, GuildId) ->
             "Plugin '~s' config for guild '~s' ('~s') read failed with reason '~p:~p', generating new config",
             [PluginId, GuildId, ConfigFilename, CatchType, CatchReason]
         ),
-        Config = new(#{guild_id => GuildId, plugin_id => PluginId}),
+        Config = new(#{guild_id => GuildId, plugin_id => PluginId, data => #{}}),
         save(Config),
         {ok, Config}
     end.
