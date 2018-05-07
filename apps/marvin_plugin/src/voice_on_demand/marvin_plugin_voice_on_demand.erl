@@ -12,10 +12,10 @@
 
 -record(active_channel, {
     channel_name :: unicode:unicode_binary(),
-    origin_channel_id :: marvin_pdu2:snowflake(),
-    owner :: marvin_pdu2_object_user:t(),
+    origin_channel_id = undefined :: marvin_pdu2:snowflake() | undefined,
+    owner = undefined :: marvin_pdu2_object_user:t() | undefined,
     channel_id :: marvin_pdu2:snowflake() | undefined,
-    created_at = os:timestamp() :: eralng:timestamp(),
+    created_at = os:timestamp() :: erlang:timestamp(),
     used = false :: boolean()
 }).
 
@@ -35,6 +35,7 @@
 -define(cleanup_event(), {cleanup_event}).
 -define(cleanup_interval, 20).
 -define(channel_immune_period, 30).
+-define(do_rescan_category(), {do_rescan_category}).
 
 
 
@@ -55,10 +56,7 @@ command_create() ->
         plugin_id => <<"marvin_plugin_voice_on_demand">>,
         command => <<"create_channel">>,
         help => <<"Create voice channel as you need it.">>,
-        keywords => [
-            <<"голос"/utf8>>, <<"голосовой"/utf8>>, <<"голосовую"/utf8>>, <<"войс"/utf8>>,
-            <<"канал"/utf8>>, <<"комнату"/utf8>>, <<"сделай"/utf8>>, <<"создай"/utf8>>, <<"запили"/utf8>>
-        ]
+        keywords => [<<"войс"/utf8>>, <<"канал"/utf8>>]
     }).
 
 
@@ -78,6 +76,7 @@ init([GuildId]) ->
     marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_channel_voice(), marvin_guild_pubsub:action_delete()),
     {ok, Adjectives} = file:consult(code:priv_dir(marvin_plugin) ++ ?adjective_terms),
     {ok, Nouns} = file:consult(code:priv_dir(marvin_plugin) ++ ?noun_terms),
+    erlang:send_after(5000, self(), ?do_rescan_category()),
     {ok, #state{
         config = PluginConfig,
         guild_id = GuildId,
@@ -102,6 +101,10 @@ handle_cast(Unexpected, S0) ->
     {noreply, S0}.
 
 
+
+handle_info(?do_rescan_category(), S0) ->
+    ok = scan_category(S0),
+    {noreply, S0};
 
 handle_info(?cleanup_event(), S0) ->
     handle_info_cleanup_event(S0);
@@ -131,6 +134,20 @@ code_change(_OldVsn, S0, _Extra) ->
 
 
 %% Internals
+
+
+
+scan_category(S0) ->
+    {ok, GuildCtx} = marvin_guild:get_context(S0#state.guild_id),
+    #{<<"category_id">> := CategoryId} = marvin_plugin_config:data(S0#state.config),
+    [
+        insert_channel(S0#state.active_channels, #active_channel{
+            channel_name = marvin_pdu2_object_channel:name(Channel),
+            channel_id = marvin_pdu2_object_channel:id(Channel)
+        }) ||
+        Channel <- marvin_guild_helper_channel_voice:r_get_channels_by_category(CategoryId, GuildCtx)
+    ],
+    ok.
 
 
 

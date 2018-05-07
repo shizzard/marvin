@@ -36,14 +36,40 @@ export(#?MODULE{
     ).
 
 load(PluginId, GuildId) ->
-    load_impl(PluginId, GuildId).
+    ConfigFilename = get_config_filename(PluginId, GuildId),
+    try
+        case file:read_file(ConfigFilename) of
+            {ok, Binary} -> {ok, new(jiffy:decode(Binary, [return_maps]))};
+            {error, Reason} -> throw({read_failed, Reason})
+        end
+    catch CatchType:CatchReason ->
+        marvin_log:error(
+            "Plugin '~s' config for guild '~s' ('~s') read failed with reason '~p:~p', generating new config",
+            [PluginId, GuildId, ConfigFilename, CatchType, CatchReason]
+        ),
+        Config = new(#{guild_id => GuildId, plugin_id => PluginId, data => #{}}),
+        save(Config),
+        {ok, Config}
+    end.
 
 
 -spec save(Config :: t()) ->
     marvin_helper_type:ok_return().
 
 save(Config) ->
-    save_impl(Config).
+    ConfigFilename = get_config_filename(plugin_id(Config), guild_id(Config)),
+    try
+        case file:write_file(ConfigFilename, jiffy:encode(export(Config))) of
+            ok -> ok;
+            {error, Reason} -> throw({write_failed, Reason})
+        end
+    catch CatchType:CatchReason ->
+        marvin_log:error(
+            "Plugin '~s' config for guild '~s' ('~s') write failed with reason '~p:~p'",
+            [plugin_id(Config), guild_id(Config), ConfigFilename, CatchType, CatchReason]
+        ),
+        ok
+    end.
 
 
 
@@ -64,47 +90,3 @@ get_config_filename(PluginId, GuildId) ->
             <<"{{guild_id}}">>, GuildId)
         )/binary
     >>.
-
-
-
--spec load_impl(PluginId :: marvin_plugin:id(), GuildId :: marvin_pdu2:snowflake()) ->
-    marvin_helper_type:ok_return(
-        OkRet :: t()
-    ).
-
-load_impl(PluginId, GuildId) ->
-    ConfigFilename = get_config_filename(PluginId, GuildId),
-    try
-        case file:read_file(ConfigFilename) of
-            {ok, Binary} -> {ok, new(jiffy:decode(Binary, [return_maps]))};
-            {error, Reason} -> throw({read_failed, Reason})
-        end
-    catch CatchType:CatchReason ->
-        marvin_log:error(
-            "Plugin '~s' config for guild '~s' ('~s') read failed with reason '~p:~p', generating new config",
-            [PluginId, GuildId, ConfigFilename, CatchType, CatchReason]
-        ),
-        Config = new(#{guild_id => GuildId, plugin_id => PluginId, data => #{}}),
-        save(Config),
-        {ok, Config}
-    end.
-
-
-
--spec save_impl(Config :: t()) ->
-    marvin_helper_type:ok_return().
-
-save_impl(#?MODULE{guild_id = GuildId, plugin_id = PluginId} = Config) ->
-    ConfigFilename = get_config_filename(PluginId, GuildId),
-    try
-        case file:write_file(ConfigFilename, jiffy:encode(export(Config))) of
-            ok -> ok;
-            {error, Reason} -> throw({write_failed, Reason})
-        end
-    catch CatchType:CatchReason ->
-        marvin_log:error(
-            "Plugin '~s' config for guild '~s' ('~s') write failed with reason '~p:~p'",
-            [PluginId, GuildId, ConfigFilename, CatchType, CatchReason]
-        ),
-        ok
-    end.

@@ -4,7 +4,8 @@
 
 -export([
     w_do_provision/2, w_channel_create/2,
-    w_channel_update/2, w_channel_delete/2
+    w_channel_update/2, w_channel_delete/2,
+    r_get_channels_by_category/2
 ]).
 
 
@@ -111,6 +112,18 @@ w_channel_delete(ChannelEvent, Ctx) ->
         {_, _} ->
             ok
     end.
+
+
+
+-spec r_get_channels_by_category(CategoryId :: marvin_pdu2:snowflake(), Ctx :: marvin_guild_context:t()) ->
+    Ret :: [marvin_pdu2_object_channel:t()].
+
+r_get_channels_by_category(CategoryId, Ctx) ->
+    [
+        Channel#channel.channel ||
+        Channel <- ets:tab2list(marvin_guild_context:channel_voice_state(Ctx)),
+        CategoryId == marvin_pdu2_object_channel:parent_id(Channel#channel.channel)
+    ].
 
 
 
