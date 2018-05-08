@@ -29,7 +29,7 @@ get_commands(_) ->
     [marvin_plugin_command:new(#{
         plugin_id => <<"marvin_plugin_ping">>,
         command => <<"ping">>,
-        help => <<"Ping me!">>,
+        help => <<"Быстропинг для проверки работоспособности бота."/utf8>>,
         keywords => [<<"ping">>, <<"пинг"/utf8>>]
     })].
 

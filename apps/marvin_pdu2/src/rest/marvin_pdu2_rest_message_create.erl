@@ -19,7 +19,7 @@
 -export_type([content/0, nonce/0, tts/0, embed/0, t/0]).
 
 
-cloak_validate(content, Value) when is_binary(Value) andalso Value /= <<>> ->
+cloak_validate(content, Value) when is_binary(Value) ->
     {ok, Value};
 
 cloak_validate(nonce, Value) when is_binary(Value) andalso Value /= <<>> ->

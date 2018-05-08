@@ -1,7 +1,7 @@
 -module(marvin_pdu2_object_member).
 -compile({parse_transform, cloak_transform}).
 
--export([export/1]).
+-export([export/1, get_nickname/1]).
 
 -record(?MODULE, {
     user :: user(),
@@ -21,6 +21,15 @@
 -type t() :: #?MODULE{}.
 
 -export_type([user/0, roles/0, nick/0, mute/0, joined_at/0, deaf/0, t/0]).
+
+
+
+get_nickname(#?MODULE{nick = undefined, user = User}) ->
+    marvin_pdu2_object_user:username(User);
+
+get_nickname(#?MODULE{nick = Nickname}) ->
+    Nickname.
+
 
 
 cloak_validate(user, Value) ->

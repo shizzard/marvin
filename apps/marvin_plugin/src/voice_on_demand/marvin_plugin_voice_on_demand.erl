@@ -55,7 +55,10 @@ command_create() ->
     marvin_plugin_command:new(#{
         plugin_id => <<"marvin_plugin_voice_on_demand">>,
         command => <<"create_channel">>,
-        help => <<"Create voice channel as you need it.">>,
+        help => <<
+            "Создает временный голосовой канал, который будет удален после использования.\n"/utf8,
+            "Если в команде будут упомянуты конкретные пользователи или группы пользователей, доступ в канал будет только у автора команды и упомянутых людей."/utf8
+        >>,
         keywords => [<<"войс"/utf8>>, <<"канал"/utf8>>]
     }).
 

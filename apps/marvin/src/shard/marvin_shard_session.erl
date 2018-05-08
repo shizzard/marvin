@@ -25,7 +25,7 @@
     heart_pid :: pid() | undefined,
     last_seq :: non_neg_integer(),
     session_id :: binary() | undefined,
-    user :: marvin_pdu2_object_user:object() | unedefined
+    user :: marvin_pdu2_object_user:object() | undefined
 }).
 -type state() :: #state{}.
 

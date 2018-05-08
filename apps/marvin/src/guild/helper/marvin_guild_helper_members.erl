@@ -2,7 +2,10 @@
 
 -include("marvin_guild_state.hrl").
 
--export([w_do_provision/2]).
+-export([
+    w_do_provision/2,
+    r_get_member_by_user_id/2
+]).
 
 
 
@@ -20,3 +23,16 @@ w_do_provision(Members, Ctx) ->
         member = Member
     } || Member <- Members]),
     ok.
+
+
+
+-spec r_get_member_by_user_id(UserId :: marvin_pdu2:snowflake(), Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_pdu2_object_member:t() | undefined.
+
+r_get_member_by_user_id(UserId, Ctx) ->
+    case ets:lookup(marvin_guild_context:member_state(Ctx), UserId) of
+        [] ->
+            undefined;
+        [#member{member_id = UserId, member = Member}] ->
+            Member
+    end.

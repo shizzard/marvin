@@ -44,7 +44,7 @@ change_nickname() ->
     marvin_plugin_command:new(#{
         plugin_id => <<"marvin_plugin_fuzzy_nickname">>,
         command => <<"change_nickname">>,
-        help => <<"Change nickname to the random one.">>,
+        help => <<"Меняет твой никнейм на случайный."/utf8>>,
         keywords => [<<"ник"/utf8>>]
     }).
 
