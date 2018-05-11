@@ -224,6 +224,7 @@ handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
     ok = marvin_guild_helper_channel_text:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
     ok = marvin_guild_helper_channel_voice:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
     ok = marvin_guild_helper_channel_category:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
+    ok = marvin_guild_helper_voice_state:w_do_provision(marvin_pdu2_dispatch_guild_create:voice_states(Struct), Ctx),
     {reply, ok, S1};
 
 handle_call(?do_provision_guild_members(Struct), _GenReplyTo, S0) ->

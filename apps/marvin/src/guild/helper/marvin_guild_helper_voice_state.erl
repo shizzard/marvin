@@ -3,6 +3,7 @@
 -include("marvin_guild_state.hrl").
 
 -export([
+    w_do_provision/2,
     w_voice_state_update/2,
     r_get_participant_channel/2,
     r_get_channel_participants/2
@@ -11,6 +12,21 @@
 
 
 %% Interface
+
+
+
+-spec w_do_provision(VoiceStates :: [marvin_pdu2_object_voice_state:t()], Ctx :: marvin_guild_context:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+w_do_provision(VoiceStates, Ctx) ->
+    [
+        ets:insert(marvin_guild_context:voice_state(Ctx), #voice_state{
+            user_id = marvin_pdu2_object_voice_state:user_id(VoiceState),
+            channel_id = marvin_pdu2_object_voice_state:channel_id(VoiceState)
+        }) || VoiceState <- VoiceStates
+    ],
+    marvin_log:info("Guild '~s' voice states: ~p total", [marvin_guild_context:guild_id(Ctx), length(VoiceStates)]),
+    ok.
 
 
 
