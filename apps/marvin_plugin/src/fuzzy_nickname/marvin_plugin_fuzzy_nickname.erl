@@ -144,14 +144,14 @@ handle_info_guild_event_change_nickname(Event, S0) ->
         },
         #{nick => Nickname}
     ),
-    {ok, ChangeNicknameResp} = marvin_rest_shotgun:request(ChangeNicknameReq),
+    ChangeNicknameResp = marvin_rest:request(ChangeNicknameReq),
     marvin_log:info("Response: ~p", [ChangeNicknameResp]),
     SendMessageReq = marvin_rest_request:new(
         marvin_rest_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{content => <<(marvin_pdu2_object_user:format(Author))/binary, " okay.">>}
     ),
-    {ok, SendMessageResp} = marvin_rest_shotgun:request(SendMessageReq),
+    SendMessageResp = marvin_rest:request(SendMessageReq),
     marvin_log:info("Response: ~p", [SendMessageResp]),
     {noreply, S0}.
 

@@ -182,7 +182,7 @@ handle_info_cleanup_event_channel_delete(ActiveChannel, S0) ->
         #{<<"channel_id">> => ActiveChannel#active_channel.channel_id},
         #{}
     ),
-    {ok, Resp} = marvin_rest_shotgun:request(Req),
+    Resp = marvin_rest:request(Req),
     marvin_log:info("Response: ~p", [Resp]),
     S0.
 
@@ -233,7 +233,7 @@ handle_info_guild_event_command_create(Event, S0) ->
             )
         }
     ),
-    {ok, Resp} = marvin_rest_shotgun:request(Req),
+    Resp = marvin_rest:request(Req),
     marvin_log:info("Response: ~p", [Resp]),
     insert_channel(S0#state.active_channels, #active_channel{
         channel_name = ChannelName,
@@ -256,12 +256,13 @@ handle_info_guild_event_channel_voice_create(Event, S0) ->
             insert_channel(S0#state.active_channels, ActiveChannel#active_channel{
                 channel_id = marvin_pdu2_dispatch_channel_create:id(OriginalEvent)
             }),
-            SendReq = marvin_rest_request:new(
+            Req = marvin_rest_request:new(
                 marvin_rest_impl_message_create,
                 #{<<"channel_id">> => ActiveChannel#active_channel.origin_channel_id},
                 #{content => <<"'", ChannelName/binary, "' is ready to go.">>}
             ),
-            marvin_rest_shotgun:request(SendReq),
+            Resp = marvin_rest:request(Req),
+            marvin_log:info("Response: ~p", [Resp]),
             {noreply, S0};
         {error, not_found} ->
             {noreply, S0}

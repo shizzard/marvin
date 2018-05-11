@@ -23,7 +23,7 @@ start_link() ->
 
 init([]) ->
     {ok, {{one_for_one, 2, 10}, [
-        {marvin_rest_shotgun, {
-            marvin_rest_shotgun, start_link, []
-        }, permanent, 5000, worker, [marvin_rest_shotgun]}
+        {marvin_rest_ratelimit_watchdog, {
+            marvin_rest_ratelimit_watchdog, start_link, []
+        }, permanent, 5000, worker, [marvin_rest_ratelimit_watchdog]}
     ]}}.

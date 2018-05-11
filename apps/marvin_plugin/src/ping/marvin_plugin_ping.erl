@@ -98,10 +98,11 @@ code_change(_OldVsn, S0, _Extra) ->
 
 handle_info_guild_event(Event, S0) ->
     #{original_message := OriginalMessage} = marvin_guild_pubsub:payload(Event),
-    SendReq = marvin_rest_request:new(
+    Req = marvin_rest_request:new(
         marvin_rest_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{content => <<"pong">>}
     ),
-    marvin_rest_shotgun:request(SendReq),
+    Resp = marvin_rest:request(Req),
+    marvin_log:info("Response: ~p", [Resp]),
     {noreply, S0}.

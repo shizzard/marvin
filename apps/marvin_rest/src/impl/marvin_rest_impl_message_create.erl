@@ -4,7 +4,7 @@
 -export([ratelimit_group/0, method/0, pdu/0, url_template/0]).
 
 
-ratelimit_group() -> '/channels/{channel.id}/messages'.
+ratelimit_group() -> channel_id.
 
 method() -> post.
 

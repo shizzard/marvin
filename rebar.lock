@@ -1,5 +1,6 @@
 {"1.1.0",
-[{<<"cloak">>,
+[{<<"certifi">>,{pkg,<<"certifi">>,<<"2.3.1">>},1},
+ {<<"cloak">>,
   {git,"https://github.com/shizzard/cloak.git",
        {ref,"45345c90ccba9a7a3732cbab83827d3da511444b"}},
   0},
@@ -20,6 +21,11 @@
   {git,"https://github.com/ninenines/gun.git",
        {ref,"3aab5ef99b98f618f701510d76bcf639b915794f"}},
   0},
+ {<<"hackney">>,
+  {git,"https://github.com/benoitc/hackney.git",
+       {ref,"e6d84f40a4d2d650659ac54dba99c0bcbbb86af4"}},
+  0},
+ {<<"idna">>,{pkg,<<"idna">>,<<"5.1.1">>},1},
  {<<"jiffy">>,
   {git,"https://github.com/davisp/jiffy.git",
        {ref,"06aaf440e091c9fd5f8aea557ac760a33bd37130"}},
@@ -28,6 +34,9 @@
   {git,"git://github.com/erlang-lager/lager",
        {ref,"6cc6b125ad55835748cd847f03314698ae439aea"}},
   0},
+ {<<"metrics">>,{pkg,<<"metrics">>,<<"1.0.1">>},1},
+ {<<"mimerl">>,{pkg,<<"mimerl">>,<<"1.0.2">>},1},
+ {<<"parse_trans">>,{pkg,<<"parse_trans">>,<<"3.2.0">>},2},
  {<<"prometheus">>,
   {git,"https://github.com/deadtrickster/prometheus.erl.git",
        {ref,"e340556c8c88a573d86da5981b21bf591647adfb"}},
@@ -48,11 +57,20 @@
   {git,"https://github.com/inaka/shotgun.git",
        {ref,"39f8745a9a8c83e757f777d276f9c887886b2666"}},
   0},
+ {<<"ssl_verify_fun">>,{pkg,<<"ssl_verify_fun">>,<<"1.1.1">>},1},
+ {<<"unicode_util_compat">>,{pkg,<<"unicode_util_compat">>,<<"0.3.1">>},2},
  {<<"uuid">>,
   {git,"https://github.com/okeuday/uuid.git",
        {ref,"aadf1be200d318f2fdf2f996b58852a4a49244f0"}},
   0}]}.
 [
 {pkg_hash,[
- {<<"goldrush">>, <<"F06E5D5F1277DA5C413E84D5A2924174182FB108DABB39D5EC548B27424CD106">>}]}
+ {<<"certifi">>, <<"D0F424232390BF47D82DA8478022301C561CF6445B5B5FB6A84D49A9E76D2639">>},
+ {<<"goldrush">>, <<"F06E5D5F1277DA5C413E84D5A2924174182FB108DABB39D5EC548B27424CD106">>},
+ {<<"idna">>, <<"CBC3B2FA1645113267CC59C760BAFA64B2EA0334635EF06DBAC8801E42F7279C">>},
+ {<<"metrics">>, <<"25F094DEA2CDA98213CECC3AEFF09E940299D950904393B2A29D191C346A8486">>},
+ {<<"mimerl">>, <<"993F9B0E084083405ED8252B99460C4F0563E41729AB42D9074FD5E52439BE88">>},
+ {<<"parse_trans">>, <<"2ADFA4DAF80C14DC36F522CF190EB5C4EE3E28008FC6394397C16F62A26258C2">>},
+ {<<"ssl_verify_fun">>, <<"28A4D65B7F59893BC2C7DE786DEC1E1555BD742D336043FE644AE956C3497FBE">>},
+ {<<"unicode_util_compat">>, <<"A1F612A7B512638634A603C8F401892AFBF99B8CE93A45041F8AACA99CADB85E">>}]}
 ].

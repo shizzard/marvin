@@ -132,7 +132,7 @@ handle_info_guild_event_get_help(Event, S0) ->
         {MyNickname, []},
         marvin_guild_context:commands(GuildCtx)
     ),
-    SendMessageReq = marvin_rest_request:new(
+    Req = marvin_rest_request:new(
         marvin_rest_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{
@@ -145,8 +145,8 @@ handle_info_guild_event_get_help(Event, S0) ->
             }
         }
     ),
-    {ok, SendMessageResp} = marvin_rest_shotgun:request(SendMessageReq),
-    marvin_log:info("Response: ~p", [SendMessageResp]),
+    Resp = marvin_rest:request(Req),
+    marvin_log:info("Response: ~p", [Resp]),
     {noreply, S0}.
 
 

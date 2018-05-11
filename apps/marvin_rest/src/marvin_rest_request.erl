@@ -1,6 +1,6 @@
 -module(marvin_rest_request).
 
--callback ratelimit_group() -> atom().
+-callback ratelimit_group() -> guild_id | channel_id | webhook_id.
 -callback method() -> get | post | head | delete | patch | put | options.
 -callback pdu() -> atom().
 -callback url_template() -> binary().
@@ -63,19 +63,21 @@ body(#?MODULE{body = Value}) ->
 
 new(ReqImplModule, UrlParams, PduMap) ->
     {ok, ApiRootUrl} = marvin_config:get(marvin, [discord, api, root_url]),
+    {ok, ApiHost} = marvin_config:get(marvin, [discord, api, host]),
+    {ok, ApiPort} = marvin_config:get(marvin, [discord, api, port]),
     case ReqImplModule:pdu() of
         undefined ->
             #?MODULE{
                 ratelimit_group = ReqImplModule:ratelimit_group(),
                 method = ReqImplModule:method(),
-                url = build_url(list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
+                url = build_url(list_to_binary(ApiHost), list_to_binary(ApiPort), list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
                 body = []
             };
         PduMod ->
             #?MODULE{
                 ratelimit_group = ReqImplModule:ratelimit_group(),
                 method = ReqImplModule:method(),
-                url = build_url(list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
+                url = build_url(list_to_binary(ApiHost), list_to_binary(ApiPort), list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
                 body = jiffy:encode(PduMod:export(PduMod:new(PduMap)))
             }
     end.
@@ -86,9 +88,9 @@ new(ReqImplModule, UrlParams, PduMap) ->
 
 
 
-build_url(ApiRootUrl, UrlTemplate, UrlParams) ->
+build_url(ApiHost, ApiPort, ApiRootUrl, UrlTemplate, UrlParams) ->
     UrlPart = maps:fold(fun build_url_fold/3, UrlTemplate, UrlParams),
-    <<ApiRootUrl/binary, UrlPart/binary>>.
+    <<"https://", ApiHost/binary, ":", ApiPort/binary, ApiRootUrl/binary, UrlPart/binary>>.
 
 build_url_fold(Key, Value, UrlTemplate) ->
     binary:replace(UrlTemplate, <<"{{", Key/binary, "}}">>, Value).
