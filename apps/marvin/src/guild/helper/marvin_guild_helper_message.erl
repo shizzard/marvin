@@ -6,7 +6,6 @@
     w_message_create/2
 ]).
 
--define(debug_hotword, <<"%debug%">>).
 -define(lower_score_mark, 0.15).
 
 
@@ -29,7 +28,8 @@ w_message_create(Message, Ctx) ->
     end, marvin_pdu2_dispatch_message_create:mentions(Message)),
     case {IsUserMessage, IsMentioned} of
         {true, true} ->
-            handle_possible_command(Message, Ctx);
+            erlang:spawn(fun() -> handle_possible_command(Message, Ctx) end),
+            ok;
         {_, _} ->
             ok
     end.
@@ -47,12 +47,13 @@ w_message_create(Message, Ctx) ->
     marvin_helper_type:ok_return().
 
 handle_possible_command(Message, Ctx) ->
-    case marvin_helper_chain:chain('marvin_guild_helper_message:handle_possible_command', [
-        fun handle_possible_command_tokenize/1,
-        fun handle_possible_command_parse/1
-    ], marvin_pdu2_dispatch_message_create:content(Message)) of
-        {ok, ParsedMessage} ->
-            maybe_run_command(Message, ParsedMessage, Ctx),
+    case marvin_dialogflow:detect_intent(
+        marvin_guild_context:guild_id(Ctx),
+        marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Message)),
+        marvin_pdu2_dispatch_message_create:content(Message)
+    ) of
+        {ok, DialogFlowResponse} ->
+            maybe_run_command(Message, DialogFlowResponse, Ctx),
             ok;
         {error, Reason} ->
             marvin_log:error(
@@ -63,92 +64,61 @@ handle_possible_command(Message, Ctx) ->
 
 
 
-handle_possible_command_tokenize(Binary) ->
-    case marvin_guild_command_lexer:string(string:lowercase(unicode:characters_to_list(Binary))) of
-        {ok, Tokens, _} -> {ok, Tokens};
-        {error, Reason, _} -> {error, Reason}
-    end.
-
-
-
-handle_possible_command_parse(Tokens) ->
-    marvin_guild_command_parser:parse(Tokens).
-
-
-
-maybe_run_command(OriginalMessage, ParsedMessage, Ctx) ->
-    Words = [Part || Part <- ParsedMessage, not is_integer(Part), not is_tuple(Part)],
-    case Words of
-        [] ->
-            ok;
-        _ ->
-            Commands = marvin_guild_context:commands(Ctx),
-            {Scores, _} = lists:foldl(fun maybe_run_command_calculate_score/2, {[], Words}, Commands),
-            ok = maybe_send_debug_info(OriginalMessage, Words, Scores),
-            %% reverse sort here
-            case lists:sort(fun({_, Score1}, {_, Score2}) -> Score1 >= Score2 end, Scores) of
-                [{_WinningCommand, Score} | _] when Score =< ?lower_score_mark ->
-                    marvin_log:info("Guild '~s' no winning command", [marvin_guild_context:guild_id(Ctx)]),
-                    false;
-                [{WinningCommand, Score} | _] ->
-                    marvin_log:info("Guild '~s' winning command: ~ts/~ts: ~.3f", [
-                        marvin_guild_context:guild_id(Ctx),
-                        marvin_plugin_command:plugin_id(WinningCommand),
-                        marvin_plugin_command:command(WinningCommand),
-                        Score
-                    ]),
+maybe_run_command(OriginalMessage, DialogFlowResponse, Ctx) ->
+    case binary:split(
+        marvin_dialogflow_response_result:action(marvin_dialogflow_response:result(DialogFlowResponse)),
+        <<".">>, [global]
+    ) of
+        [<<"marvin">>, PluginId, CommandId] ->
+            marvin_log:info(
+                "Guild '~s' winning command according to DialogFlow response: ~ts/~ts with score ~.3f",
+                [marvin_guild_context:guild_id(Ctx), PluginId, CommandId,
+                marvin_dialogflow_response_result:score(marvin_dialogflow_response:result(DialogFlowResponse))]
+            ),
+            case find_command(PluginId, CommandId, marvin_guild_context:commands(Ctx)) of
+                undefined ->
+                    marvin_log:info(
+                        "Guild '~s' is passing ~ts/~ts command to fallback as-is handler",
+                        [marvin_guild_context:guild_id(Ctx), PluginId, CommandId]
+                    ),
+                    send_dialogflow_response(OriginalMessage, DialogFlowResponse);
+                Command ->
                     marvin_guild_pubsub:publish(
                         marvin_guild_context:guild_id(Ctx),
                         Ctx,
                         marvin_guild_pubsub:type_command(),
-                        marvin_plugin_command:short(WinningCommand),
+                        marvin_plugin_command:short(Command),
                         #{
-                            command => marvin_plugin_command:command(WinningCommand),
+                            command => marvin_plugin_command:command(Command),
                             original_message => OriginalMessage,
-                            parsed_message => ParsedMessage
+                            dialogflow_response => DialogFlowResponse
                         }
-                    ),
-                    true
-            end
+                    )
+            end;
+        _Other ->
+            send_dialogflow_response(OriginalMessage, DialogFlowResponse)
     end.
 
 
 
-maybe_run_command_calculate_score(Command, {Acc, Words}) ->
-    Keywords = marvin_plugin_command:keywords(Command),
-    Score = length(lists:filter(fun(Keyword) ->
-        lists:member(Keyword, Words)
-    end, Keywords)) / length(Words),
-    {[{Command, Score} | Acc], Words}.
+find_command(_PluginId, _CommandId, []) ->
+    undefined;
 
-
-
-maybe_send_debug_info(OriginalMessage, Words, Scores) ->
-    case lists:member(?debug_hotword, Words) of
-        true ->
-            SendReq = marvin_rest_request:new(
-                marvin_rest_impl_message_create,
-                #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
-                #{
-                    content => <<"`", (marvin_pdu2_dispatch_message_create:content(OriginalMessage))/binary, "`">>,
-                    embed => #{
-                        title => <<"Debug info requested">>,
-                        type => <<"rich">>,
-                        fields => lists:map(fun maybe_send_debug_info_format_score_as_field/1, Scores)
-                    }
-                }
-            ),
-            marvin_rest_shotgun:request(SendReq),
-            ok;
-        false ->
-            ok
+find_command(PluginId, CommandId, [Command | Commands]) ->
+    case {marvin_plugin_command:plugin_id(Command), marvin_plugin_command:command(Command)} of
+        {PluginId, CommandId} ->
+            Command;
+        {_, _} ->
+            find_command(PluginId, CommandId, Commands)
     end.
 
 
 
-maybe_send_debug_info_format_score_as_field({Command, Score}) ->
-    #{
-        name => marvin_plugin_command:short(Command),
-        value => iolist_to_binary(io_lib:format("~.3f", [Score])),
-        inline => false
-    }.
+send_dialogflow_response(OriginalMessage, DialogFlowResponse) ->
+    SendReq = marvin_rest_request:new(
+        marvin_rest_impl_message_create,
+        #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
+        #{content => marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))}
+    ),
+    marvin_rest:request(SendReq),
+    ok.

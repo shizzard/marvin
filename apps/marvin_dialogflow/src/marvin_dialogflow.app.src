@@ -1,0 +1,8 @@
+{application, marvin_dialogflow, [
+    {description, "Marvin DialogFlow helper"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {mod, {marvin_dialogflow_app, []}},
+    {applications, [kernel, stdlib]},
+    {env, []}
+]}.

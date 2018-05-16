@@ -1,8 +1,9 @@
 Definitions.
 
-Digit = [0-9]
-Letter = [^0-9<:@&!>,;\.\s\t\n\r]
-Separator = [:,;\.\s\t\n\r]
+Digit = 0-9
+Space = \s\t\n\r
+Punctuation = :,;\.!?
+SpecialCharacters = <@!&#:>
 
 Rules.
 
@@ -12,8 +13,10 @@ Rules.
 <# : {token, {channel_mention_start, TokenLine}}.
 <: : {token, {emoji_mention_start, TokenLine}}.
 > : {token, {mention_end, TokenLine}}.
-{Separator}+ : skip_token.
-{Digit}+ : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
-{Letter}+ : {token, {word, TokenLine, unicode:characters_to_binary(TokenChars)}}.
+[{Space}] : skip_token.
+[{Punctuation}] : skip_token.
+[{SpecialCharacters}] : skip_token.
+[{Digit}]+ : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
+[^{Space}{Punctuation}{SpecialCharacters}{Digit}]+ : {token, {word, TokenLine, unicode:characters_to_binary(TokenChars)}}.
 
 Erlang code.

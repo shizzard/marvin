@@ -16,7 +16,8 @@
     owner = undefined :: marvin_pdu2_object_user:t() | undefined,
     channel_id :: marvin_pdu2:snowflake() | undefined,
     created_at = os:timestamp() :: erlang:timestamp(),
-    used = false :: boolean()
+    used = false :: boolean(),
+    dialogflow_message_template = <<"">> :: unicode:unicode_binary()
 }).
 
 -record(state, {
@@ -28,6 +29,8 @@
     nouns :: [binary()]
 }).
 -type state() :: #state{}.
+
+-define(message_template_placeholder_channel_name, <<"{{channel_name}}">>).
 
 -define(noun_terms, "/voice_on_demand/noun.terms").
 -define(adjective_terms, "/voice_on_demand/adjective.terms").
@@ -213,7 +216,10 @@ handle_info_guild_event(Event, S0) ->
 
 handle_info_guild_event_command_create(Event, S0) ->
     #{<<"category_id">> := CategoryId} = marvin_plugin_config:data(S0#state.config),
-    #{original_message := OriginalMessage} = marvin_guild_pubsub:payload(Event),
+    #{
+        original_message := OriginalMessage,
+        dialogflow_response := DialogFlowResponse
+    } = marvin_guild_pubsub:payload(Event),
     ChannelName = generate_channel_name(S0#state.adjectives, S0#state.nouns, S0#state.active_channels),
     marvin_log:info(
         "Plugin '~s' for guild '~s' is creating voice channel '~ts'",
@@ -238,7 +244,8 @@ handle_info_guild_event_command_create(Event, S0) ->
     insert_channel(S0#state.active_channels, #active_channel{
         channel_name = ChannelName,
         origin_channel_id = marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
-        owner = marvin_pdu2_dispatch_message_create:author(OriginalMessage)
+        owner = marvin_pdu2_dispatch_message_create:author(OriginalMessage),
+        dialogflow_message_template = marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))
     }),
     {noreply, S0}.
 
@@ -259,7 +266,7 @@ handle_info_guild_event_channel_voice_create(Event, S0) ->
             Req = marvin_rest_request:new(
                 marvin_rest_impl_message_create,
                 #{<<"channel_id">> => ActiveChannel#active_channel.origin_channel_id},
-                #{content => <<"'", ChannelName/binary, "' is ready to go.">>}
+                #{content => fill_response_with_data(ActiveChannel#active_channel.dialogflow_message_template, ActiveChannel#active_channel.channel_name)}
             ),
             Resp = marvin_rest:request(Req),
             marvin_log:info("Response: ~p", [Resp]),
@@ -306,6 +313,11 @@ generate_channel_name(Adjectives, Nouns, Ets, Gen) ->
         {error, not_found} ->
             ChannelName
     end.
+
+
+
+fill_response_with_data(MessageTemplate, ChannelName) ->
+    binary:replace(MessageTemplate, ?message_template_placeholder_channel_name, ChannelName, [global]).
 
 
 

@@ -60,6 +60,7 @@
 -define(event_user_update, <<"USER_UPDATE">>).
 -define(event_voice_state_update, <<"VOICE_STATE_UPDATE">>).
 -define(event_voice_server_update, <<"VOICE_SERVER_UPDATE">>).
+-define(event_presences_replace, <<"PRESENCES_REPLACE">>).
 -define(events, [
     ?event_ready, ?event_resumed, ?event_channel_create, ?event_channel_update, ?event_channel_delete,
     ?event_guild_create, ?event_guild_update, ?event_guild_delete, ?event_guild_ban_add,
@@ -69,7 +70,7 @@
     ?event_guild_role_delete, ?event_message_create, ?event_message_update, ?event_message_delete,
     ?event_message_delete_bulk, ?event_message_reaction_add, ?event_message_reaction_remove,
     ?event_message_reaction_remove_all, ?event_presence_update, ?event_typing_start,
-    ?event_user_update, ?event_voice_state_update, ?event_voice_server_update
+    ?event_user_update, ?event_voice_state_update, ?event_voice_server_update, ?event_presences_replace
 ]).
 
 
@@ -327,7 +328,9 @@ dispatch_event_to_mod(?event_presence_update) -> marvin_pdu2_dispatch_presence_u
 dispatch_event_to_mod(?event_typing_start) -> marvin_pdu2_dispatch_typing_start;
 dispatch_event_to_mod(?event_user_update) -> marvin_pdu2_dispatch_user_update;
 dispatch_event_to_mod(?event_voice_state_update) -> marvin_pdu2_dispatch_voice_state_update;
-dispatch_event_to_mod(?event_voice_server_update) -> marvin_pdu2_dispatch_voice_server_update.
+dispatch_event_to_mod(?event_voice_server_update) -> marvin_pdu2_dispatch_voice_server_update;
+dispatch_event_to_mod(?event_presences_replace) -> marvin_pdu2_dispatch_presences_replace.
+
 
 
 op_to_mod(?op_heartbeat) -> marvin_pdu2_heartbeat;
@@ -385,4 +388,5 @@ mod_to_op_event(marvin_pdu2_dispatch_presence_update) -> {?op_dispatch, ?event_p
 mod_to_op_event(marvin_pdu2_dispatch_typing_start) -> {?op_dispatch, ?event_typing_start};
 mod_to_op_event(marvin_pdu2_dispatch_user_update) -> {?op_dispatch, ?event_user_update};
 mod_to_op_event(marvin_pdu2_dispatch_voice_state_update) -> {?op_dispatch, ?event_voice_state_update};
-mod_to_op_event(marvin_pdu2_dispatch_voice_server_update) -> {?op_dispatch, ?event_voice_server_update}.
+mod_to_op_event(marvin_pdu2_dispatch_voice_server_update) -> {?op_dispatch, ?event_voice_server_update};
+mod_to_op_event(marvin_pdu2_dispatch_presences_replace) -> {?op_dispatch, ?event_presences_replace}.
