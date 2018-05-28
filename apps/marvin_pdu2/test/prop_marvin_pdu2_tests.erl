@@ -59,6 +59,7 @@ pdu_mods() ->
         marvin_pdu2_dispatch_presence_update,
         marvin_pdu2_dispatch_message_create,
         marvin_pdu2_dispatch_guild_members_chunk,
+        marvin_pdu2_dispatch_typing_start,
         marvin_pdu2_dispatch_voice_state_update,
         marvin_pdu2_request_guild_members
     ].
@@ -289,6 +290,13 @@ marvin_pdu2_dispatch_guild_members_chunk() ->
     ?MAP([
         {guild_id, non_empty(proper_unicode:utf8(20))},
         {members, list(marvin_pdu2_object_member())}
+    ]).
+
+marvin_pdu2_dispatch_typing_start() ->
+    ?MAP([
+        {channel_id, non_empty(proper_unicode:utf8(20))},
+        {user_id, non_empty(proper_unicode:utf8(20))},
+        {timestamp, marvin_pdu2_dispatch_typing_start:timestamp()}
     ]).
 
 marvin_pdu2_dispatch_voice_state_update() ->

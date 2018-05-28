@@ -212,6 +212,10 @@ handle_call_incoming_event(Event, S0) ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_presence_update]),
                     handle_call_incoming_event_dispatch_presence_update(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_typing_start ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_typing_start]),
+                    handle_call_incoming_event_dispatch_typing_start(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_voice_state_update ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_voice_state_update]),
@@ -597,6 +601,20 @@ handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
 
 
 
+-spec handle_call_incoming_event_dispatch_typing_start(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_typing_start(_Struct, S0) ->
+    {reply, ok, S0}.
+
+
+
 -spec handle_call_incoming_event_dispatch_voice_state_update(
     PDU :: marvin_pdu2:data(),
     State :: state()
@@ -635,7 +653,15 @@ handle_call_incoming_event_dispatch_voice_state_update(Struct, S0) ->
     ).
 
 handle_call_incoming_event_dispatch_message_create(Struct, S0) ->
-    ChannelId = marvin_pdu2_dispatch_message_create:channel_id(Struct),
+    ChannelId = try
+        marvin_pdu2_dispatch_message_create:channel_id(Struct)
+    catch _:_ ->
+        marvin_log:error(
+            "[ISSUE-31] Shard '~p' got message create with undefined channel faked to 0; Struct: ~p",
+            [S0#state.shard_name, Struct]
+        ),
+        0
+    end,
     case marvin_channel_registry:lookup(ChannelId) of
         {ok, GuildId} ->
             marvin_log:debug(
