@@ -1,0 +1,56 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-05-30T15:55:43.379000+00:00",
+        "pinned": false,
+        "nonce": "451413407787122688",
+        "mentions": [],
+        "mention_roles": [],
+        "mention_everyone": false,
+        "member": {
+            "roles": [
+                "399557799811612704",
+                "427217463693017088",
+                "399587748283154432"
+            ],
+            "nick": null,
+            "mute": false,
+            "joined_at": "2017-05-28T12:32:43.223000+00:00",
+            "deaf": false
+        },
+        "id": "451413408236044288",
+        "guild_id": "318325967602843658",
+        "embeds": [
+            {
+                "url": "https://www.dropbox.com/s/uqla3j21iv2as56/Screenshot%202018-05-30%2018.55.08.png?dl=0",
+                "type": "article",
+                "title": "Screenshot 2018-05-30 18.55.08.png",
+                "thumbnail": {
+                    "width": 1024,
+                    "url": "https://www.dropbox.com/temp_thumb_from_token/s/uqla3j21iv2as56?preserve_transparency=False&size=1024x1024&size_mode=2",
+                    "proxy_url": "https://images-ext-1.discordapp.net/external/Eqyt_ttmojkOTA6oI13aSCrp5xXmJtHPddqBbOv1Asg/%3Fpreserve_transparency%3DFalse%26size%3D1024x1024%26size_mode%3D2/https/www.dropbox.com/temp_thumb_from_token/s/uqla3j21iv2as56",
+                    "height": 1024
+                },
+                "provider": {
+                    "url": null,
+                    "name": "Dropbox"
+                },
+                "description": "Shared with Dropbox"
+            }
+        ],
+        "edited_timestamp": null,
+        "content": "https://www.dropbox.com/s/uqla3j21iv2as56/Screenshot%202018-05-30%2018.55.08.png?dl=0",
+        "channel_id": "448788687300591618",
+        "author": {
+            "username": "BizkitCake",
+            "id": "143022070429646848",
+            "discriminator": "8836",
+            "avatar": "d526eca4a94c1810d72f9b0aebb12f4d"
+        },
+        "attachments": []
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}

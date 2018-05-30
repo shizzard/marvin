@@ -1,0 +1,14 @@
+{
+    "op": 0,
+    "d": {
+        "user": {
+            "id": "321644406979428354"
+        },
+        "status": "offline",
+        "roles": [],
+        "guild_id": "318325967602843658",
+        "game": null
+    },
+    "s": 1,
+    "t": "PRESENCE_UPDATE"
+}

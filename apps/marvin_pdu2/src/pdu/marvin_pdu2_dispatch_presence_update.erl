@@ -9,7 +9,7 @@
 % status  string  either "idle", "dnd", "online", or "offline"
 -record(?MODULE, {
     user :: user(),
-    nick :: nick(),
+    nick = undefined :: nick(),
     roles :: roles(),
     game = undefined :: game() | undefined,
     guild_id :: guild_id(),

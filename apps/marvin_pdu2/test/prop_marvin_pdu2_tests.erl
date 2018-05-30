@@ -525,7 +525,7 @@ marvin_pdu2_object_embed_video() ->
 marvin_pdu2_object_embed_provider() ->
     ?MAP([
         {name, non_empty(proper_unicode:utf8(15))},
-        {url, non_empty(proper_unicode:utf8(15))}
+        {url, ?NULLABLE(non_empty(proper_unicode:utf8(15)))}
     ]).
 
 marvin_pdu2_object_embed_author() ->

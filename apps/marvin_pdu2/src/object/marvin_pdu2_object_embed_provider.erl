@@ -19,6 +19,9 @@
 cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
+cloak_validate(url, null) ->
+    {ok, undefined};
+
 cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
@@ -32,5 +35,5 @@ export(#?MODULE{
 }) ->
     #{
         <<"name">> => Name,
-        <<"url">> => Url
+        <<"url">> => marvin_pdu2:nullify(Url)
     }.

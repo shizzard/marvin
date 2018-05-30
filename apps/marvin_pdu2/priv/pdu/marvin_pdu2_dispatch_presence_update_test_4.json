@@ -1,0 +1,18 @@
+{
+    "op": 0,
+    "d": {
+        "user": {
+            "id": "321283856017784833"
+        },
+        "status": "online",
+        "roles": [],
+        "nick": null,
+        "guild_id": "318325967602843658",
+        "game": {
+            "type": 3,
+            "name": "на битовые часы: 22:50 UTC"
+        }
+    },
+    "s": 1,
+    "t": "PRESENCE_UPDATE"
+}

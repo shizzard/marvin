@@ -14,8 +14,9 @@
 -define(type_playing, 0).
 -define(type_streaming, 1).
 -define(type_listening, 2).
+-define(type_watching, 3).
 
--type type() :: ?type_playing | ?type_streaming | ?type_listening.
+-type type() :: ?type_playing | ?type_streaming | ?type_watching.
 -type name() :: unicode:unicode_binary().
 -type timestamps() :: pos_integer().
 -type url() :: unicode:unicode_binary().
@@ -26,7 +27,10 @@
 
 
 cloak_validate(type, Value)
-when is_integer(Value) andalso (?type_playing == Value orelse ?type_streaming == Value orelse ?type_listening == Value) ->
+when is_integer(Value) andalso (
+    ?type_playing == Value orelse ?type_streaming == Value
+    orelse ?type_listening == Value orelse ?type_watching == Value
+) ->
     {ok, Value};
 
 cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
