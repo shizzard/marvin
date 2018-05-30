@@ -82,7 +82,15 @@ handle_call(?report_operational(RxPid, TxPid), _GenReplyTo, S0) ->
 
 handle_call(?incoming_event(Event), _GenReplyTo, S0)
 when is_binary(Event) ->
-    handle_call_incoming_event(Event, S0);
+    try
+        handle_call_incoming_event(Event, S0)
+    catch Type:Reason ->
+        marvin_log:error(
+            "[ISSUE-31] Shard '~p' got error ~p:~p while handling event ~p, ignoring",
+            [S0#state.shard_name, Type, Reason, Event]
+        ),
+        {reply, ok, S0}
+    end;
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
     marvin_log:warn("Unexpected call: ~p", [Unexpected]),
@@ -653,15 +661,7 @@ handle_call_incoming_event_dispatch_voice_state_update(Struct, S0) ->
     ).
 
 handle_call_incoming_event_dispatch_message_create(Struct, S0) ->
-    ChannelId = try
-        marvin_pdu2_dispatch_message_create:channel_id(Struct)
-    catch _:_ ->
-        marvin_log:error(
-            "[ISSUE-31] Shard '~p' got message create with undefined channel faked to 0; Struct: ~p",
-            [S0#state.shard_name, Struct]
-        ),
-        0
-    end,
+    ChannelId = marvin_pdu2_dispatch_message_create:channel_id(Struct),
     case marvin_channel_registry:lookup(ChannelId) of
         {ok, GuildId} ->
             marvin_log:debug(
