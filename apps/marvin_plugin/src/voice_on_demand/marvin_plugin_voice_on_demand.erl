@@ -333,9 +333,9 @@ maybe_get_permission_overwrites(Message, Ctx) ->
             %% public channel since no overrides defined
             [];
         SomeOverrides ->
-            %% private channel, adding message author and denyng
+            %% private channel, adding message author and self user and denying everyone
             maybe_get_permission_overwrites_users([
-                marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Message))
+                MyId, marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Message))
             ]) ++ [#{
                 id => marvin_pdu2_object_role:id(marvin_guild_helper_role:r_get_everyone(Ctx)),
                 type => marvin_pdu2_object_permission_overwrite:type_role(),
