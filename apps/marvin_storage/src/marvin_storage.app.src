@@ -1,0 +1,8 @@
+{application, marvin_storage, [
+    {description, "Marvin storage application"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {mod, {marvin_storage_app, []}},
+    {applications, [kernel, stdlib]},
+    {env, []}
+]}.

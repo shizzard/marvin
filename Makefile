@@ -57,6 +57,11 @@ run-release:
 	MARVIN_APP_GUILD_CONFIG_FILENAME_TEMPLATE=guild_{{guild_id}}_config.json \
 	MARVIN_APP_PLUGIN_CONFIG_ROOT=`pwd`/data/plugin/ \
 	MARVIN_APP_PLUGIN_CONFIG_FILENAME_TEMPLATE=plugin_{{plugin_id}}_{{guild_id}}_config.json \
+	MARVIN_STORAGE_DB_POOL_SIZE=10 \
+	MARVIN_STORAGE_DB_POOL_OVERFLOW=10 \
+	MARVIN_STORAGE_DB_NAME=marvin \
+	MARVIN_STORAGE_DB_HOST=192.168.99.100 \
+	MARVIN_STORAGE_DB_PORT=27017 \
 	_build/default/rel/marvin/bin/marvin console
 
 run-logtail:
