@@ -8,7 +8,7 @@
 % proxy_icon_url  string  a proxied url of author icon
 -record(?MODULE, {
     name :: name(),
-    url :: url(),
+    url = undefined :: url(),
     icon_url = undefined :: icon_url() | undefined,
     proxy_icon_url = undefined :: proxy_icon_url() | undefined
 }).

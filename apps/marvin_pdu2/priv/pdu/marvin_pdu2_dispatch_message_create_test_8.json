@@ -1,0 +1,75 @@
+{
+    "op": 0,
+    "d": {
+        "type": 0,
+        "tts": false,
+        "timestamp": "2018-06-01T18:07:46.888000+00:00",
+        "pinned": false,
+        "nonce": null,
+        "mentions": [],
+        "mention_roles": [],
+        "mention_everyone": false,
+        "member": {
+            "roles": [
+                "451421298204213258",
+                "448779403925651463"
+            ],
+            "nick": null,
+            "mute": false,
+            "joined_at": "2018-05-23T09:29:07.808830+00:00",
+            "deaf": false
+        },
+        "id": "452171417572868107",
+        "guild_id": "318325967602843658",
+        "embeds": [
+            {
+                "url": "https://www.twitch.tv/pur_purr_purrr",
+                "type": "rich",
+                "title": "Пуррхай как бабочка, жаль что не дайм | ОВЕРВОТЧ!",
+                "thumbnail": {
+                    "width": 0,
+                    "url": "https://static-cdn.jtvnw.net/jtv_user_pictures/9a5c1439-34c4-489d-9af3-0bd854ee574f-profile_image-300x300.jpg",
+                    "proxy_url": "https://images-ext-1.discordapp.net/external/b27_zcOQnh-M6AAIk5QqxKacpMLDIRJ-L7hfKsy9JIk/https/static-cdn.jtvnw.net/jtv_user_pictures/9a5c1439-34c4-489d-9af3-0bd854ee574f-profile_image-300x300.jpg",
+                    "height": 0
+                },
+                "image": {
+                    "width": 0,
+                    "url": "https://static-cdn.jtvnw.net/previews-ttv/live_user_pur_purr_purrr-320x180.jpg?r=217629",
+                    "proxy_url": "https://images-ext-2.discordapp.net/external/QRefLHsRB68djPrlssICGc97mZx4uqlvYPfYSgIMDBI/%3Fr%3D217629/https/static-cdn.jtvnw.net/previews-ttv/live_user_pur_purr_purrr-320x180.jpg",
+                    "height": 0
+                },
+                "fields": [
+                    {
+                        "value": "Overwatch",
+                        "name": "Game",
+                        "inline": true
+                    },
+                    {
+                        "value": "1",
+                        "name": "Viewers",
+                        "inline": true
+                    }
+                ],
+                "color": 6570404,
+                "author": {
+                    "proxy_icon_url": "https://images-ext-1.discordapp.net/external/b27_zcOQnh-M6AAIk5QqxKacpMLDIRJ-L7hfKsy9JIk/https/static-cdn.jtvnw.net/jtv_user_pictures/9a5c1439-34c4-489d-9af3-0bd854ee574f-profile_image-300x300.jpg",
+                    "name": "pur_purr_purrr",
+                    "icon_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/9a5c1439-34c4-489d-9af3-0bd854ee574f-profile_image-300x300.jpg"
+                }
+            }
+        ],
+        "edited_timestamp": null,
+        "content": "Клац-клац, хлопци и дивчины, pur_purr_purrr запустила стримулю https://www.twitch.tv/pur_purr_purrr ! Бронза фтв!",
+        "channel_id": "399552308486340608",
+        "author": {
+            "username": "MEE6",
+            "id": "159985870458322944",
+            "discriminator": "4876",
+            "bot": true,
+            "avatar": "8c7187aa71f15ba271c85bfece9b067e"
+        },
+        "attachments": []
+    },
+    "s": 1,
+    "t": "MESSAGE_CREATE"
+}
