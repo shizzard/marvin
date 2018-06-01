@@ -12,12 +12,13 @@
 
 
 
--define(registry_table_name, marvin_guild_monitor_registry).
+-define(registry_table, marvin_guild_monitor_registry).
 -define(start_guild(GuildId, MyId), {start_guild, GuildId, MyId}).
 -define(stop_guild(GuildId), {stop_guild, GuildId}).
 -define(monitor_down(MonRef, Pid, Info), {'DOWN', MonRef, process, Pid, Info}).
 
 -record(guild, {
+    my_id :: marvin_pdu2_object_user:id(),
     guild_id :: marvin_pdu2_object_guild:id(),
     guild_pid :: pid(),
     guild_mon_ref :: reference()
@@ -77,7 +78,7 @@ stop_guild(GuildId) ->
     ).
 
 get_guild(GuildId) ->
-    case ets:lookup(?registry_table_name, GuildId) of
+    case ets:lookup(?registry_table, GuildId) of
         [#guild{guild_id = GuildId, guild_pid = Pid}] ->
             {ok, Pid};
         [] ->
@@ -95,8 +96,8 @@ start_link() ->
 
 
 init([]) ->
-    Registry = ets:new(?registry_table_name, [
-        set, protected, named_table, {keypos, 2}, {read_concurrency, true}
+    Registry = ets:new(?registry_table, [
+        set, protected, named_table, {keypos, 3}, {read_concurrency, true}
     ]),
     {ok, #state{registry = Registry}}.
 
@@ -154,11 +155,7 @@ code_change(_OldVsn, S0, _Extra) ->
     ).
 
 handle_call_start_guild(GuildId, MyId, S0) ->
-    {ok, Pid} = marvin_guild_sup:start_guild(GuildId, MyId),
-    MonRef = erlang:monitor(process, Pid),
-    true = ets:insert(?registry_table_name, #guild{
-        guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef
-    }),
+    {ok, Pid} = do_start_guild(GuildId, MyId),
     {reply, {ok, Pid}, S0}.
 
 
@@ -173,11 +170,11 @@ handle_call_start_guild(GuildId, MyId, S0) ->
     ).
 
 handle_call_stop_guild(GuildId, S0) ->
-    case ets:lookup(?registry_table_name, GuildId) of
+    case ets:lookup(?registry_table, GuildId) of
         [#guild{guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef}] ->
             _ = erlang:demonitor(MonRef, [flush, info]),
             ok = marvin_guild_sup:stop_guild(Pid),
-            true = ets:delete(?registry_table_name, GuildId);
+            true = ets:delete(?registry_table, GuildId);
         [] ->
             ok
     end,
@@ -194,17 +191,28 @@ handle_call_stop_guild(GuildId, S0) ->
     marvin_helper_type:gen_server_noreply_simple(State :: state()).
 
 handle_info_monitor_down(MonRef, Pid, Info, S0) ->
-    case ets:match_object(?registry_table_name, {'_', '_', Pid, MonRef}) of
+    case ets:match_object(?registry_table, {'_', '_', '_', Pid, MonRef}) of
         [] ->
             marvin_log:warn(
                 "Unexpected monitor DOWN from ~p with reason ~w",
                 [Pid, Info]
             );
-        [{GuildId, Pid, MonRef}] ->
+        [#guild{my_id = MyId, guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef}] ->
             marvin_log:warn(
-                "Guild '~p' sup ~p terminated with reason ~w",
+                "Guild '~ts' (~p) terminated with reason ~w; restarting",
                 [GuildId, Pid, Info]
             ),
-            true = ets:delete(?registry_table_name, GuildId)
+            true = ets:delete(?registry_table, GuildId),
+            {ok, _Pid} = do_start_guild(GuildId, MyId)
     end,
     {noreply, S0}.
+
+
+
+do_start_guild(GuildId, MyId) ->
+    {ok, Pid} = marvin_guild_sup:start_guild(GuildId, MyId),
+    MonRef = erlang:monitor(process, Pid),
+    true = ets:insert(?registry_table, #guild{
+        my_id = MyId, guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef
+    }),
+    {ok, Pid}.

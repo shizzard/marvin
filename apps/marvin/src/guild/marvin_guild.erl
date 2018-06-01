@@ -167,8 +167,14 @@ init([GuildId, MyId]) ->
 maybe_start_plugins(GuildId, PluginsList) ->
     maps:from_list(lists:map(fun(PluginId) ->
         marvin_log:info("Guild '~s' is starting plugin ~p", [GuildId, PluginId]),
-        {ok, Pid} = marvin_plugin_sup:start_plugin(binary_to_atom(PluginId, latin1), GuildId),
-        {PluginId, Pid}
+        case marvin_plugin_sup:start_plugin(binary_to_atom(PluginId, latin1), GuildId) of
+            {ok, Pid} ->
+                {PluginId, Pid};
+            {error, {already_started, Pid}} ->
+                {PluginId, Pid};
+            {error, Reason} ->
+                error(Reason)
+        end
     end, PluginsList)).
 
 
