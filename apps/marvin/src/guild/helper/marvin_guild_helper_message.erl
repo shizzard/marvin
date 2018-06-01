@@ -80,8 +80,7 @@ maybe_run_command(OriginalMessage, DialogFlowResponse, Ctx) ->
                     marvin_log:info(
                         "Guild '~s' is passing ~ts/~ts command to fallback as-is handler",
                         [marvin_guild_context:guild_id(Ctx), PluginId, CommandId]
-                    ),
-                    send_dialogflow_response(OriginalMessage, DialogFlowResponse);
+                    );
                 Command ->
                     marvin_guild_pubsub:publish(
                         marvin_guild_context:guild_id(Ctx),

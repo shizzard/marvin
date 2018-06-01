@@ -28,9 +28,9 @@
 get_commands(_) ->
     [marvin_plugin_command:new(#{
         plugin_id => <<"marvin_plugin_ping">>,
-        command => <<"ping">>,
-        help => <<"Быстропинг для проверки работоспособности бота."/utf8>>,
-        keywords => [<<"ping">>, <<"пинг"/utf8>>]
+        command => <<"status">>,
+        help => <<"Проверка статуса бота."/utf8>>,
+        keywords => [<<"статус"/utf8>>, <<"пинг"/utf8>>]
     })].
 
 
@@ -101,8 +101,29 @@ handle_info_guild_event(Event, S0) ->
     Req = marvin_rest_request:new(
         marvin_rest_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
-        #{content => <<"pong">>}
+        #{content => get_status_message()}
     ),
     Resp = marvin_rest:request(Req),
     marvin_log:info("Response: ~p", [Resp]),
     {noreply, S0}.
+
+
+
+get_status_message() ->
+    {ok, LibraryName} = marvin_config:get(marvin, [system_info, library_name]),
+    {ok, LibraryVersion} = marvin_config:get(marvin, [system_info, library_version]),
+    MemoryFootprintMB = erlang:memory(total) / (1024 * 1024),
+    {
+        StoragePoolStatus, StorageWorkersCount, StorageOverflowCount, StorageBusyCount
+    } = poolboy:status(marvin_storage),
+    Uptime = marvin_helper_time:uptime_string(),
+    iolist_to_binary([
+        "```",
+        <<LibraryName/binary, " v", LibraryVersion/binary, " is up for ", Uptime/binary, "\n">>,
+        "Storage ", io_lib:format("~s", [StoragePoolStatus]), ", ",
+        "workers: ", io_lib:format("~B", [StorageWorkersCount]), ", ",
+        "overflow: ", io_lib:format("~B", [StorageOverflowCount]), ", ",
+        "busy: ", io_lib:format("~B", [StorageBusyCount]), "\n",
+        "Memory footprint: ", io_lib:format("~.2f MB", [MemoryFootprintMB]), "\n"
+        "```"
+    ]).

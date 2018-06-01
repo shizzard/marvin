@@ -35,7 +35,7 @@ get_help() ->
         plugin_id => <<"marvin_plugin_help">>,
         command => <<"generic_help">>,
         help => <<"Выводит эту справку."/utf8>>,
-        keywords => [<<"помоги"/utf8>>, <<"помощь"/utf8>>]
+        keywords => [<<"справка"/utf8>>, <<"помощь"/utf8>>]
     }).
 
 
