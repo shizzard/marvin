@@ -34,6 +34,8 @@
 
 -define(noun_terms, "/voice_on_demand/noun.terms").
 -define(adjective_terms, "/voice_on_demand/adjective.terms").
+-define(participats_limit_min, 1).
+-define(participats_limit_max, 50).
 -define(max_channel_name_gen, 15).
 -define(cleanup_event(), {cleanup_event}).
 -define(cleanup_interval, 20).
@@ -225,6 +227,20 @@ handle_info_guild_event_command_create(Event, S0) ->
         "Plugin '~s' for guild '~s' is creating voice channel '~ts'",
         [?MODULE, S0#state.guild_id, ChannelName]
     ),
+    UserLimit = case maps:find(<<"n_participants">>, marvin_dialogflow_response_result:parameters(
+        marvin_dialogflow_response:result(DialogFlowResponse)
+    )) of
+        {ok, Number} when is_integer(Number) andalso Number =< ?participats_limit_min ->
+            undefined;
+        {ok, Number} when is_integer(Number) andalso Number >= ?participats_limit_max ->
+            ?participats_limit_max;
+        {ok, Number} when is_integer(Number) ->
+            Number;
+        {ok, _Any} ->
+            undefined;
+        error ->
+            undefined
+    end,
     Req = marvin_rest_request:new(
         marvin_rest_impl_guild_channel_create,
         #{<<"guild_id">> => marvin_guild_context:guild_id(marvin_guild_pubsub:guild_context(Event))},
@@ -233,6 +249,7 @@ handle_info_guild_event_command_create(Event, S0) ->
             name => ChannelName,
             bitrate => 64000,
             parent_id => CategoryId,
+            user_limit => UserLimit,
             permission_overwrites => maybe_get_permission_overwrites(
                 OriginalMessage,
                 marvin_guild_pubsub:guild_context(Event)

@@ -59,6 +59,9 @@ cloak_validate(topic, Value) when is_binary(Value) ->
 cloak_validate(bitrate, Value) when is_integer(Value) andalso Value >= 16000 andalso Value =< 96000 ->
     {ok, Value};
 
+cloak_validate(user_limit, undefined) ->
+    {ok, undefined};
+
 cloak_validate(user_limit, Value) when is_integer(Value) andalso Value > 0 ->
     {ok, Value};
 
