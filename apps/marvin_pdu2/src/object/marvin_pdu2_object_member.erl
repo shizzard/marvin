@@ -1,7 +1,7 @@
 -module(marvin_pdu2_object_member).
 -compile({parse_transform, cloak_transform}).
 
--export([export/1, get_nickname/1]).
+-export([export/1, get_nickname/1, have_role/2]).
 
 -record(?MODULE, {
     user :: user(),
@@ -29,6 +29,11 @@ get_nickname(#?MODULE{nick = undefined, user = User}) ->
 
 get_nickname(#?MODULE{nick = Nickname}) ->
     Nickname.
+
+
+
+have_role(Member, RoleId) ->
+    lists:member(RoleId, roles(Member)).
 
 
 

@@ -5,6 +5,8 @@
     my_id :: marvin_pdu2:snowflake(),
     guild_id :: marvin_pdu2:snowflake(),
     owner_id :: marvin_pdu2:snowflake(),
+    role_admin :: marvin_pdu2:snowflake(),
+    role_moderator :: marvin_pdu2:snowflake(),
     commands :: [marvin_plugin:command()],
     presence_state :: ets:tid(),
     role_state :: ets:tid(),
