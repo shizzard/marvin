@@ -16,8 +16,7 @@
     owner = undefined :: marvin_pdu2_object_user:t() | undefined,
     channel_id :: marvin_pdu2:snowflake() | undefined,
     created_at = os:timestamp() :: erlang:timestamp(),
-    used = false :: boolean(),
-    dialogflow_message_template = <<"">> :: unicode:unicode_binary()
+    used = false :: boolean()
 }).
 
 -record(state, {
@@ -34,6 +33,8 @@
 
 -define(noun_terms, "/voice_on_demand/noun.terms").
 -define(adjective_terms, "/voice_on_demand/adjective.terms").
+-define(participats_limit_min, 1).
+-define(participats_limit_max, 99).
 -define(max_channel_name_gen, 15).
 -define(cleanup_event(), {cleanup_event}).
 -define(cleanup_interval, 20).
@@ -218,13 +219,14 @@ handle_info_guild_event_command_create(Event, S0) ->
     #{<<"category_id">> := CategoryId} = marvin_plugin_config:data(S0#state.config),
     #{
         original_message := OriginalMessage,
-        dialogflow_response := DialogFlowResponse
+        parsed_message_content := ParsedMessage
     } = marvin_guild_pubsub:payload(Event),
     ChannelName = generate_channel_name(S0#state.adjectives, S0#state.nouns, S0#state.active_channels),
     marvin_log:info(
         "Plugin '~s' for guild '~s' is creating voice channel '~ts'",
         [?MODULE, S0#state.guild_id, ChannelName]
     ),
+    UserLimit = maybe_get_user_limit(ParsedMessage),
     Req = marvin_rest_request:new(
         marvin_rest_impl_guild_channel_create,
         #{<<"guild_id">> => marvin_guild_context:guild_id(marvin_guild_pubsub:guild_context(Event))},
@@ -233,6 +235,7 @@ handle_info_guild_event_command_create(Event, S0) ->
             name => ChannelName,
             bitrate => 64000,
             parent_id => CategoryId,
+            user_limit => UserLimit,
             permission_overwrites => maybe_get_permission_overwrites(
                 OriginalMessage,
                 marvin_guild_pubsub:guild_context(Event)
@@ -244,8 +247,7 @@ handle_info_guild_event_command_create(Event, S0) ->
     insert_channel(S0#state.active_channels, #active_channel{
         channel_name = ChannelName,
         origin_channel_id = marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
-        owner = marvin_pdu2_dispatch_message_create:author(OriginalMessage),
-        dialogflow_message_template = marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))
+        owner = marvin_pdu2_dispatch_message_create:author(OriginalMessage)
     }),
     {noreply, S0}.
 
@@ -266,7 +268,7 @@ handle_info_guild_event_channel_voice_create(Event, S0) ->
             Req = marvin_rest_request:new(
                 marvin_rest_impl_message_create,
                 #{<<"channel_id">> => ActiveChannel#active_channel.origin_channel_id},
-                #{content => fill_response_with_data(ActiveChannel#active_channel.dialogflow_message_template, ActiveChannel#active_channel.channel_name)}
+                #{content => <<"Канал '"/utf8, (ActiveChannel#active_channel.channel_name)/binary, "' готов."/utf8>>}
             ),
             Resp = marvin_rest:request(Req),
             marvin_log:info("Response: ~p", [Resp]),
@@ -299,6 +301,18 @@ generate_channel_name(Adjectives, Nouns, Ets) ->
 
 
 
+maybe_get_user_limit(ParsedMessage) ->
+    case [Integer || Integer <- ParsedMessage, is_integer(Integer)] of
+        [] -> undefined;
+        List -> case hd(List) of
+            Number when Number =< ?participats_limit_min -> undefined;
+            Number when Number >= ?participats_limit_max -> ?participats_limit_max;
+            Number -> Number
+        end
+    end.
+
+
+
 generate_channel_name(_Adjectives, _Nouns, _Ets, Gen)
 when Gen > ?max_channel_name_gen ->
     throw({generate_channel_name, max_channel_name_gen_reached});
@@ -313,11 +327,6 @@ generate_channel_name(Adjectives, Nouns, Ets, Gen) ->
         {error, not_found} ->
             ChannelName
     end.
-
-
-
-fill_response_with_data(MessageTemplate, ChannelName) ->
-    binary:replace(MessageTemplate, ?message_template_placeholder_channel_name, ChannelName, [global]).
 
 
 
