@@ -39,6 +39,7 @@
 -define(cleanup_event(), {cleanup_event}).
 -define(cleanup_interval, 20).
 -define(default_duration, 10).
+-define(max_duration, 120).
 
 
 
@@ -62,7 +63,7 @@ command_mute() ->
             "Затыкает указанного пользователя или пользователей на указанное количество минут.\n"/utf8,
             "Применимо только модераторами. Время наказания по умолчанию - 10 минут."/utf8
         >>,
-        keywords => [<<"мьют"/utf8>>, <<"накажи"/utf8>>, <<"арестуй"/utf8>>, <<"заткни"/utf8>>]
+        keywords => [<<"накажи"/utf8>>, <<"арестуй"/utf8>>]
     }).
 
 
@@ -231,10 +232,15 @@ handle_info_guild_event_command_mute_provision_context(
         marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(OriginalMessage)),
         marvin_guild_pubsub:guild_context(Event)
     ),
+    SubjectIds = [
+        marvin_pdu2_object_user:id(Subject) || Subject
+        <- marvin_pdu2_dispatch_message_create:mentions(OriginalMessage)
+    ],
+    marvin_log:info("~p", [SubjectIds]),
     Subjects = [marvin_guild_helper_members:r_get_member_by_user_id(
-        marvin_pdu2_object_user:id(Subject),
-        marvin_guild_pubsub:guild_context(Event)
-    ) || Subject <- marvin_pdu2_dispatch_message_create:mentions(OriginalMessage)],
+        Id, marvin_guild_pubsub:guild_context(Event)
+    ) || Id <- SubjectIds, Id /= marvin_guild_context:my_id(marvin_guild_pubsub:guild_context(Event))],
+    marvin_log:info("~p", [Subjects]),
     {ok, ChainCtx#handle_info_guild_event_command_mute{
         channel_id = ChannelId, caller = Caller, subjects = Subjects
     }}.
@@ -283,15 +289,21 @@ handle_info_guild_event_command_mute_filter_already_muted_subjects(
 handle_info_guild_event_command_mute_maybe_get_mute_duration(
     #handle_info_guild_event_command_mute{event = Event} = ChainCtx
 ) ->
-    #{dialogflow_response := DialogFlowResponse} = marvin_guild_pubsub:payload(Event),
-    Duration = case maps:find(<<"n_minutes">>, marvin_dialogflow_response_result:parameters(
-        marvin_dialogflow_response:result(DialogFlowResponse)
-    )) of
-        {ok, DetectedDuration} -> DetectedDuration;
-        error -> ?default_duration
-    end,
+    #{parsed_message_content := ParsedMessage} = marvin_guild_pubsub:payload(Event),
+    Duration = get_mute_duration(ParsedMessage),
     {ok, ChainCtx#handle_info_guild_event_command_mute{duration = Duration}}.
 
+
+
+get_mute_duration(ParsedMessage) ->
+    case [Integer || Integer <- ParsedMessage, is_integer(Integer)] of
+        [] -> ?default_duration;
+        List -> case hd(List) of
+            Number when Number =< 0 -> ?default_duration;
+            Number when Number >= ?max_duration -> ?max_duration;
+            Number -> Number
+        end
+    end.
 
 
 
