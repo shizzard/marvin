@@ -131,10 +131,7 @@ handle_info_guild_event(Event, S0) ->
 
 
 handle_info_guild_event_change_nickname(Event, S0) ->
-    #{
-        original_message := OriginalMessage,
-        dialogflow_response := DialogFlowResponse
-    } = marvin_guild_pubsub:payload(Event),
+    #{original_message := OriginalMessage} = marvin_guild_pubsub:payload(Event),
     Author = marvin_pdu2_dispatch_message_create:author(OriginalMessage),
     Nickname = generate_nickname(S0#state.adjectives, S0#state.nouns),
     marvin_log:info(
@@ -154,10 +151,7 @@ handle_info_guild_event_change_nickname(Event, S0) ->
     SendMessageReq = marvin_rest_request:new(
         marvin_rest_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
-        #{content => fill_response_with_data(
-            marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse)),
-            Author
-        )}
+        #{content => <<"Буду звать тебя "/utf8, (marvin_pdu2_object_user:format(Author))/binary, "."/utf8>>}
     ),
     SendMessageResp = marvin_rest:request(SendMessageReq),
     marvin_log:info("Response: ~p", [SendMessageResp]),
@@ -169,13 +163,3 @@ generate_nickname(Adjectives, Nouns) ->
     Adjective = lists:nth(rand:uniform(length(Adjectives)), Adjectives),
     Noun = lists:nth(rand:uniform(length(Nouns)), Nouns),
     <<Adjective/binary, " ", Noun/binary>>.
-
-
-
-fill_response_with_data(MessageTemplate, User) ->
-    binary:replace(
-        MessageTemplate,
-        ?message_template_placeholder_user_mention,
-        marvin_pdu2_object_user:format(User),
-        [global]
-    ).

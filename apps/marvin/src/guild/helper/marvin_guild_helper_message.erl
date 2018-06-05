@@ -7,6 +7,17 @@
 ]).
 
 -define(lower_score_mark, 0.15).
+-define(debug_hotword, <<"%debug%">>).
+
+
+
+-record(handle_possible_command, {
+    original_message :: marvin_pdu2_dispatch_message_create:t(),
+    tokenized_message_content :: [term()],
+    parsed_message_content :: [term()],
+    detected_command :: marvin_plugin_command:t() | undefined,
+    ctx :: marvin_guild_context:t()
+}).
 
 
 
@@ -47,13 +58,13 @@ w_message_create(Message, Ctx) ->
     marvin_helper_type:ok_return().
 
 handle_possible_command(Message, Ctx) ->
-    case marvin_dialogflow:detect_intent(
-        marvin_guild_context:guild_id(Ctx),
-        marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Message)),
-        marvin_pdu2_dispatch_message_create:content(Message)
-    ) of
-        {ok, DialogFlowResponse} ->
-            maybe_run_command(Message, DialogFlowResponse, Ctx),
+    case marvin_helper_chain:chain('marvin_guild_helper_message:handle_possible_command', [
+        fun handle_possible_command_tokenize/1,
+        fun handle_possible_command_parse/1,
+        fun handle_possible_command_maybe_detect/1,
+        fun handle_possible_command_run_command_or_response/1
+    ], #handle_possible_command{original_message = Message, ctx = Ctx}) of
+        {ok, _ChainCtx} ->
             ok;
         {error, Reason} ->
             marvin_log:error(
@@ -64,60 +75,97 @@ handle_possible_command(Message, Ctx) ->
 
 
 
-maybe_run_command(OriginalMessage, DialogFlowResponse, Ctx) ->
-    case binary:split(
-        marvin_dialogflow_response_result:action(marvin_dialogflow_response:result(DialogFlowResponse)),
-        <<".">>, [global]
+handle_possible_command_tokenize(#handle_possible_command{
+    original_message = Message
+} = ChainCtx) ->
+    case marvin_guild_command_lexer:string(
+        unicode:characters_to_list(marvin_pdu2_dispatch_message_create:content(Message))
     ) of
-        [<<"marvin">>, PluginId, CommandId] ->
-            marvin_log:info(
-                "Guild '~s' winning command according to DialogFlow response: ~ts/~ts with score ~.3f",
-                [marvin_guild_context:guild_id(Ctx), PluginId, CommandId,
-                marvin_dialogflow_response_result:score(marvin_dialogflow_response:result(DialogFlowResponse))]
-            ),
-            case find_command(PluginId, CommandId, marvin_guild_context:commands(Ctx)) of
-                undefined ->
-                    marvin_log:info(
-                        "Guild '~s' is passing ~ts/~ts command to fallback as-is handler",
-                        [marvin_guild_context:guild_id(Ctx), PluginId, CommandId]
-                    );
-                Command ->
-                    marvin_guild_pubsub:publish(
-                        marvin_guild_context:guild_id(Ctx),
-                        Ctx,
-                        marvin_guild_pubsub:type_command(),
-                        marvin_plugin_command:short(Command),
-                        #{
-                            command => marvin_plugin_command:command(Command),
-                            original_message => OriginalMessage,
-                            dialogflow_response => DialogFlowResponse
-                        }
-                    )
+        {ok, Tokens, _} ->
+            marvin_log:info("Tokenized message: ~p", [Tokens]),
+            {ok, ChainCtx#handle_possible_command{tokenized_message_content = Tokens}};
+        {error, Reason} ->
+            {error, Reason}
+    end.
+
+
+
+handle_possible_command_parse(#handle_possible_command{
+    tokenized_message_content = Tokens
+} = ChainCtx) ->
+    case marvin_guild_command_parser:parse(Tokens) of
+        {ok, ParsedMessage} ->
+            marvin_log:info("Parsed message: ~p", [ParsedMessage]),
+            {ok, ChainCtx#handle_possible_command{
+                parsed_message_content = ParsedMessage
+            }};
+        {error, Reason} ->
+            {error, Reason}
+    end.
+
+
+
+handle_possible_command_maybe_detect(#handle_possible_command{
+    parsed_message_content = ParsedMessage,
+    ctx = Ctx
+} = ChainCtx) ->
+    Words = [Part || Part <- ParsedMessage, not is_integer(Part), not is_tuple(Part)],
+    marvin_log:info("~p", [Words]),
+    Commands = marvin_guild_context:commands(Ctx),
+    case lists:foldl(fun
+        (Command, undefined) ->
+            case lists:any(fun(Keyword) -> lists:member(Keyword, Words) end, marvin_plugin_command:keywords(Command)) of
+                true -> Command;
+                false -> undefined
             end;
-        _Other ->
-            send_dialogflow_response(OriginalMessage, DialogFlowResponse)
+        (_Command, Ret) ->
+            Ret
+    end, undefined, Commands) of
+        undefined ->
+            {ok, ChainCtx};
+        Command ->
+            {ok, ChainCtx#handle_possible_command{detected_command = Command}}
     end.
 
 
 
-find_command(_PluginId, _CommandId, []) ->
-    undefined;
+handle_possible_command_run_command_or_response(#handle_possible_command{
+    detected_command = undefined,
+    original_message = Message,
+    ctx = Ctx
+} = ChainCtx) ->
+    case marvin_dialogflow:detect_intent(
+        marvin_guild_context:guild_id(Ctx),
+        marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Message)),
+        marvin_pdu2_dispatch_message_create:content(Message)
+    ) of
+        {ok, DialogFlowResponse} ->
+            SendReq = marvin_rest_request:new(
+                marvin_rest_impl_message_create,
+                #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(Message)},
+                #{content => marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))}
+            ),
+            marvin_rest:request(SendReq),
+            {ok, ChainCtx};
+        {error, Reason} ->
+            {error, Reason}
+    end;
 
-find_command(PluginId, CommandId, [Command | Commands]) ->
-    case {marvin_plugin_command:plugin_id(Command), marvin_plugin_command:command(Command)} of
-        {PluginId, CommandId} ->
-            Command;
-        {_, _} ->
-            find_command(PluginId, CommandId, Commands)
-    end.
-
-
-
-send_dialogflow_response(OriginalMessage, DialogFlowResponse) ->
-    SendReq = marvin_rest_request:new(
-        marvin_rest_impl_message_create,
-        #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
-        #{content => marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))}
+handle_possible_command_run_command_or_response(#handle_possible_command{
+    detected_command = Command,
+    original_message = Message,
+    parsed_message_content = ParsedMessage,
+    ctx = Ctx
+} = ChainCtx) ->
+    marvin_guild_pubsub:publish(
+        marvin_guild_context:guild_id(Ctx),
+        Ctx,
+        marvin_guild_pubsub:type_command(),
+        marvin_plugin_command:short(Command),
+        #{
+            command => marvin_plugin_command:command(Command),
+            original_message => Message,
+            parsed_message_content => ParsedMessage
+        }
     ),
-    marvin_rest:request(SendReq),
-    ok.
+    {ok, ChainCtx}.
