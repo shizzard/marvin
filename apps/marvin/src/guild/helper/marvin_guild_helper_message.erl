@@ -42,6 +42,13 @@ w_message_create(Message, Ctx) ->
             erlang:spawn(fun() -> handle_possible_command(Message, Ctx) end),
             ok;
         {_, _} ->
+            marvin_guild_pubsub:publish(
+                marvin_guild_context:guild_id(Ctx),
+                Ctx,
+                marvin_guild_pubsub:type_message(),
+                marvin_guild_pubsub:action_create(),
+                Message
+            ),
             ok
     end.
 
