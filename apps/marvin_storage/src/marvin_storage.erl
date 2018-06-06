@@ -23,9 +23,12 @@ set_user_info(PluginId, GuildId, UserId, Data) ->
 
 get_user_info(PluginId, GuildId, UserId) ->
     poolboy:transaction(marvin_storage, fun(Worker) ->
-        mc_worker_api:find_one(
+        case mc_worker_api:find_one(
             Worker, GuildId, #{
                 <<"_id">> => UserId, <<"_plugin_id">> => PluginId
             }
-        )
+        ) of
+            undefined -> undefined;
+            #{<<"_data">> := Data} -> Data
+        end
     end).
