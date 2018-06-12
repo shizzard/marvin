@@ -2,7 +2,7 @@
 -compile({parse_transform, cloak_transform}).
 
 -export([
-    type_command/0, type_channel_voice/0, type_voice_state/0,
+    type_command/0, type_channel_voice/0, type_voice_state/0, type_message/0,
     action_create/0, action_update/0, action_delete/0
 ]).
 -export([channel/3, subscribe/3, publish/5]).
@@ -25,6 +25,7 @@
 type_command() -> <<"command">>.
 type_channel_voice() -> <<"channel_voice">>.
 type_voice_state() -> <<"voice_state">>.
+type_message() -> <<"message">>.
 
 action_create() -> <<"create">>.
 action_update() -> <<"update">>.
