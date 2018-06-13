@@ -86,8 +86,8 @@ when is_binary(Event) ->
         handle_call_incoming_event(Event, S0)
     catch Type:Reason ->
         marvin_log:error(
-            "[ISSUE-31] Shard '~p' got error ~p:~p while handling event ~p, ignoring",
-            [S0#state.shard_name, Type, Reason, Event]
+            "[ISSUE-31] Shard '~p' got error ~p:~p while handling event ~p, ignoring: ~p",
+            [S0#state.shard_name, Type, Reason, Event, erlang:get_stacktrace()]
         ),
         {reply, ok, S0}
     end;
@@ -212,6 +212,10 @@ handle_call_incoming_event(Event, S0) ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_channel_delete]),
                     handle_call_incoming_event_dispatch_channel_delete(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_guild_member_update ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_member_update]),
+                    handle_call_incoming_event_dispatch_guild_member_update(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_guild_members_chunk ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_members_chunk]),
@@ -564,6 +568,27 @@ handle_call_incoming_event_dispatch_channel_delete(Struct, S0) ->
             ),
             ok = marvin_guild:channel_delete(GuildId, Struct)
     end,
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_guild_member_update(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_guild_member_update(Struct, S0) ->
+    GuildId = marvin_pdu2_dispatch_guild_member_update:guild_id(Struct),
+    UserId = marvin_pdu2_dispatch_guild_member_update:user(Struct),
+    marvin_log:debug(
+        "Shard '~p' got member update for guild '~s'/user '~s'",
+        [S0#state.shard_name, GuildId, UserId]
+    ),
+    ok = marvin_guild:member_update(GuildId, Struct),
     {reply, ok, S0}.
 
 

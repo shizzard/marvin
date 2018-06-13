@@ -89,7 +89,6 @@ handle_possible_command_tokenize(#handle_possible_command{
         unicode:characters_to_list(marvin_pdu2_dispatch_message_create:content(Message))
     ) of
         {ok, Tokens, _} ->
-            marvin_log:info("Tokenized message: ~p", [Tokens]),
             {ok, ChainCtx#handle_possible_command{tokenized_message_content = Tokens}};
         {error, Reason} ->
             {error, Reason}
@@ -102,7 +101,6 @@ handle_possible_command_parse(#handle_possible_command{
 } = ChainCtx) ->
     case marvin_guild_command_parser:parse(Tokens) of
         {ok, ParsedMessage} ->
-            marvin_log:info("Parsed message: ~p", [ParsedMessage]),
             {ok, ChainCtx#handle_possible_command{
                 parsed_message_content = ParsedMessage
             }};

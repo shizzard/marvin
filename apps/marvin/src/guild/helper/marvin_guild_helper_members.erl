@@ -4,7 +4,9 @@
 
 -export([
     w_do_provision/2,
-    r_get_member_by_user_id/2
+    w_member_update/2,
+    r_get_member_by_user_id/2,
+    r_get_members_by_role/2
 ]).
 
 
@@ -23,6 +25,34 @@ w_do_provision(Members, Ctx) ->
         member = Member
     } || Member <- Members]),
     ok.
+
+
+
+w_member_update(Struct, Ctx) ->
+    UserId = marvin_pdu2_object_user:id(marvin_pdu2_dispatch_guild_member_update:user(Struct)),
+    case r_get_member_by_user_id(UserId, Ctx) of
+        undefined ->
+            marvin_log:error(
+                "Guild '~s' got unknown member update: ~p",
+                [marvin_guild_context:guild_id(Ctx), Struct]
+            ),
+            ok;
+        Member ->
+            ets:insert(marvin_guild_context:member_state(Ctx), #member{
+                member_id = UserId,
+                member = marvin_pdu2_object_member:update(Member, marvin_pdu2_dispatch_guild_member_update:export(Struct))
+            }),
+            ok
+    end.
+
+
+
+r_get_members_by_role(RoleId, Ctx) ->
+    [
+        Member#member.member || Member
+        <- ets:tab2list(marvin_guild_context:member_state(Ctx)),
+        lists:member(RoleId, marvin_pdu2_object_member:roles(Member#member.member))
+    ].
 
 
 

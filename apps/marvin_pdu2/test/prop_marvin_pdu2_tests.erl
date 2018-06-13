@@ -58,6 +58,7 @@ pdu_mods() ->
         marvin_pdu2_dispatch_channel_delete,
         marvin_pdu2_dispatch_presence_update,
         marvin_pdu2_dispatch_message_create,
+        marvin_pdu2_dispatch_guild_member_update,
         marvin_pdu2_dispatch_guild_members_chunk,
         marvin_pdu2_dispatch_typing_start,
         marvin_pdu2_dispatch_voice_state_update,
@@ -284,6 +285,14 @@ marvin_pdu2_dispatch_message_create() ->
         {pinned, marvin_pdu2_dispatch_message_create:pinned()},
         ?OPTIONAL({webhook_id, non_empty(proper_unicode:utf8(20))}),
         {type, marvin_pdu2_dispatch_message_create:type()}
+    ]).
+
+marvin_pdu2_dispatch_guild_member_update() ->
+    ?MAP([
+        {guild_id, non_empty(proper_unicode:utf8(20))},
+        {roles, list(non_empty(proper_unicode:utf8(20)))},
+        {user, marvin_pdu2_object_user()},
+        ?OPTIONAL({nick, ?NULLABLE(non_empty(proper_unicode:utf8(15)))})
     ]).
 
 marvin_pdu2_dispatch_guild_members_chunk() ->

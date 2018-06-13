@@ -11,7 +11,7 @@
     ratelimit_group :: atom(),
     method :: atom(),
     url :: binary(),
-    body :: binary() | []
+    body :: binary() | <<>>
 }).
 -type t() :: #?MODULE{}.
 -export_type([t/0]).
@@ -71,7 +71,7 @@ new(ReqImplModule, UrlParams, PduMap) ->
                 ratelimit_group = ReqImplModule:ratelimit_group(),
                 method = ReqImplModule:method(),
                 url = build_url(list_to_binary(ApiHost), list_to_binary(ApiPort), list_to_binary(ApiRootUrl), ReqImplModule:url_template(), UrlParams),
-                body = []
+                body = <<>>
             };
         PduMod ->
             #?MODULE{

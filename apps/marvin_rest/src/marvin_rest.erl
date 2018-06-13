@@ -23,7 +23,8 @@ request(Req) ->
             Headers = [
                 {<<"user-agent">>, get_header_user_agent()},
                 {<<"authorization">>, get_header_authorization()},
-                {<<"content-type">>, <<"application/json">>}
+                {<<"content-type">>, <<"application/json">>},
+                {<<"content-length">>, byte_size(marvin_rest_request:body(Req))}
             ],
             marvin_log:info(
                 "Request params: Ratelimit group: '~ts'; Method '~ts'; Url '~ts'; Headers ~p; Body '~ts'",

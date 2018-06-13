@@ -1,0 +1,18 @@
+{
+    "op": 0,
+    "d": {
+        "user": {
+            "username": "acc1to",
+            "id": "279344012228558849",
+            "discriminator": "1626",
+            "avatar": "ded696b466595850a4ca4f74a8599f37"
+        },
+        "roles": [
+            "399572963881386006"
+        ],
+        "nick": null,
+        "guild_id": "318325967602843658"
+    },
+    "s": 1337,
+    "t": "GUILD_MEMBER_UPDATE"
+}

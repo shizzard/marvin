@@ -10,4 +10,4 @@ method() -> put.
 
 pdu() -> undefined.
 
-url_template() -> <<"/guilds/{{guild.id}}/members/{{user.id}}/roles/{{role.id}}">>.
+url_template() -> <<"/guilds/{{guild_id}}/members/{{user_id}}/roles/{{role_id}}">>.

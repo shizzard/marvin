@@ -18,6 +18,7 @@
 -record(handle_info_award_gay_of_the_day, {
     active_users :: ets:tid(),
     guild_id :: marvin_pdu2:snowflake(),
+    role_id :: marvin_pdu2:snowflake(),
     awards_channel_id :: marvin_pdu2:snowflake(),
     awards_message_template :: unicode:unicode_binary(),
     awarded_user :: #active_user{} | undefined
@@ -139,16 +140,20 @@ seconds_to_desired_time(Hours, Minutes) ->
 
 handle_info_award_gay_of_the_day(S0) ->
     #{
+        <<"awards_role_id">> := RoleId,
         <<"awards_channel_id">> := ChannelId,
         <<"awards_message_template">> := MessageTemplate
     } = marvin_plugin_config:data(S0#state.config),
     case marvin_helper_chain:chain('marvin_plugin_gay_of_the_day:handle_info_award_gay_of_the_day', [
         fun handle_info_award_gay_of_the_day_select_awarded_user/1,
+        fun handle_info_award_gay_of_the_day_drop_role/1,
+        fun handle_info_award_gay_of_the_day_set_role/1,
         fun handle_info_award_gay_of_the_day_send_message/1,
         fun handle_info_award_gay_of_the_day_reset_ets_table/1,
         fun handle_info_award_gay_of_the_day_persist_award/1
     ], #handle_info_award_gay_of_the_day{
         guild_id = S0#state.guild_id,
+        role_id = RoleId,
         active_users = S0#state.active_users,
         awards_channel_id = ChannelId,
         awards_message_template = MessageTemplate
@@ -184,6 +189,50 @@ handle_info_award_gay_of_the_day_select_awarded_user(#handle_info_award_gay_of_t
                 awarded_user = lists:nth(rand:uniform(length(Users)), Users)
             }}
     end.
+
+
+
+handle_info_award_gay_of_the_day_drop_role(#handle_info_award_gay_of_the_day{
+    guild_id = GuildId, role_id = RoleId
+} = ChainCtx) ->
+    {ok, Ctx} = marvin_guild:get_context(GuildId),
+    case marvin_guild_helper_members:r_get_members_by_role(RoleId, Ctx) of
+        [] ->
+            ok;
+        Members ->
+            lists:map(fun(Member) ->
+                UserId = marvin_pdu2_object_user:id(marvin_pdu2_object_member:user(Member)),
+                Req = marvin_rest_request:new(
+                    marvin_rest_impl_guild_member_role_delete,
+                    #{
+                        <<"guild_id">> => GuildId,
+                        <<"user_id">> => UserId,
+                        <<"role_id">> => RoleId
+                    }, #{}
+                ),
+                Resp = marvin_rest:request(Req),
+                marvin_log:info("Response: ~p", [Resp])
+            end, Members)
+    end,
+    {ok, ChainCtx}.
+
+
+
+handle_info_award_gay_of_the_day_set_role(#handle_info_award_gay_of_the_day{
+    guild_id = GuildId, role_id = RoleId, awarded_user = #active_user{user = User}
+} = ChainCtx) ->
+    UserId = marvin_pdu2_object_user:id(User),
+    Req = marvin_rest_request:new(
+        marvin_rest_impl_guild_member_role_add,
+        #{
+            <<"guild_id">> => GuildId,
+            <<"user_id">> => UserId,
+            <<"role_id">> => RoleId
+        }, #{}
+    ),
+    Resp = marvin_rest:request(Req),
+    marvin_log:info("Response: ~p", [Resp]),
+    {ok, ChainCtx}.
 
 
 

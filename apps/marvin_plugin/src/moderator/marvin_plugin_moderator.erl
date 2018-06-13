@@ -11,6 +11,7 @@
 ]).
 
 -record(handle_info_guild_event_command_mute, {
+    guild_id :: marvin_pdu2:snowflake(),
     role_moderator :: marvin_pdu2:snowflake(),
     role_mute :: marvin_pdu2:snowflake(),
     channel_id :: marvin_pdu2:snowflake(),
@@ -18,7 +19,9 @@
     subjects :: [marvin_pdu2_object_member:t(), ...],
     subjects_muted :: [marvin_pdu2_object_member:t(), ...],
     duration :: pos_integer(),
-    event :: map()
+    event :: map(),
+    message :: unicode:unicode_binary(),
+    active_mutes :: ets:tid()
 }).
 
 -record(active_mute, {
@@ -33,8 +36,6 @@
     cleanup_timer :: timer:tref()
 }).
 -type state() :: #state{}.
-
--define(message_template_placeholder_, <<"{{}}">>).
 
 -define(cleanup_event(), {cleanup_event}).
 -define(cleanup_interval, 20).
@@ -159,7 +160,8 @@ handle_info_cleanup_event_maybe_mute_stop(#active_mute{
                 }, #{}
             ),
             Resp = marvin_rest:request(Req),
-            marvin_log:info("Response: ~p", [Resp]);
+            marvin_log:info("Response: ~p", [Resp]),
+            delete_mute(S0#state.active_mutes, UserId);
         false ->
             ok
     end,
@@ -172,7 +174,7 @@ handle_info_guild_event(Event, S0) ->
     ShortCommandMute = marvin_plugin_command:short(command_mute()),
     case {marvin_guild_pubsub:type(Event), marvin_guild_pubsub:action(Event)} of
         {TypeCommand, ShortCommandMute} ->
-            handle_info_guild_event_command_mute(Event, S0);
+            handle_info_guild_event_command_mute_prepare(Event, S0);
         {_Type, _Action} ->
             marvin_log:warn(
                 "Plugin '~s' for guild '~s' got unknown guild event: ~ts/~ts",
@@ -183,47 +185,65 @@ handle_info_guild_event(Event, S0) ->
 
 
 
-handle_info_guild_event_command_mute(Event, S0) ->
+handle_info_guild_event_command_mute_prepare(Event, S0) ->
     #{<<"role_mute">> := RoleMute} = marvin_plugin_config:data(S0#state.config),
+    GuildId = marvin_guild_context:guild_id(marvin_guild_pubsub:guild_context(Event)),
     RoleModerator = marvin_guild_context:role_moderator(marvin_guild_pubsub:guild_context(Event)),
     case marvin_helper_chain:chain(
-        'marvin_plugin_moderator:handle_info_guild_event_command_mute', [
-            fun handle_info_guild_event_command_mute_provision_context/1,
-            fun handle_info_guild_event_command_mute_ensure_caller_is_moderator/1,
-            fun handle_info_guild_event_command_mute_filter_already_muted_subjects/1,
-            fun handle_info_guild_event_command_mute_maybe_get_mute_duration/1
+        'marvin_plugin_moderator:handle_info_guild_event_command_mute_prepare', [
+            fun handle_info_guild_event_command_mute_prepare_provision_context/1,
+            fun handle_info_guild_event_command_mute_prepare_ensure_caller_is_moderator/1,
+            fun handle_info_guild_event_command_mute_prepare_filter_already_muted_subjects/1,
+            fun handle_info_guild_event_command_mute_prepare_maybe_get_mute_duration/1
         ], #handle_info_guild_event_command_mute{
-            event = Event, role_mute = RoleMute, role_moderator = RoleModerator
+            guild_id = GuildId,
+            event = Event,
+            role_mute = RoleMute,
+            role_moderator = RoleModerator,
+            active_mutes = S0#state.active_mutes
         }
     ) of
         {ok, ChainCtx} ->
-            marvin_log:info("command successful: ~p", [ChainCtx]);
-        {skip, {Reason, ChainCtx}} ->
-            marvin_log:info("command skip due to ~p: ~p", [Reason, ChainCtx]);
+            marvin_helper_chain:chain(
+                'marvin_plugin_moderator:handle_info_guild_event_command_mute_act', [
+                    fun handle_info_guild_event_command_mute_act_set_role/1,
+                    fun handle_info_guild_event_command_mute_act_send_message/1
+                ], ChainCtx#handle_info_guild_event_command_mute{
+                    message = <<"Готово."/utf8>>
+                }
+            ),
+            ok;
+        {skip, {no_subject_to_mute, ChainCtx}} ->
+            marvin_helper_chain:chain(
+                'marvin_plugin_moderator:handle_info_guild_event_command_mute_no_subjects', [
+                    fun handle_info_guild_event_command_mute_act_send_message/1
+                ], ChainCtx#handle_info_guild_event_command_mute{
+                    message = <<"Не понял. Кого?"/utf8>>
+                }
+            ),
+            ok;
+        {skip, {insufficient_permissions, ChainCtx}} ->
+            marvin_helper_chain:chain(
+                'marvin_plugin_moderator:handle_info_guild_event_command_mute_insufficient_permissions', [
+                    fun handle_info_guild_event_command_mute_act_send_message/1
+                ], ChainCtx#handle_info_guild_event_command_mute{
+                    message = <<"Ты не смеешь приказывать мне такое."/utf8>>
+                }
+            ),
+            ok;
         {error, Reason} ->
-            marvin_log:info("command error: ~p", [Reason])
+            marvin_log:error(
+                "Guild '~s' plugin '~s' failed mute command handling with reason ~p",
+                [S0#state.guild_id, ?MODULE, Reason]
+            ),
+            ok
     end,
-            % Req = marvin_rest_request:new(
-            %     marvin_rest_impl_guild_member_role_add,
-            %     #{
-            %         <<"guild_id">> => S0#state.guild_id,
-            %         <<"user_id">> => ActiveMute#active_mute.channel_id,
-            %         <<"role_id">> => RoleMute
-            %     }, #{}
-            % ),
-            % Resp = marvin_rest:request(Req),
-            % marvin_log:info("Response: ~p", [Resp]),
-            % insert_mute(S0#state.active_mutes, #active_mute{
-            %     channel_name = ChannelName,
-            %     origin_channel_id = marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
-            %     owner = marvin_pdu2_dispatch_message_create:author(OriginalMessage),
-            %     dialogflow_message_template = marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))
-            % }),
+
     {noreply, S0}.
 
 
 
-handle_info_guild_event_command_mute_provision_context(
+handle_info_guild_event_command_mute_prepare_provision_context(
     #handle_info_guild_event_command_mute{event = Event} = ChainCtx
 ) ->
     #{original_message := OriginalMessage} = marvin_guild_pubsub:payload(Event),
@@ -236,18 +256,16 @@ handle_info_guild_event_command_mute_provision_context(
         marvin_pdu2_object_user:id(Subject) || Subject
         <- marvin_pdu2_dispatch_message_create:mentions(OriginalMessage)
     ],
-    marvin_log:info("~p", [SubjectIds]),
     Subjects = [marvin_guild_helper_members:r_get_member_by_user_id(
         Id, marvin_guild_pubsub:guild_context(Event)
     ) || Id <- SubjectIds, Id /= marvin_guild_context:my_id(marvin_guild_pubsub:guild_context(Event))],
-    marvin_log:info("~p", [Subjects]),
     {ok, ChainCtx#handle_info_guild_event_command_mute{
         channel_id = ChannelId, caller = Caller, subjects = Subjects
     }}.
 
 
 
-handle_info_guild_event_command_mute_ensure_caller_is_moderator(
+handle_info_guild_event_command_mute_prepare_ensure_caller_is_moderator(
     #handle_info_guild_event_command_mute{
         caller = Caller, role_moderator = RoleModerator
     } = ChainCtx
@@ -256,12 +274,12 @@ handle_info_guild_event_command_mute_ensure_caller_is_moderator(
         true ->
             {ok, ChainCtx};
         false ->
-            {skip, {caller_is_not_moderator, ChainCtx}}
+            {skip, {insufficient_permissions, ChainCtx}}
     end.
 
 
 
-handle_info_guild_event_command_mute_filter_already_muted_subjects(
+handle_info_guild_event_command_mute_prepare_filter_already_muted_subjects(
     #handle_info_guild_event_command_mute{
         subjects = Subjects0, role_mute = RoleMute
     } = ChainCtx
@@ -286,46 +304,71 @@ handle_info_guild_event_command_mute_filter_already_muted_subjects(
 
 
 
-handle_info_guild_event_command_mute_maybe_get_mute_duration(
+handle_info_guild_event_command_mute_prepare_maybe_get_mute_duration(
     #handle_info_guild_event_command_mute{event = Event} = ChainCtx
 ) ->
     #{parsed_message_content := ParsedMessage} = marvin_guild_pubsub:payload(Event),
-    Duration = get_mute_duration(ParsedMessage),
-    {ok, ChainCtx#handle_info_guild_event_command_mute{duration = Duration}}.
-
-
-
-get_mute_duration(ParsedMessage) ->
-    case [Integer || Integer <- ParsedMessage, is_integer(Integer)] of
+    Duration = case [Integer || Integer <- ParsedMessage, is_integer(Integer)] of
         [] -> ?default_duration;
         List -> case hd(List) of
             Number when Number =< 0 -> ?default_duration;
             Number when Number >= ?max_duration -> ?max_duration;
             Number -> Number
         end
-    end.
+    end,
+    {ok, ChainCtx#handle_info_guild_event_command_mute{duration = Duration}}.
 
 
 
+handle_info_guild_event_command_mute_act_set_role(#handle_info_guild_event_command_mute{
+    guild_id = GuildId,
+    role_mute = RoleMute,
+    subjects = Subjects,
+    active_mutes = ActiveMutes,
+    duration = Duration
+} = ChainCtx) ->
+    lists:map(fun(Subject) ->
+        UserId = marvin_pdu2_object_user:id(marvin_pdu2_object_member:user(Subject)),
+        Req = marvin_rest_request:new(
+            marvin_rest_impl_guild_member_role_add,
+            #{
+                <<"guild_id">> => GuildId,
+                <<"user_id">> => UserId,
+                <<"role_id">> => RoleMute
+            }, #{}
+        ),
+        Resp = marvin_rest:request(Req),
+        marvin_log:info("Response: ~p", [Resp]),
+        ok = insert_mute(ActiveMutes, #active_mute{
+            user_id = UserId,
+            mute_till = marvin_helper_time:timestamp() + Duration * 60
+        })
+    end, Subjects),
+    {ok, ChainCtx}.
 
 
 
-% lookup_mute(Ets, ChannelName) ->
-%     case ets:lookup(Ets, ChannelName) of
-%         [Channel] ->
-%             {ok, Channel};
-%         [] ->
-%             {error, not_found}
-%     end.
+handle_info_guild_event_command_mute_act_send_message(#handle_info_guild_event_command_mute{
+    channel_id = ChannelId,
+    message = Message
+} = ChainCtx) ->
+    Req = marvin_rest_request:new(
+        marvin_rest_impl_message_create,
+        #{<<"channel_id">> => ChannelId},
+        #{content => Message}
+    ),
+    Resp = marvin_rest:request(Req),
+    marvin_log:info("Response: ~p", [Resp]),
+    {ok, ChainCtx}.
 
 
 
-% insert_mute(Ets, Channel) ->
-%     ets:insert(Ets, Channel),
-%     ok.
+insert_mute(Ets, Mute) ->
+    ets:insert(Ets, Mute),
+    ok.
 
 
 
-% delete_mute(Ets, ChannelName) ->
-%     ets:delete(Ets, ChannelName),
-%     ok.
+delete_mute(Ets, UserId) ->
+    ets:delete(Ets, UserId),
+    ok.

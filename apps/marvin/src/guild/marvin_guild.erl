@@ -6,7 +6,8 @@
 
 -export([
     get_context/1,
-    do_provision/2, do_provision_guild_members/2, presence_update/2, voice_state_update/2, message_create/2,
+    do_provision/2, do_provision_guild_members/2,
+    member_update/2, presence_update/2, voice_state_update/2, message_create/2,
     channel_create/2, channel_update/2, channel_delete/2,
     start_link/2, init/1,
     handle_call/3, handle_cast/2, handle_info/2,
@@ -16,6 +17,7 @@
 -define(get_context(), {get_context}).
 -define(do_provision(Struct), {do_provision, Struct}).
 -define(do_provision_guild_members(Struct), {do_provision_guild_members, Struct}).
+-define(member_update(Struct), {member_update, Struct}).
 -define(presence_update(Struct), {presence_update, Struct}).
 -define(voice_state_update(Struct), {voice_state_update, Struct}).
 -define(message_create(Struct), {message_create, Struct}).
@@ -52,6 +54,15 @@ get_context(GuildId) ->
 do_provision(GuildId, Struct) ->
     {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
     gen_server:call(GuildPid, ?do_provision(Struct)).
+
+
+
+-spec member_update(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_member_update:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+member_update(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?member_update(Struct)).
 
 
 
@@ -242,6 +253,11 @@ handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
 handle_call(?do_provision_guild_members(Struct), _GenReplyTo, S0) ->
     marvin_log:info("Guild '~s' is being provisioned with members", [S0#state.guild_id]),
     ok = marvin_guild_helper_members:w_do_provision(marvin_pdu2_dispatch_guild_members_chunk:members(Struct), context_from_state(S0)),
+    {reply, ok, S0};
+
+handle_call(?member_update(Struct), _GenReplyTo, S0) ->
+    marvin_log:debug("Guild '~s' got member update", [S0#state.guild_id]),
+    ok = marvin_guild_helper_members:w_member_update(Struct, context_from_state(S0)),
     {reply, ok, S0};
 
 handle_call(?presence_update(Struct), _GenReplyTo, S0) ->
