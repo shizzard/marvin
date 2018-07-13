@@ -1,0 +1,6 @@
+{"plugin_id":"marvin_plugin_gay_of_the_day","guild_id":"269209661973069825","data":{
+    "hours": 2, "minutes": 4,
+    "awards_role_id": "456261760509542402",
+    "awards_channel_id": "438089095630028800",
+    "awards_message_template": "Good news @everyone! Красавчиком дня сегодня становится {{user_mention}}."
+}}

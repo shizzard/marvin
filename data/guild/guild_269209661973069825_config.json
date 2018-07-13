@@ -1,0 +1,13 @@
+{
+    "guild_id":"269209661973069825",
+    "role_admin":"269213127835516929",
+    "role_moderator":"269213289978920960",
+    "enabled_plugins":[
+        "marvin_plugin_ping",
+        "marvin_plugin_voice_on_demand",
+        "marvin_plugin_fuzzy_nickname",
+        "marvin_plugin_help",
+        "marvin_plugin_gay_of_the_day",
+        "marvin_plugin_moderator"
+    ]
+}

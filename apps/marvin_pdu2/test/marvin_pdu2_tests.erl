@@ -5,7 +5,7 @@
 
 can_get_valid_parsed_pdu_test_() ->
     filelib:fold_files(
-        code:priv_dir(marvin_pdu2) ++ "/pdu",
+        code:priv_dir(marvin_pdu2) ++ "/test_cases/pdu",
         "marvin_pdu2_.*\\.json",
         false,
         fun(File, List) ->
@@ -28,7 +28,7 @@ can_get_valid_parsed_pdu_test_() ->
 
 can_get_valid_parsed_object_test_() ->
     filelib:fold_files(
-        code:priv_dir(marvin_pdu2) ++ "/object",
+        code:priv_dir(marvin_pdu2) ++ "/test_cases/object",
         "marvin_pdu2_.*\\.json",
         false,
         fun(File, List) ->
