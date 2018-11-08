@@ -136,6 +136,9 @@ cloak_validate(permission_overwrites, Value) when is_list(Value) ->
 cloak_validate(last_pin_timestamp, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
+cloak_validate(last_pin_timestamp, null) ->
+    {ok, undefined};
+
 cloak_validate(_, _) ->
     {error, invalid}.
 
