@@ -36,8 +36,8 @@ when is_integer(Value) andalso (
 cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
-cloak_validate(timestamps, #{<<"start">> := Value}) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
+cloak_validate(timestamps, Map) when is_map(Map) ->
+    {ok, Map};
 
 cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
