@@ -1,6 +1,7 @@
 -module(marvin_shard_session).
 -behaviour(gen_server).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -84,22 +85,27 @@ handle_call(?incoming_event(Event), _GenReplyTo, S0)
 when is_binary(Event) ->
     try
         handle_call_incoming_event(Event, S0)
-    catch Type:Reason ->
-        marvin_log:error(
-            "[ISSUE-31] Shard '~p' got error ~p:~p while handling event ~p, ignoring: ~p",
-            [S0#state.shard_name, Type, Reason, Event, erlang:get_stacktrace()]
-        ),
+    catch Type:Reason:Stacktrace ->
+        ?l_error(#{
+            text => "Shard got error while handling event, ignoring",
+            what => handle_call,
+            details => #{
+                shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                type => Type, reason => Reason, stacktrace => Stacktrace,
+                link => 'https://github.com/shizzard/marvin/issues/31'
+            }
+        }),
         {reply, ok, S0}
     end;
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -111,7 +117,7 @@ handle_info({'EXIT', ExitPid, ExitReason}, S0) ->
     handle_info_exit(ExitPid, ExitReason, S0);
 
 handle_info(Unexpected, S0) ->
-    marvin_log:warn("Unexpected info: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected info", what => handle_info, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -137,6 +143,13 @@ handle_info_start_connection(#state{
     shard_id = ShardId,
     wss_url = WssUrl
 } = S0) ->
+    ?l_debug(#{
+        text => "Shard is starting rx",
+        what => handle_info,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name
+        }
+    }),
     {ok, RxPid} = marvin_shard_sup:start_shard_rx(ShardId, self(), WssUrl),
     true = erlang:link(RxPid),
     {noreply, S0}.
@@ -150,7 +163,13 @@ handle_info_start_connection(#state{
     ).
 
 handle_call_report_operational(RxPid, TxPid, S0) ->
-    marvin_log:debug("Shard '~p' is in operational state", [S0#state.shard_name]),
+    ?l_debug(#{
+        text => "Shard is in operational state",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name
+        }
+    }),
     true = erlang:link(RxPid),
     {reply, ok, S0#state{
         rx_pid = RxPid,
@@ -166,10 +185,14 @@ handle_call_report_operational(RxPid, TxPid, S0) ->
     ).
 
 handle_call_incoming_event(Event, S0) ->
-    marvin_log:debug(
-        "Shard '~p' got incoming event (~p bytes)",
-        [S0#state.shard_name, byte_size(Event)]
-    ),
+    ?l_debug(#{
+        text => "Shard got incoming event",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            data_size => byte_size(Event)
+        }
+    }),
     ParseStartTime = erlang:monotonic_time(),
     case marvin_pdu2:parse(Event) of
         {ok, Struct} ->
@@ -247,7 +270,14 @@ handle_call_incoming_event(Event, S0) ->
                 [S0#state.shard_name, error],
                 erlang:monotonic_time() - ParseStartTime
             ),
-            marvin_log:error("Incoming PDU failed to parse due to reason: ~p, ignoring", [Reason]),
+            ?l_error(#{
+                text => "Shard failed to parse incoming PDU",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    type => error, reason => Reason
+                }
+            }),
             {reply, ok, S0}
     end.
 
@@ -264,10 +294,14 @@ handle_call_incoming_event(Event, S0) ->
 handle_info_exit(ExitPid, ExitReason, #state{
     rx_pid = ExitPid
 } = S0) ->
-    marvin_log:alert(
-        "Shard '~p' reporting connection down with reason '~p', restarting",
-        [S0#state.shard_name, ExitReason]
-    ),
+    ?l_alert(#{
+        text => "Shard connection down, restarting",
+        what => handle_info,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            reason => ExitReason
+        }
+    }),
     self() ! ?start_connection(),
     {noreply, S0#state{
         rx_pid = undefined,
@@ -277,10 +311,14 @@ handle_info_exit(ExitPid, ExitReason, #state{
 handle_info_exit(ExitPid, ExitReason, #state{
     heart_pid = ExitPid
 } = S0) ->
-    marvin_log:alert(
-        "Shard '~p' reporting heart down with reason '~p'",
-        [S0#state.shard_name, ExitReason]
-    ),
+    ?l_alert(#{
+        text => "Shard heart down, restarting",
+        what => handle_info,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            reason => ExitReason
+        }
+    }),
     {noreply, S0#state{
         rx_pid = undefined,
         tx_pid = undefined
@@ -289,10 +327,14 @@ handle_info_exit(ExitPid, ExitReason, #state{
 handle_info_exit(ExitPid, ExitReason, #state{
     rx_pid = RxLinkRef
 } = S0) when RxLinkRef =/= ExitPid ->
-    marvin_log:alert(
-        "Shard '~p' got unexpected 'EXIT' with reason '~p' from ~p, shutting down ",
-        [S0#state.shard_name, ExitReason, ExitPid]
-    ),
+    ?l_alert(#{
+        text => "Shard got unexpected 'EXIT', terminating",
+        what => handle_info,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            pid => ExitPid, reason => ExitReason
+        }
+    }),
     {stop, shutdown, S0}.
 
 
@@ -312,35 +354,24 @@ handle_info_exit(ExitPid, ExitReason, #state{
 
 handle_call_incoming_event_hello(Struct, #state{
     shard_id = ShardId,
-    tx_pid = TxPid,
-    session_id = undefined
-} = S0) ->
-    HeartbeatInterval = marvin_pdu2_hello:heartbeat_interval(Struct),
-    marvin_log:info(
-        "Shard '~p' starting heartbeat with interval '~p'",
-        [S0#state.shard_name, HeartbeatInterval]
-    ),
-    {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
-    erlang:link(HeartPid),
-    {ok, IdentifyEvent} = get_pdu_identify(S0),
-    ok = marvin_shard_tx:send_sync(TxPid, IdentifyEvent),
-    {reply, ok, S0#state{
-        heart_pid = HeartPid
-    }};
-
-handle_call_incoming_event_hello(Struct, #state{
-    shard_id = ShardId,
     tx_pid = TxPid
 } = S0) ->
     HeartbeatInterval = marvin_pdu2_hello:heartbeat_interval(Struct),
-    marvin_log:info(
-        "Shard '~p' starting heartbeat with interval '~p'",
-        [S0#state.shard_name, HeartbeatInterval]
-    ),
+    ?l_info(#{
+        text => "Shard is starting heart",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            interval => HeartbeatInterval
+        }
+    }),
     {ok, HeartPid} = marvin_shard_sup:start_shard_heart(ShardId, TxPid, HeartbeatInterval),
     erlang:link(HeartPid),
-    {ok, ResumeEvent} = get_pdu_resume(S0),
-    ok = marvin_shard_tx:send_sync(TxPid, ResumeEvent),
+    {ok, Event} = case S0#state.session_id of
+        undefined -> get_pdu_identify(S0);
+        _SessionId -> get_pdu_resume(S0)
+    end,
+    ok = marvin_shard_tx:send_sync(TxPid, Event),
     {reply, ok, S0#state{
         heart_pid = HeartPid
     }}.
@@ -354,10 +385,13 @@ handle_call_incoming_event_hello(Struct, #state{
     marvin_helper_type:gen_server_stop_simple(State :: state()).
 
 handle_call_incoming_event_invalid_session(_Struct, S0) ->
-    marvin_log:error(
-        "Shard '~p' invalid session event, performing controlled crash",
-        [S0#state.shard_name]
-    ),
+    ?l_info(#{
+        text => "Shard got 'invalid session' event, terminate",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name
+        }
+    }),
     {stop, invalid_session, ok, S0}.
 
 
@@ -374,10 +408,14 @@ handle_call_incoming_event_invalid_session(_Struct, S0) ->
 handle_call_incoming_event_dispatch_resumed(_Struct, #state{
     session_id = SessionId
 } = S0) ->
-    marvin_log:info(
-        "Shard '~p' successfully resumed session '~s'",
-        [S0#state.shard_name, SessionId]
-    ),
+    ?l_info(#{
+        text => "Shard resumed session",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            session_id => SessionId
+        }
+    }),
     {reply, ok, S0#state{}}.
 
 
@@ -394,7 +432,13 @@ handle_call_incoming_event_dispatch_resumed(_Struct, #state{
 handle_call_incoming_event_heartbeat_ack(_Struct, #state{
     heart_pid = HeartPid
 } = S0) ->
-    marvin_log:debug("Shard '~p' got heartbeat ack", [S0#state.shard_name]),
+    ?l_debug(#{
+        text => "Shard got heartbeat ack",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name
+        }
+    }),
     marvin_shard_heart:heartbeat_ack(HeartPid),
     {reply, ok, S0}.
 
@@ -415,10 +459,14 @@ handle_call_incoming_event_dispatch_ready(Struct, #state{
     SessionId = marvin_pdu2_dispatch_ready:session_id(Struct),
     SelfUser = marvin_pdu2_dispatch_ready:user(Struct),
     SelfUserId = marvin_pdu2_object_user:id(SelfUser),
-    marvin_log:info(
-        "Shard '~p' is ready with session '~s'",
-        [S0#state.shard_name, SessionId]
-    ),
+    ?l_info(#{
+        text => "Shard is ready",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            session_id => SessionId
+        }
+    }),
     {ok, StatusUpdate} = get_pdu_status_update(S0),
     ok = marvin_shard_tx:send_sync(TxPid, StatusUpdate),
     _ = marvin_helper_chain:chain(
@@ -479,10 +527,14 @@ handle_call_incoming_event_dispatch_guild_create(Struct, #state{
 } = S0) ->
     SelfUserId = marvin_pdu2_object_user:id(SelfUser),
     GuildId = marvin_pdu2_dispatch_guild_create:id(Struct),
-    marvin_log:info(
-        "Shard '~p' is provisioning the guild '~s'",
-        [S0#state.shard_name, GuildId]
-    ),
+    ?l_info(#{
+        text => "Shard is provisioning the guild",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            self_user_id => SelfUserId, guild_id => GuildId
+        }
+    }),
     marvin_guild_monitor:maybe_start_guild(GuildId, SelfUserId),
     {ok, RequestGuildMembers} = get_pdu_request_guild_members(GuildId, S0),
     ok = marvin_shard_tx:send_sync(TxPid, RequestGuildMembers),
@@ -503,15 +555,28 @@ handle_call_incoming_event_dispatch_guild_create(Struct, #state{
 handle_call_incoming_event_dispatch_channel_create(Struct, S0) ->
     case marvin_pdu2_dispatch_channel_create:guild_id(Struct) of
         undefined ->
-            marvin_log:debug(
-                "Shard '~p' is got channel of type '~p' create event for unknown guild",
-                [S0#state.shard_name, marvin_pdu2_dispatch_channel_create:type(Struct)]
-            );
+            ?l_warning(#{
+                text => "Shard got 'channel create' event for unknown guild",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    channel_id => marvin_pdu2_dispatch_channel_create:id(Struct),
+                    channel_type => marvin_pdu2_dispatch_channel_create:type(Struct),
+                    channel_name => marvin_pdu2_dispatch_channel_create:name(Struct)
+                }
+            });
         GuildId ->
-            marvin_log:debug(
-                "Shard '~p' is got channel create event for guild '~s'",
-                [S0#state.shard_name, GuildId]
-            ),
+            ?l_debug(#{
+                text => "Shard got 'channel create' event",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    guild_id => GuildId,
+                    channel_id => marvin_pdu2_dispatch_channel_create:id(Struct),
+                    channel_type => marvin_pdu2_dispatch_channel_create:type(Struct),
+                    channel_name => marvin_pdu2_dispatch_channel_create:name(Struct)
+                }
+            }),
             ok = marvin_guild:channel_create(GuildId, Struct)
     end,
     {reply, ok, S0}.
@@ -530,15 +595,28 @@ handle_call_incoming_event_dispatch_channel_create(Struct, S0) ->
 handle_call_incoming_event_dispatch_channel_update(Struct, S0) ->
     case marvin_pdu2_dispatch_channel_update:guild_id(Struct) of
         undefined ->
-            marvin_log:debug(
-                "Shard '~p' is got channel of type '~p' update event for unknown guild",
-                [S0#state.shard_name, marvin_pdu2_dispatch_channel_update:type(Struct)]
-            );
+            ?l_warning(#{
+                text => "Shard got 'channel update' event for unknown guild",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    channel_id => marvin_pdu2_dispatch_channel_update:id(Struct),
+                    channel_type => marvin_pdu2_dispatch_channel_update:type(Struct),
+                    channel_name => marvin_pdu2_dispatch_channel_update:name(Struct)
+                }
+            });
         GuildId ->
-            marvin_log:debug(
-                "Shard '~p' is got channel update event for guild '~s'",
-                [S0#state.shard_name, GuildId]
-            ),
+            ?l_debug(#{
+                text => "Shard got 'channel create' event",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    guild_id => GuildId,
+                    channel_id => marvin_pdu2_dispatch_channel_update:id(Struct),
+                    channel_type => marvin_pdu2_dispatch_channel_update:type(Struct),
+                    channel_name => marvin_pdu2_dispatch_channel_update:name(Struct)
+                }
+            }),
             ok = marvin_guild:channel_update(GuildId, Struct)
     end,
     {reply, ok, S0}.
@@ -557,15 +635,28 @@ handle_call_incoming_event_dispatch_channel_update(Struct, S0) ->
 handle_call_incoming_event_dispatch_channel_delete(Struct, S0) ->
     case marvin_pdu2_dispatch_channel_delete:guild_id(Struct) of
         undefined ->
-            marvin_log:debug(
-                "Shard '~p' is got channel of type '~p' delete event for unknown guild",
-                [S0#state.shard_name, marvin_pdu2_dispatch_channel_delete:type(Struct)]
-            );
+            ?l_warning(#{
+                text => "Shard got 'channel delete' event for unknown guild",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    channel_id => marvin_pdu2_dispatch_channel_delete:id(Struct),
+                    channel_type => marvin_pdu2_dispatch_channel_delete:type(Struct),
+                    channel_name => marvin_pdu2_dispatch_channel_delete:name(Struct)
+                }
+            });
         GuildId ->
-            marvin_log:debug(
-                "Shard '~p' is got channel delete event for guild '~s'",
-                [S0#state.shard_name, GuildId]
-            ),
+            ?l_debug(#{
+                text => "Shard got 'channel delete' event",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    guild_id => GuildId,
+                    channel_id => marvin_pdu2_dispatch_channel_delete:id(Struct),
+                    channel_type => marvin_pdu2_dispatch_channel_delete:type(Struct),
+                    channel_name => marvin_pdu2_dispatch_channel_delete:name(Struct)
+                }
+            }),
             ok = marvin_guild:channel_delete(GuildId, Struct)
     end,
     {reply, ok, S0}.
@@ -583,11 +674,17 @@ handle_call_incoming_event_dispatch_channel_delete(Struct, S0) ->
 
 handle_call_incoming_event_dispatch_guild_member_update(Struct, S0) ->
     GuildId = marvin_pdu2_dispatch_guild_member_update:guild_id(Struct),
-    UserId = marvin_pdu2_dispatch_guild_member_update:user(Struct),
-    marvin_log:debug(
-        "Shard '~p' got member update for guild '~s'/user '~s'",
-        [S0#state.shard_name, GuildId, UserId]
-    ),
+    User = marvin_pdu2_dispatch_guild_member_update:user(Struct),
+    UserId = marvin_pdu2_object_user:id(User),
+    UserName = marvin_pdu2_object_user:username(User),
+    ?l_debug(#{
+        text => "Shard got 'member update' event",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            guild_id => GuildId, user_id => UserId, user_name => UserName
+        }
+    }),
     ok = marvin_guild:member_update(GuildId, Struct),
     {reply, ok, S0}.
 
@@ -604,10 +701,14 @@ handle_call_incoming_event_dispatch_guild_member_update(Struct, S0) ->
 
 handle_call_incoming_event_dispatch_guild_members_chunk(Struct, S0) ->
     GuildId = marvin_pdu2_dispatch_guild_members_chunk:guild_id(Struct),
-    marvin_log:info(
-        "Shard '~p' is provisioning members for the guild '~s'",
-        [S0#state.shard_name, GuildId]
-    ),
+    ?l_info(#{
+        text => "Shard is provisioning members",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            guild_id => GuildId
+        }
+    }),
     ok = marvin_guild:do_provision_guild_members(GuildId, Struct),
     {reply, ok, S0}.
 
@@ -625,10 +726,14 @@ handle_call_incoming_event_dispatch_guild_members_chunk(Struct, S0) ->
 handle_call_incoming_event_dispatch_presence_update(Struct, S0) ->
     GuildId = marvin_pdu2_dispatch_presence_update:guild_id(Struct),
     UserId = marvin_pdu2_dispatch_presence_update:user(Struct),
-    marvin_log:debug(
-        "Shard '~p' got presence update for guild '~s'/user '~s'",
-        [S0#state.shard_name, GuildId, UserId]
-    ),
+    ?l_debug(#{
+        text => "Shard got 'presence update' event",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            guild_id => GuildId, user_id => UserId
+        }
+    }),
     ok = marvin_guild:presence_update(GuildId, Struct),
     {reply, ok, S0}.
 
@@ -658,18 +763,27 @@ handle_call_incoming_event_dispatch_typing_start(_Struct, S0) ->
     ).
 
 handle_call_incoming_event_dispatch_voice_state_update(Struct, S0) ->
-    UserId = marvin_pdu2_dispatch_voice_state_update:user_id(Struct),
     case marvin_pdu2_dispatch_voice_state_update:guild_id(Struct) of
         undefined ->
-            marvin_log:info(
-                "Shard '~p' got voice state update for undefined guild/user '~s'",
-                [S0#state.shard_name, UserId]
-            );
+            ?l_warning(#{
+                text => "Shard got 'voice state update' event for unknown guild",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    channel_id => marvin_pdu2_dispatch_voice_state_update:channel_id(Struct),
+                    user_id => marvin_pdu2_dispatch_voice_state_update:user_id(Struct)
+                }
+            });
         GuildId ->
-            marvin_log:debug(
-                "Shard '~p' got voice state update for guild '~s'/user '~s'",
-                [S0#state.shard_name, GuildId, UserId]
-            ),
+            ?l_debug(#{
+                text => "Shard got 'voice state update' event",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    channel_id => marvin_pdu2_dispatch_voice_state_update:channel_id(Struct),
+                    user_id => marvin_pdu2_dispatch_voice_state_update:user_id(Struct)
+                }
+            }),
             ok = marvin_guild:voice_state_update(GuildId, Struct)
     end,
     {reply, ok, S0}.
@@ -689,16 +803,27 @@ handle_call_incoming_event_dispatch_message_create(Struct, S0) ->
     ChannelId = marvin_pdu2_dispatch_message_create:channel_id(Struct),
     case marvin_channel_registry:lookup(ChannelId) of
         {ok, GuildId} ->
-            marvin_log:debug(
-                "Shard '~p' got message create for guild '~s'/channel '~s'",
-                [S0#state.shard_name, GuildId, ChannelId]
-            ),
+            ?l_debug(#{
+                text => "Shard got 'message create' event",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    guild_id => GuildId,
+                    channel_id => marvin_pdu2_dispatch_message_create:channel_id(Struct),
+                    user_id => marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Struct))
+                }
+            }),
             ok = marvin_guild:message_create(GuildId, Struct);
         {error, not_found} ->
-            marvin_log:debug(
-                "Shard '~p' got message create for unknown channel '~s'",
-                [S0#state.shard_name, ChannelId]
-            )
+            ?l_warning(#{
+                text => "Shard got 'message create' event for unknown guild",
+                what => handle_call,
+                details => #{
+                    shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+                    channel_id => marvin_pdu2_dispatch_message_create:channel_id(Struct),
+                    user_id => marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Struct))
+                }
+            })
     end,
     {reply, ok, S0}.
 
@@ -714,10 +839,14 @@ handle_call_incoming_event_dispatch_message_create(Struct, S0) ->
     ).
 
 handle_call_incoming_event_generic(Struct, S0) ->
-    marvin_log:warn(
-        "Shard '~p' got unhandled pdu of type '~p'",
-        [S0#state.shard_name, marvin_pdu2:prot_mod(Struct)]
-    ),
+    ?l_warning(#{
+        text => "Shard got unhandled event",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            event_type => marvin_pdu2:prot_mod(Struct)
+        }
+    }),
     {reply, ok, S0}.
 
 
@@ -740,10 +869,14 @@ get_pdu_identify(#state{
     {ok, LibraryVersion} = marvin_config:get(marvin, [system_info, library_version]),
     Library = <<LibraryName/binary, "/", LibraryVersion/binary>>,
     Shard = [ShardId, marvin_gateway_meta:get_shards_count()],
-    marvin_log:debug(
-        "Shard '~p' is identifying against discord server as '~s'",
-        [S0#state.shard_name, Library]
-    ),
+    ?l_info(#{
+        text => "Shard is about to identify against discord server",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            library => Library
+        }
+    }),
     marvin_pdu2:render(marvin_pdu2_identify:new(#{
         token => Token,
         compress => Compress,
@@ -764,10 +897,14 @@ get_pdu_identify(#state{
     marvin_helper_type:ok_return(OkRet :: binary()).
 
 get_pdu_request_guild_members(GuildId, S0) ->
-    marvin_log:debug(
-        "Shard '~p' is requesting guild members for guild '~s'",
-        [S0#state.shard_name, GuildId]
-    ),
+    ?l_debug(#{
+        text => "Shard is requesting guild members",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            guild_id => GuildId
+        }
+    }),
     marvin_pdu2:render(marvin_pdu2_request_guild_members:new(#{
         guild_id => GuildId,
         query => <<>>,
@@ -796,10 +933,14 @@ get_pdu_resume(#state{
     last_seq = LastSeq
 } = S0) ->
     {ok, Token} = marvin_config:get(marvin, [discord, token]),
-    marvin_log:debug(
-        "Shard '~p' is resuming session '~s'",
-        [S0#state.shard_name, SessionId]
-    ),
+    ?l_info(#{
+        text => "Shard is about to resume session",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            session_id => SessionId
+        }
+    }),
     marvin_pdu2:render(marvin_pdu2_resume:new(#{
         token => Token, session_id => SessionId, seq => LastSeq
     })).

@@ -1,5 +1,7 @@
 -module(marvin_helper_chain).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
+
 -export([chain/3, unwrap2/1]).
 
 -type chain_name() :: atom().
@@ -34,20 +36,35 @@ when is_function(Fun, 1) ->
         {ok, NewValue} ->
             chain(Name, Funs, NewValue);
         {skip, Reason} ->
-            marvin_log:info(
-                "Chain ~p skipped fun#-~p ~p execution with reason ~p",
-                [Name, length(Funs) + 1, Fun, Reason]),
+            ?l_info(#{
+                text => "Chain skipped function execution",
+                what => skip,
+                details => #{
+                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason,
+                    initial_value => InitialValue
+                }
+            }),
             {skip, Reason};
         {error, Reason} ->
-            marvin_log:info(
-                "Chain ~p failed fun#-~p ~p execution with reason ~p",
-                [Name, length(Funs) + 1, Fun, Reason]),
+            ?l_error(#{
+                text => "Chain dropped function execution with error",
+                what => error,
+                details => #{
+                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason,
+                    initial_value => InitialValue
+                }
+            }),
             {error, Reason}
     catch
-        _Type:Reason ->
-            marvin_log:error(
-                "Chain ~p crashed fun#-~p ~p execution with reason ~p when initial value was ~p~n~p",
-                [Name, length(Funs) + 1, Fun, Reason, InitialValue, erlang:get_stacktrace()]),
+        _Type:Reason:Stacktrace ->
+            ?l_error(#{
+                text => "Chain dropped function execution with crash",
+                what => error,
+                details => #{
+                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason,
+                    initial_value => InitialValue, stacktrace => Stacktrace
+                }
+            }),
             {error, Reason}
     end.
 

@@ -1,6 +1,7 @@
 -module(marvin_plugin_help).
 -behaviour(gen_server).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -56,13 +57,13 @@ init([GuildId]) ->
 
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -71,11 +72,15 @@ handle_info(Info, S0) ->
     try
         handle_info_guild_event(Info, S0)
     catch
-        T:R ->
-            marvin_log:error(
-                "Guild '~s' plugin '~s' failed guild event hadling with reason ~p:~p. ~p",
-                [S0#state.guild_id, ?MODULE, T, R, erlang:get_stacktrace()]
-            ),
+        T:R:S ->
+            ?l_error(#{
+                text => "Plugin failed guild event handling",
+                what => handle_info, result => fail,
+                details => #{
+                    type => T, reason => R, stacktrace => S,
+                    guild_id => S0#state.guild_id
+                }
+            }),
             {noreply, S0}
     end.
 
@@ -101,21 +106,21 @@ handle_info_guild_event(Event, S0) ->
     case {marvin_guild_pubsub:type(Event), marvin_guild_pubsub:action(Event)} of
         {TypeCommand, ShortCommandChangeNickname} ->
             handle_info_guild_event_get_help(Event, S0);
-        {_Type, _Action} ->
-            marvin_log:warn(
-                "Plugin '~s' for guild '~s' got unknown guild event: ~ts/~ts",
-                [?MODULE, S0#state.guild_id, _Type, _Action]
-            ),
+        {Type, Action} ->
+            ?l_warning(#{
+                text => "Plugin got unknown guild event",
+                what => handle_info, result => fail,
+                details => #{
+                    pubsub_type => Type, pubsub_action => Action,
+                    guild_id => S0#state.guild_id
+                }
+            }),
             {noreply, S0}
     end.
 
 
 
 handle_info_guild_event_get_help(Event, S0) ->
-    marvin_log:info(
-        "Plugin '~s' for guild '~s' is sending help",
-        [?MODULE, S0#state.guild_id]
-    ),
     {ok, GuildCtx} = marvin_guild:get_context(S0#state.guild_id),
     MyNickname = marvin_pdu2_object_member:get_nickname(
         marvin_guild_helper_members:r_get_member_by_user_id(
@@ -145,8 +150,7 @@ handle_info_guild_event_get_help(Event, S0) ->
             }
         }
     ),
-    Resp = marvin_rest:request(Req),
-    marvin_log:info("Response: ~p", [Resp]),
+    _ = marvin_rest:request(Req),
     {noreply, S0}.
 
 

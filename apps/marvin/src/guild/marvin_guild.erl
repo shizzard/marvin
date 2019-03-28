@@ -1,7 +1,7 @@
 -module(marvin_guild).
 -behaviour(gen_server).
-
 -include("marvin_guild_state.hrl").
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -179,13 +179,27 @@ init([GuildId, MyId]) ->
 
 maybe_start_plugins(GuildId, PluginsList) ->
     maps:from_list(lists:map(fun(PluginId) ->
-        marvin_log:info("Guild '~s' is starting plugin ~p", [GuildId, PluginId]),
         case marvin_plugin_sup:start_plugin(binary_to_atom(PluginId, latin1), GuildId) of
             {ok, Pid} ->
+                ?l_info(#{
+                    text => "Guild plugin start",
+                    what => guild_plugin_start, result => ok,
+                    details => #{guild_id => GuildId, plugin_id => PluginId, plugin_pid => Pid}
+                }),
                 {PluginId, Pid};
             {error, {already_started, Pid}} ->
+                ?l_notice(#{
+                    text => "Guild plugin start",
+                    what => guild_plugin_start, result => already_started,
+                    details => #{guild_id => GuildId, plugin_id => PluginId, plugin_pid => Pid}
+                }),
                 {PluginId, Pid};
             {error, Reason} ->
+                ?l_error(#{
+                    text => "Guild plugin start failed",
+                    what => guild_plugin_start, result => failure,
+                    details => #{guild_id => GuildId, plugin_id => PluginId, reason => Reason}
+                }),
                 error(Reason)
         end
     end, PluginsList)).
@@ -200,6 +214,7 @@ collect_commands(PluginsList) ->
 
 
 context_from_state(#state{
+    name = Name,
     my_id = MyId,
     guild_id = GuildId,
     owner_id = OwnerId,
@@ -216,6 +231,7 @@ context_from_state(#state{
     voice_state = VoiceState
 }) ->
     marvin_guild_context:new(#{
+        name => Name,
         my_id => MyId,
         guild_id => GuildId,
         owner_id => OwnerId,
@@ -238,8 +254,10 @@ handle_call(?get_context(), _GenReplyTo, S0) ->
     {reply, {ok, context_from_state(S0)}, S0};
 
 handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
-    marvin_log:info("Guild '~s' is being provisioned", [S0#state.guild_id]),
-    S1 = S0#state{owner_id = marvin_pdu2_dispatch_guild_create:owner_id(Struct)},
+    S1 = S0#state{
+        name = marvin_pdu2_dispatch_guild_create:name(Struct),
+        owner_id = marvin_pdu2_dispatch_guild_create:owner_id(Struct)
+    },
     Ctx = context_from_state(S1),
     ok = marvin_guild_helper_presence:w_do_provision(marvin_pdu2_dispatch_guild_create:presences(Struct), Ctx),
     ok = marvin_guild_helper_role:w_do_provision(marvin_pdu2_dispatch_guild_create:roles(Struct), Ctx),
@@ -248,71 +266,135 @@ handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
     ok = marvin_guild_helper_channel_voice:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
     ok = marvin_guild_helper_channel_category:w_do_provision(marvin_pdu2_dispatch_guild_create:channels(Struct), Ctx),
     ok = marvin_guild_helper_voice_state:w_do_provision(marvin_pdu2_dispatch_guild_create:voice_states(Struct), Ctx),
+    ?l_info(#{
+        text => "Guild provisioning",
+        what => handle_call_do_provision_guild, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            presences_count => length(marvin_pdu2_dispatch_guild_create:presences(Struct)),
+            roles_count => length(marvin_pdu2_dispatch_guild_create:roles(Struct)),
+            emojis_count => length(marvin_pdu2_dispatch_guild_create:emojis(Struct)),
+            channels_text_count => length(marvin_pdu2_dispatch_guild_create:channels(Struct)),
+            channels_voice_count => length(marvin_pdu2_dispatch_guild_create:channels(Struct)),
+            channels_category_count => length(marvin_pdu2_dispatch_guild_create:channels(Struct)),
+            voice_states_count => length(marvin_pdu2_dispatch_guild_create:voice_states(Struct))
+        }
+    }),
     {reply, ok, S1};
 
 handle_call(?do_provision_guild_members(Struct), _GenReplyTo, S0) ->
-    marvin_log:info("Guild '~s' is being provisioned with members", [S0#state.guild_id]),
     ok = marvin_guild_helper_members:w_do_provision(marvin_pdu2_dispatch_guild_members_chunk:members(Struct), context_from_state(S0)),
+    ?l_info(#{
+        text => "Guild provisioning (members)",
+        what => handle_call_do_provision_guild_members, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            members_count => length(marvin_pdu2_dispatch_guild_members_chunk:members(Struct))
+        }
+    }),
     {reply, ok, S0};
 
 handle_call(?member_update(Struct), _GenReplyTo, S0) ->
-    marvin_log:debug("Guild '~s' got member update", [S0#state.guild_id]),
     ok = marvin_guild_helper_members:w_member_update(Struct, context_from_state(S0)),
+    ?l_debug(#{
+        text => "Guild member update",
+        what => handle_call_member_update, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            user_id => marvin_pdu2_object_user:id(marvin_pdu2_dispatch_guild_member_update:user(Struct))
+        }
+    }),
     {reply, ok, S0};
 
 handle_call(?presence_update(Struct), _GenReplyTo, S0) ->
-    marvin_log:debug("Guild '~s' got presence update", [S0#state.guild_id]),
     ok = marvin_guild_helper_presence:w_presence_update(Struct, context_from_state(S0)),
+    ?l_debug(#{
+        text => "Guild presence update",
+        what => handle_call_presence_update, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            user_id => marvin_pdu2_dispatch_presence_update:user(Struct),
+            status => marvin_pdu2_dispatch_presence_update:status(Struct)
+        }
+    }),
     {reply, ok, S0};
 
 handle_call(?voice_state_update(Struct), _GenReplyTo, S0) ->
-    marvin_log:debug("Guild '~s' got voice state update", [S0#state.guild_id]),
     ok = marvin_guild_helper_voice_state:w_voice_state_update(Struct, context_from_state(S0)),
+    ?l_debug(#{
+        text => "Guild voice state update",
+        what => handle_call_voice_state_update, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            user_id => marvin_pdu2_dispatch_voice_state_update:user_id(Struct),
+            channel_id => marvin_pdu2_dispatch_voice_state_update:channel_id(Struct)
+        }
+    }),
     {reply, ok, S0};
 
 handle_call(?message_create(Struct), _GenReplyTo, S0) ->
-    marvin_log:debug("Guild '~s' got message", [S0#state.guild_id]),
     ok = marvin_guild_helper_message:w_message_create(Struct, context_from_state(S0)),
+    ?l_debug(#{
+        text => "Guild message create",
+        what => handle_call_message_create, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            channel_id => marvin_pdu2_dispatch_message_create:channel_id(Struct),
+            user_id => marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Struct))
+        }
+    }),
     {reply, ok, S0};
 
 handle_call(?channel_create(Struct), _GenReplyTo, S0) ->
-    marvin_log:debug("Guild '~s' got channel create event", [S0#state.guild_id]),
     Ctx = context_from_state(S0),
     ok = marvin_guild_helper_channel_text:w_channel_create(Struct, Ctx),
     ok = marvin_guild_helper_channel_voice:w_channel_create(Struct, Ctx),
     ok = marvin_guild_helper_channel_category:w_channel_create(Struct, Ctx),
+    ?l_debug(#{
+        text => "Guild channel create",
+        what => handle_call_channel_create, result => ok,
+        details => #{guild_id => S0#state.guild_id, channel_id => marvin_pdu2_dispatch_channel_create:id(Struct)}
+    }),
     {reply, ok, S0};
 
 handle_call(?channel_update(Struct), _GenReplyTo, S0) ->
-    marvin_log:debug("Guild '~s' got channel update event", [S0#state.guild_id]),
     Ctx = context_from_state(S0),
     ok = marvin_guild_helper_channel_text:w_channel_update(Struct, Ctx),
     ok = marvin_guild_helper_channel_voice:w_channel_update(Struct, Ctx),
     ok = marvin_guild_helper_channel_category:w_channel_update(Struct, Ctx),
+    ?l_debug(#{
+        text => "Guild channel update",
+        what => handle_call_channel_update, result => ok,
+        details => #{guild_id => S0#state.guild_id, channel_id => marvin_pdu2_dispatch_channel_update:id(Struct)}
+    }),
     {reply, ok, S0};
 
 handle_call(?channel_delete(Struct), _GenReplyTo, S0) ->
-    marvin_log:debug("Guild '~s' got channel delete event", [S0#state.guild_id]),
     Ctx = context_from_state(S0),
     ok = marvin_guild_helper_channel_text:w_channel_delete(Struct, Ctx),
     ok = marvin_guild_helper_channel_voice:w_channel_delete(Struct, Ctx),
     ok = marvin_guild_helper_channel_category:w_channel_delete(Struct, Ctx),
+    ?l_debug(#{
+        text => "Guild channel delete",
+        what => handle_call_channel_delete, result => ok,
+        details => #{guild_id => S0#state.guild_id, channel_id => marvin_pdu2_dispatch_channel_delete:id(Struct)}
+    }),
     {reply, ok, S0};
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
 
 handle_info(Unexpected, S0) ->
-    marvin_log:warn("Unexpected info: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected info", what => handle_info, details => Unexpected}),
     {noreply, S0}.
 
 

@@ -1,6 +1,6 @@
 -module(marvin_guild_helper_channel_category).
-
 -include("marvin_guild_state.hrl").
+-include_lib("marvin_log/include/marvin_log.hrl").
 
 -export([
     w_do_provision/2, w_channel_create/2,
@@ -21,7 +21,15 @@ w_do_provision(Channels, Ctx) ->
         Channel || Channel <- Channels,
         marvin_pdu2_object_channel:channel_type_guild_category() == marvin_pdu2_object_channel:type(Channel)
     ],
-    marvin_log:info("Guild '~s' categories: ~p total", [marvin_guild_context:guild_id(Ctx), length(Categories)]),
+    ?l_info(#{
+        text => "Guild categories provisioned",
+        what => channel_provision, result => ok,
+        details => #{
+            guild_id => marvin_guild_context:guild_id(Ctx),
+            total => length(Categories),
+            channel_type => category
+        }
+    }),
     lists:foreach(fun(Channel) -> set_channel_category(Channel, Ctx) end, Categories),
     ok.
 
@@ -36,10 +44,15 @@ w_channel_create(ChannelEvent, Ctx) ->
         marvin_pdu2_dispatch_channel_create:channel_type_guild_category()
     } of
         {_Same, _Same} ->
-            marvin_log:info(
-                "Guild '~s' got new category '~s'",
-                [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_create:id(ChannelEvent)
-            ]),
+            ?l_info(#{
+                text => "Guild got new category",
+                what => channel_create, result => ok,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    channel_id => marvin_pdu2_dispatch_channel_create:id(ChannelEvent),
+                    channel_type => category
+                }
+            }),
             Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_create:export(ChannelEvent)),
             set_channel_category(Channel, Ctx),
             ok;
@@ -58,10 +71,15 @@ w_channel_update(ChannelEvent, Ctx) ->
         marvin_pdu2_dispatch_channel_update:channel_type_guild_category()
     } of
         {_Same, _Same} ->
-            marvin_log:info(
-                "Guild '~s' got updated category '~s'",
-                [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_update:id(ChannelEvent)
-            ]),
+            ?l_info(#{
+                text => "Guild got updated category",
+                what => channel_update, result => ok,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    channel_id => marvin_pdu2_dispatch_channel_update:id(ChannelEvent),
+                    channel_type => category
+                }
+            }),
             Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_update:export(ChannelEvent)),
             set_channel_category(Channel, Ctx),
             ok;
@@ -80,10 +98,15 @@ w_channel_delete(ChannelEvent, Ctx) ->
         marvin_pdu2_dispatch_channel_delete:channel_type_guild_category()
     } of
         {_Same, _Same} ->
-            marvin_log:info(
-                "Guild '~s' lost category '~s'",
-                [marvin_guild_context:guild_id(Ctx), marvin_pdu2_dispatch_channel_delete:id(ChannelEvent)
-            ]),
+            ?l_info(#{
+                text => "Guild lost category",
+                what => channel_delete, result => ok,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    channel_id => marvin_pdu2_dispatch_channel_delete:id(ChannelEvent),
+                    channel_type => category
+                }
+            }),
             Channel = marvin_pdu2_object_channel:new(marvin_pdu2_dispatch_channel_delete:export(ChannelEvent)),
             delete_channel_category(Channel, Ctx),
             ok;

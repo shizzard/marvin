@@ -60,9 +60,9 @@ run-release:
 	MARVIN_STORAGE_DB_POOL_SIZE=10 \
 	MARVIN_STORAGE_DB_POOL_OVERFLOW=10 \
 	MARVIN_STORAGE_DB_NAME=marvin \
-	MARVIN_STORAGE_DB_HOST=192.168.99.100 \
+	MARVIN_STORAGE_DB_HOST=localhost \
 	MARVIN_STORAGE_DB_PORT=27017 \
 	_build/default/rel/marvin/bin/marvin console
 
 run-logtail:
-	tail -F _build/default/rel/marvin/log/debug.log
+	multitail -CS marvin _build/default/rel/marvin/log/lgr_info.log.1 _build/default/rel/marvin/log/lgr_error.log.1

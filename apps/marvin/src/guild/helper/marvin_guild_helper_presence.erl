@@ -1,6 +1,6 @@
 -module(marvin_guild_helper_presence).
-
 -include("marvin_guild_state.hrl").
+-include_lib("marvin_log/include/marvin_log.hrl").
 
 -export([
     w_do_provision/2,
@@ -18,7 +18,14 @@
     marvin_helper_type:ok_return().
 
 w_do_provision(Presences, Ctx) ->
-    marvin_log:info("Guild '~s' presences: ~p total", [marvin_guild_context:guild_id(Ctx), length(Presences)]),
+    ?l_debug(#{
+        text => "Guild presences provisioned",
+        what => presence_provision, result => ok,
+        details => #{
+            guild_id => marvin_guild_context:guild_id(Ctx),
+            total => length(Presences)
+        }
+    }),
     lists:foldl(fun w_do_provision_fold/2, Ctx, Presences),
     do_report_presence_state(Ctx),
     ok.
@@ -32,6 +39,16 @@ w_presence_update(Presence, Ctx) ->
     UserId = marvin_pdu2_dispatch_presence_update:user(Presence),
     Status = marvin_pdu2_dispatch_presence_update:status(Presence),
     OldStatus = r_get_member_status(UserId, Ctx),
+    ?l_debug(#{
+        text => "Guild presence updated",
+        what => presence_update, result => ok,
+        details => #{
+            guild_id => marvin_guild_context:guild_id(Ctx),
+            user_id => UserId,
+            old_status => OldStatus,
+            new_status => Status
+        }
+    }),
     do_update_member_presence(UserId, OldStatus, Status, Ctx),
     do_report_presence_state(Ctx),
     ok.

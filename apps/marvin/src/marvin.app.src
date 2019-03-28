@@ -4,6 +4,6 @@
     {registered, []},
     {mod, {marvin_app, []}},
     {applications, [
-        kernel, stdlib, gun
+        kernel, stdlib, marvin_log, gun
     ]}
  ]}.

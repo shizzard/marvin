@@ -1,6 +1,6 @@
 -module(marvin_guild_helper_voice_state).
-
 -include("marvin_guild_state.hrl").
+-include_lib("marvin_log/include/marvin_log.hrl").
 
 -export([
     w_do_provision/2,
@@ -19,13 +19,20 @@
     Ret :: marvin_helper_type:ok_return().
 
 w_do_provision(VoiceStates, Ctx) ->
+    ?l_debug(#{
+        text => "Guild voice states provisioned",
+        what => voice_state_provision, result => ok,
+        details => #{
+            guild_id => marvin_guild_context:guild_id(Ctx),
+            total => length(VoiceStates)
+        }
+    }),
     [
         ets:insert(marvin_guild_context:voice_state(Ctx), #voice_state{
             user_id = marvin_pdu2_object_voice_state:user_id(VoiceState),
             channel_id = marvin_pdu2_object_voice_state:channel_id(VoiceState)
         }) || VoiceState <- VoiceStates
     ],
-    marvin_log:info("Guild '~s' voice states: ~p total", [marvin_guild_context:guild_id(Ctx), length(VoiceStates)]),
     ok.
 
 
@@ -39,22 +46,41 @@ w_voice_state_update(VoiceStateUpdate, Ctx) ->
     OldChannelId = r_get_participant_channel(UserId, Ctx),
     case {OldChannelId, ChannelId} of
         {undefined, ChannelId} ->
-            marvin_log:debug(
-                "Guild '~s' voice channel: user '~s' joined to channel '~s'",
-                [marvin_guild_context:guild_id(Ctx), UserId, ChannelId]
-            ),
+            ?l_debug(#{
+                text => "Guild voice state update",
+                what => voice_state_update, result => ok,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    user_id => UserId,
+                    channel_id => ChannelId,
+                    kind => join
+                }
+            }),
             ets:insert(marvin_guild_context:voice_state(Ctx), #voice_state{user_id = UserId, channel_id = ChannelId});
         {OldChannelId, undefined} ->
-            marvin_log:debug(
-                "Guild '~s' voice channel: user '~s' left channel '~s'",
-                [marvin_guild_context:guild_id(Ctx), UserId, OldChannelId]
-            ),
+            ?l_debug(#{
+                text => "Guild voice state update",
+                what => voice_state_update, result => ok,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    user_id => UserId,
+                    channel_id => OldChannelId,
+                    kind => leave
+                }
+            }),
             ets:delete(marvin_guild_context:voice_state(Ctx), UserId);
         {OldChannelId, ChannelId} ->
-            marvin_log:debug(
-                "Guild '~s' voice channel: user '~s' moved from channel '~s' to channel '~s'",
-                [marvin_guild_context:guild_id(Ctx), UserId, OldChannelId, ChannelId]
-            ),
+            ?l_debug(#{
+                text => "Guild voice state update",
+                what => voice_state_update, result => ok,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    user_id => UserId,
+                    from_channel_id => OldChannelId,
+                    channel_id => ChannelId,
+                    kind => move
+                }
+            }),
             ets:insert(marvin_guild_context:voice_state(Ctx), #voice_state{user_id = UserId, channel_id = ChannelId})
     end,
     marvin_guild_pubsub:publish(

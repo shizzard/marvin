@@ -1,6 +1,6 @@
 -module(marvin_guild_helper_emoji).
-
 -include("marvin_guild_state.hrl").
+-include_lib("marvin_log/include/marvin_log.hrl").
 
 -export([w_do_provision/2]).
 
@@ -14,7 +14,14 @@
     marvin_helper_type:ok_return().
 
 w_do_provision(Emojis, Ctx) ->
-    marvin_log:info("Guild '~s' emojis: ~p total", [marvin_guild_context:guild_id(Ctx), length(Emojis)]),
+    ?l_debug(#{
+        text => "Guild emojis provisioned",
+        what => emoji_provision, result => ok,
+        details => #{
+            guild_id => marvin_guild_context:guild_id(Ctx),
+            total => length(Emojis)
+        }
+    }),
     ets:insert(marvin_guild_context:emoji_state(Ctx), [#emoji{
         emoji_id = marvin_pdu2_object_emoji:id(Emoji),
         emoji = Emoji

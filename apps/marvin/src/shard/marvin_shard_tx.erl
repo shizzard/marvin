@@ -1,6 +1,7 @@
 -module(marvin_shard_tx).
 -behaviour(gen_server).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -72,7 +73,7 @@ handle_call(?send_event(Event), _GenReplyTo, S0) ->
     handle_call_send_event(Event, S0);
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
@@ -81,13 +82,13 @@ handle_cast(?send_event(Event), S0) ->
     handle_cast_send_event(Event, S0);
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
 
 handle_info(Unexpected, S0) ->
-    marvin_log:warn("Unexpected info: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected info", what => handle_info, details => Unexpected}),
     {noreply, S0}.
 
 

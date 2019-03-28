@@ -1,6 +1,8 @@
 -module(marvin_pdu2).
 -compile({parse_transform, cloak_transform}).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
+
 -record(?MODULE, {
     op :: operation(),
     d = #{} :: data(),
@@ -288,7 +290,13 @@ cloak_validate_struct_construct_data_safe_temp(Mod, Data) ->
             spawn(fun() ->
                 {ok, LogDir} = marvin_config:get(lager, log_root),
                 Filename = filename:join([LogDir, io_lib:format("dump_~p_~p.json", [Mod, marvin_helper_time:timestamp()])]),
-                marvin_log:warn("Failed to construct internal of mod '~p', dumping to '~s'.", [Mod, Filename]),
+                ?l_warning(#{
+                    text => "Unexpected cast",
+                    what => cloak_validate_struct,
+                    details => #{
+                        mod => Mod, dump_to => Filename
+                    }
+                }),
                 file:write_file(Filename, jiffy:encode(Data))
             end),
             #{}

@@ -3,6 +3,6 @@
     {vsn, "0.0.1"},
     {registered, []},
     {mod, {marvin_rest_app, []}},
-    {applications, [kernel, stdlib, lager]},
+    {applications, [kernel, stdlib]},
     {env, []}
 ]}.

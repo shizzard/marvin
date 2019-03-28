@@ -2,13 +2,26 @@
 -include("marvin_guild_state.hrl").
 
 -export([
-    dump_channel_categories/1, dump_channel_text/1, dump_channel_voice/1,
+    dump_guilds/0, dump_channel_categories/1, dump_channel_text/1, dump_channel_voice/1,
     dump_members/1, dump_roles/1
 ]).
 
 
 
 %% Interface
+
+
+
+dump_guilds() ->
+    {ok, Ids} = marvin_guild_monitor:get_all_guild_ids(),
+    lists:map(fun(Id) ->
+        {ok, Ctx} = marvin_guild:get_context(Id),
+        io:format("'~ts' '~ts'~n", [
+            marvin_guild_context:guild_id(Ctx),
+            marvin_guild_context:name(Ctx)
+        ])
+    end, Ids),
+    ok.
 
 
 

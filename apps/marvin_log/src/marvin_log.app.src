@@ -2,6 +2,6 @@
     {description, "Marvin log"},
     {vsn, "0.0.1"},
     {registered, []},
-    {applications, [kernel, stdlib, lager]},
+    {applications, [kernel, stdlib]},
     {env, []}
 ]}.

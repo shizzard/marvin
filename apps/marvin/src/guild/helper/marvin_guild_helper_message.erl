@@ -1,13 +1,10 @@
 -module(marvin_guild_helper_message).
-
 -include("marvin_guild_state.hrl").
+-include_lib("marvin_log/include/marvin_log.hrl").
 
 -export([
     w_message_create/2
 ]).
-
--define(lower_score_mark, 0.15).
--define(debug_hotword, <<"%debug%">>).
 
 
 
@@ -74,10 +71,15 @@ handle_possible_command(Message, Ctx) ->
         {ok, _ChainCtx} ->
             ok;
         {error, Reason} ->
-            marvin_log:error(
-                "Guild '~s' failed to parse possible command with reason '~p'",
-                [marvin_guild_context:guild_id(Ctx), Reason]
-            )
+            ?l_error(#{
+                text => "Guild handle_possible_command failure",
+                what => handle_possible_command, result => failure,
+                details => #{
+                    error => Reason,
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    original_message => marvin_pdu2_dispatch_message_create:content(Message)
+                }
+            })
     end.
 
 
@@ -115,13 +117,14 @@ handle_possible_command_maybe_detect(#handle_possible_command{
     ctx = Ctx
 } = ChainCtx) ->
     Words = [Part || Part <- ParsedMessage, not is_integer(Part), not is_tuple(Part)],
-    marvin_log:info("~p", [Words]),
     Commands = marvin_guild_context:commands(Ctx),
     case lists:foldl(fun
-        (Command, undefined) ->
-            case lists:any(fun(Keyword) -> lists:member(Keyword, Words) end, marvin_plugin_command:keywords(Command)) of
-                true -> Command;
-                false -> undefined
+        (FoldCommand, undefined) ->
+            case lists:any(fun(Keyword) -> lists:member(Keyword, Words) end, marvin_plugin_command:keywords(FoldCommand)) of
+                true ->
+                    FoldCommand;
+                false ->
+                    undefined
             end;
         (_Command, Ret) ->
             Ret
@@ -129,6 +132,15 @@ handle_possible_command_maybe_detect(#handle_possible_command{
         undefined ->
             {ok, ChainCtx};
         Command ->
+            ?l_notice(#{
+                text => "Guild handle_possible_command command detected",
+                what => handle_possible_command, result => ok,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    plugin => marvin_plugin_command:plugin_id(Command),
+                    command => marvin_plugin_command:command(Command)
+                }
+            }),
             {ok, ChainCtx#handle_possible_command{detected_command = Command}}
     end.
 

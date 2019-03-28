@@ -1,6 +1,8 @@
 -module(marvin_plugin_config).
 -compile({parse_transform, cloak_transform}).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
+
 -export([load/2, save/1, export/1]).
 
 -record(?MODULE, {
@@ -43,10 +45,15 @@ load(PluginId, GuildId) ->
             {error, Reason} -> throw({read_failed, Reason})
         end
     catch CatchType:CatchReason ->
-        marvin_log:error(
-            "Plugin '~s' config for guild '~s' ('~s') read failed with reason '~p:~p', generating new config",
-            [PluginId, GuildId, ConfigFilename, CatchType, CatchReason]
-        ),
+        ?l_error(#{
+            text => "Plugin config read failed, generating new one",
+            what => load,
+            details => #{
+                type => CatchType, reason => CatchReason,
+                plugin_id => PluginId, guild_id => GuildId,
+                filename => ConfigFilename
+            }
+        }),
         Config = new(#{guild_id => GuildId, plugin_id => PluginId, data => #{}}),
         save(Config),
         {ok, Config}
@@ -64,10 +71,15 @@ save(Config) ->
             {error, Reason} -> throw({write_failed, Reason})
         end
     catch CatchType:CatchReason ->
-        marvin_log:error(
-            "Plugin '~s' config for guild '~s' ('~s') write failed with reason '~p:~p'",
-            [plugin_id(Config), guild_id(Config), ConfigFilename, CatchType, CatchReason]
-        ),
+        ?l_error(#{
+            text => "Plugin config write failed",
+            what => load,
+            details => #{
+                type => CatchType, reason => CatchReason,
+                plugin_id => plugin_id(Config), guild_id => guild_id(Config),
+                filename => ConfigFilename
+            }
+        }),
         ok
     end.
 
