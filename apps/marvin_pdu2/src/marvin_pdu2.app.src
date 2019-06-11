@@ -2,6 +2,6 @@
     {description, "Marvin PDUs v2"},
     {vsn, "0.0.1"},
     {registered, []},
-    {applications, [kernel, stdlib]},
+    {applications, [kernel, stdlib, marvin_log]},
     {env, []}
 ]}.

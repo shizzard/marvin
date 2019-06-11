@@ -1,6 +1,7 @@
 -module(marvin_shard_heart).
 -behaviour(gen_server).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -84,13 +85,13 @@ handle_call(?heartbeat_ack(), _GenReplyTo, S0) ->
     handle_call_heartbeat_ack(S0);
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -99,7 +100,7 @@ handle_info(?do_beat(), S0) ->
     handle_info_do_beat(S0);
 
 handle_info(Unexpected, S0) ->
-    marvin_log:warn("Unexpected info: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected info", what => handle_info, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -127,7 +128,11 @@ handle_info_do_beat(#state{
     last_seq = LastSeq
 } = S0) ->
     {ok, Event} = marvin_pdu2:render(marvin_pdu2_heartbeat:new(#{plain_value => LastSeq})),
-    marvin_log:debug("Shard '~p' now heartbeats", [S0#state.shard_name]),
+    ?l_debug(#{
+        text => "Shard heartbeat",
+        what => heartbeat,
+        details => #{shard_id => S0#state.shard_id, shard_name => S0#state.shard_name}
+    }),
     ok = marvin_shard_tx:send_sync(TxPid, Event),
     {ok, TRef} = schedule_beat(HeartbeatInterval),
     {noreply, S0#state{
@@ -146,10 +151,11 @@ handle_info_do_beat(#state{
 handle_call_bump_seq(Seq, #state{
     last_seq = PrevSeq
 } = S0) ->
-    ((Seq - 1) == PrevSeq) orelse marvin_log:warn(
-        "Shard '~p' got invalid sequences: ~p -> ~p",
-        [S0#state.shard_name, PrevSeq, Seq]
-    ),
+    ((Seq - 1) == PrevSeq) orelse ?l_warning(#{
+        text => "Invalid heartbeat sequence",
+        what => bump_seq,
+        details => #{seq => Seq, prev_seq => PrevSeq}
+    }),
     {reply, ok, S0#state{last_seq = Seq}}.
 
 
@@ -161,7 +167,11 @@ handle_call_bump_seq(Seq, #state{
     ).
 
 handle_call_heartbeat_ack(S0) ->
-    marvin_log:debug("Shard '~p' got heartbeat ack", [S0#state.shard_name]),
+    ?l_debug(#{
+        text => "Shard heartbeat ack",
+        what => heartbeat_ack,
+        details => #{shard_id => S0#state.shard_id, shard_name => S0#state.shard_name}
+    }),
     {reply, ok, S0#state{
         waiting_for_ack = false
     }}.

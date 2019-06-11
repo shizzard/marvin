@@ -1,8 +1,31 @@
 -module(marvin_log).
 -marvin_mod(marvin_log).
+-include_lib("kernel/include/logger.hrl").
 
--compile({no_auto_import, [error/2]}).
--export([debug/2, info/2, notice/2, warn/2, error/2, crit/2, alert/2, emerg/2]).
+-export([log_map/1, log_meta/1, target/2, http_req_map/1, http_ret_map/1]).
+
+-define(default_log, #{
+    what => 'NONE',
+    text => 'NONE',
+    result => 'NONE',
+    details => 'NONE'
+}).
+
+-define(default_meta, #{
+    id => uuid:uuid_to_string(uuid:get_v4_urandom()),
+    in => 'NONE'
+}).
+
+-define(default_http_req, #{
+    method => 'NONE',
+    path => 'NONE',
+    size => 'NONE'
+}).
+
+-define(default_http_ret, #{
+    code => 'NONE',
+    path => 'NONE'
+}).
 
 
 
@@ -10,64 +33,40 @@
 
 
 
--spec debug(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
+-spec log_map(InMap :: map()) ->
+    Ret :: map().
 
-debug(Format, Args) ->
-    lager:log(debug, self(), Format, Args).
-
-
-
--spec info(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
-
-info(Format, Args) ->
-    lager:log(info, self(), Format, Args).
+log_map(InMap) ->
+    maps:merge(?default_log, InMap).
 
 
 
--spec notice(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
+-spec log_meta(InMap :: map()) ->
+    Ret :: map().
 
-notice(Format, Args) ->
-    lager:log(notice, self(), Format, Args).
-
-
-
--spec warn(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
-
-warn(Format, Args) ->
-    lager:log(warning, self(), Format, Args).
+log_meta(InMap) ->
+    maps:merge(?default_meta, InMap).
 
 
 
--spec error(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
+-spec target(Host :: binary(), Port :: pos_integer()) ->
+    Ret :: map().
 
-error(Format, Args) ->
-    lager:log(error, self(), Format, Args).
-
-
-
--spec crit(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
-
-crit(Format, Args) ->
-    lager:log(critical, self(), Format, Args).
+target(Host, Port) ->
+    #{host => Host, port => Port}.
 
 
 
--spec alert(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
+-spec http_ret_map(InMap :: map()) ->
+    Ret :: map().
 
-alert(Format, Args) ->
-    lager:log(alert, self(), Format, Args).
+http_ret_map(InMap) ->
+    maps:merge(?default_http_ret, InMap).
 
 
 
--spec emerg(Format :: string(), Args :: [term()]) ->
-    marvin_helper_type:generic_return(ErrorRet :: lager_not_running).
+-spec http_req_map(InMap :: map()) ->
+    Ret :: map().
 
-emerg(Format, Args) ->
-    lager:log(emergency, self(), Format, Args).
+http_req_map(InMap) ->
+    maps:merge(?default_http_req, InMap).

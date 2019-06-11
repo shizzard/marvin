@@ -1,6 +1,7 @@
 -module(marvin_plugin_ping).
 -behaviour(gen_server).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -61,13 +62,13 @@ init([GuildId]) ->
 
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -76,11 +77,15 @@ handle_info(Info, S0) ->
     try
         handle_info_guild_event(Info, S0)
     catch
-        T:R ->
-            marvin_log:error(
-                "Guild '~s' plugin '~s' failed guild event hadling with reason ~p:~p",
-                [S0#state.guild_id, ?MODULE, T, R]
-            ),
+        T:R:S ->
+            ?l_error(#{
+                text => "Plugin failed guild event handling",
+                what => handle_info, result => fail,
+                details => #{
+                    type => T, reason => R, stacktrace => S,
+                    guild_id => S0#state.guild_id
+                }
+            }),
             {noreply, S0}
     end.
 
@@ -103,8 +108,7 @@ handle_info_guild_event(Event, S0) ->
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{content => get_status_message()}
     ),
-    Resp = marvin_rest:request(Req),
-    marvin_log:info("Response: ~p", [Resp]),
+    _ = marvin_rest:request(Req),
     {noreply, S0}.
 
 

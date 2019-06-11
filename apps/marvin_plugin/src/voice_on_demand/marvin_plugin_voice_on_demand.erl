@@ -1,6 +1,7 @@
 -module(marvin_plugin_voice_on_demand).
 -behaviour(gen_server).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -99,13 +100,13 @@ init([GuildId]) ->
 
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -121,11 +122,15 @@ handle_info(Info, S0) ->
     try
         handle_info_guild_event(Info, S0)
     catch
-        T:R ->
-            marvin_log:error(
-                "Guild '~s' plugin '~s' failed guild event hadling with reason ~p:~p. ~p",
-                [S0#state.guild_id, ?MODULE, T, R, erlang:get_stacktrace()]
-            ),
+        T:R:S ->
+            ?l_error(#{
+                text => "Plugin failed guild event handling",
+                what => handle_info, result => fail,
+                details => #{
+                    type => T, reason => R, stacktrace => S,
+                    guild_id => S0#state.guild_id
+                }
+            }),
             {noreply, S0}
     end.
 
@@ -178,17 +183,21 @@ handle_info_cleanup_event(S0) ->
 
 
 handle_info_cleanup_event_channel_delete(ActiveChannel, S0) ->
-    marvin_log:info(
-        "Plugin '~s' for guild '~s' is deleting voice channel '~ts'",
-        [?MODULE, S0#state.guild_id, ActiveChannel#active_channel.channel_name]
-    ),
+    ?l_info(#{
+        text => "Plugin is deleting voice channel",
+        what => handle_info,
+        details => #{
+            guild_id => S0#state.guild_id,
+            channel_id => ActiveChannel#active_channel.channel_id,
+            channel_name => ActiveChannel#active_channel.channel_name
+        }
+    }),
     Req = marvin_rest_request:new(
         marvin_rest_impl_guild_channel_delete,
         #{<<"channel_id">> => ActiveChannel#active_channel.channel_id},
         #{}
     ),
-    Resp = marvin_rest:request(Req),
-    marvin_log:info("Response: ~p", [Resp]),
+    _ = marvin_rest:request(Req),
     S0.
 
 
@@ -206,11 +215,15 @@ handle_info_guild_event(Event, S0) ->
             handle_info_guild_event_channel_voice_create(Event, S0);
         {TypeChannelVoice, ActionDelete} ->
             handle_info_guild_event_channel_voice_delete(Event, S0);
-        {_Type, _Action} ->
-            marvin_log:warn(
-                "Plugin '~s' for guild '~s' got unknown guild event: ~ts/~ts",
-                [?MODULE, S0#state.guild_id, _Type, _Action]
-            ),
+        {Type, Action} ->
+            ?l_warning(#{
+                text => "Plugin got unknown guild event",
+                what => handle_info, result => fail,
+                details => #{
+                    pubsub_type => Type, pubsub_action => Action,
+                    guild_id => S0#state.guild_id
+                }
+            }),
             {noreply, S0}
     end.
 
@@ -223,10 +236,14 @@ handle_info_guild_event_command_create(Event, S0) ->
         parsed_message_content := ParsedMessage
     } = marvin_guild_pubsub:payload(Event),
     ChannelName = generate_channel_name(S0#state.adjectives, S0#state.nouns, S0#state.active_channels),
-    marvin_log:info(
-        "Plugin '~s' for guild '~s' is creating voice channel '~ts'",
-        [?MODULE, S0#state.guild_id, ChannelName]
-    ),
+    ?l_info(#{
+        text => "Plugin is creating voice channel",
+        what => handle_info,
+        details => #{
+            guild_id => S0#state.guild_id,
+            channel_name => ChannelName
+        }
+    }),
     UserLimit = maybe_get_user_limit(ParsedMessage),
     Req = marvin_rest_request:new(
         marvin_rest_impl_guild_channel_create,
@@ -243,8 +260,7 @@ handle_info_guild_event_command_create(Event, S0) ->
             )
         }
     ),
-    Resp = marvin_rest:request(Req),
-    marvin_log:info("Response: ~p", [Resp]),
+    _ = marvin_rest:request(Req),
     insert_channel(S0#state.active_channels, #active_channel{
         channel_name = ChannelName,
         origin_channel_id = marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
@@ -259,10 +275,15 @@ handle_info_guild_event_channel_voice_create(Event, S0) ->
     ChannelName = marvin_pdu2_dispatch_channel_create:name(OriginalEvent),
     case lookup_channel(S0#state.active_channels, ChannelName) of
         {ok, ActiveChannel} ->
-            marvin_log:info(
-                "Plugin '~s' for guild '~s' got voice channel '~ts' created",
-                [?MODULE, S0#state.guild_id, ChannelName]
-            ),
+            ?l_info(#{
+                text => "Plugin voice channel created",
+                what => handle_info,
+                details => #{
+                    guild_id => S0#state.guild_id,
+                    channel_id => ActiveChannel#active_channel.channel_id,
+                    channel_name => ActiveChannel#active_channel.channel_name
+                }
+            }),
             insert_channel(S0#state.active_channels, ActiveChannel#active_channel{
                 channel_id = marvin_pdu2_dispatch_channel_create:id(OriginalEvent)
             }),
@@ -271,8 +292,7 @@ handle_info_guild_event_channel_voice_create(Event, S0) ->
                 #{<<"channel_id">> => ActiveChannel#active_channel.origin_channel_id},
                 #{content => <<"Канал '"/utf8, (ActiveChannel#active_channel.channel_name)/binary, "' готов."/utf8>>}
             ),
-            Resp = marvin_rest:request(Req),
-            marvin_log:info("Response: ~p", [Resp]),
+            _ = marvin_rest:request(Req),
             {noreply, S0};
         {error, not_found} ->
             {noreply, S0}
@@ -284,11 +304,16 @@ handle_info_guild_event_channel_voice_delete(Event, S0) ->
     OriginalEvent = marvin_guild_pubsub:payload(Event),
     ChannelName = marvin_pdu2_dispatch_channel_delete:name(OriginalEvent),
     case lookup_channel(S0#state.active_channels, ChannelName) of
-        {ok, _ActiveChannel} ->
-            marvin_log:info(
-                "Plugin '~s' for guild '~s' got voice channel '~ts' deleted",
-                [?MODULE, S0#state.guild_id, ChannelName]
-            ),
+        {ok, ActiveChannel} ->
+            ?l_info(#{
+                text => "Plugin voice channel deleted",
+                what => handle_info,
+                details => #{
+                    guild_id => S0#state.guild_id,
+                    channel_id => ActiveChannel#active_channel.channel_id,
+                    channel_name => ActiveChannel#active_channel.channel_name
+                }
+            }),
             delete_channel(S0#state.active_channels, ChannelName),
             {noreply, S0};
         {error, not_found} ->

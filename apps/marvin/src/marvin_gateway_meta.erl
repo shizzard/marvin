@@ -1,10 +1,17 @@
 -module(marvin_gateway_meta).
 -behavior(gen_statem).
+-include_lib("marvin_log/include/marvin_log.hrl").
 
 -export([callback_mode/0, start_link/0, init/1, handle_event/4]).
 -export([get_shards_count/0]).
 
 -record(state, {
+    api_host :: string(),
+    api_port :: pos_integer(),
+    api_root_url :: string(),
+    api_gateway_url :: string(),
+    header_user_agent :: string(),
+    header_authorization :: string(),
     gun_pid :: pid() | undefined,
     gun_stream_reference :: reference() | undefined,
     http_req_start_time = erlang:monotonic_time() :: integer(),
@@ -45,7 +52,18 @@ start_link() ->
 
 init(_) ->
     do_report_shards_count(0),
-    {ok, on_start, #state{}, {state_timeout, 0, ?gun_connect()}}.
+    {ok, ApiHost} = marvin_config:get(marvin, [discord, api, host]),
+    {ok, ApiPort} = marvin_config:get_integer(marvin, [discord, api, port]),
+    {ok, ApiRootUrl} = marvin_config:get(marvin, [discord, api, root_url]),
+    {ok, ApiGatewayUrl} = marvin_config:get(marvin, [discord, api, gateway_url]),
+    {ok, on_start, #state{
+        api_host = ApiHost,
+        api_port = ApiPort,
+        api_root_url = ApiRootUrl,
+        api_gateway_url = ApiGatewayUrl,
+        header_user_agent = get_header_user_agent(),
+        header_authorization = get_header_authorization()
+    }, {state_timeout, 0, ?gun_connect()}}.
 
 
 callback_mode() ->
@@ -56,25 +74,33 @@ callback_mode() ->
 
 
 handle_event(state_timeout, ?gun_connect(), on_start, S0) ->
-    {ok, ApiHost} = marvin_config:get(marvin, [discord, api, host]),
-    {ok, ApiPort} = marvin_config:get_integer(marvin, [discord, api, port]),
-    marvin_log:info("Connecting to '~s:~p' to gather meta", [ApiHost, ApiPort]),
-    {ok, GunPid} = gun:open(ApiHost, ApiPort),
+    ?l_info(#{
+        text => "Connecting to API gateway",
+        what => connection, dst => marvin_log:target(S0#state.api_host, S0#state.api_port)
+    }),
+    {ok, GunPid} = gun:open(S0#state.api_host, S0#state.api_port),
     {next_state, on_gun_connect, S0#state{
         gun_pid = GunPid
     }};
 
 handle_event(info, ?gun_up(_ConnPid, _Proto), on_gun_connect, S0) ->
-    marvin_log:debug("Connection up, scheduling meta gathering", []),
+    ?l_info(#{
+        text => "Connected to API gateway",
+        what => connection, result => ok, dst => marvin_log:target(S0#state.api_host, S0#state.api_port)
+    }),
     {next_state, on_gun_up, S0, {state_timeout, 0, ?gather_meta()}};
 
 handle_event(state_timeout, ?gather_meta(), on_gun_up, S0) ->
-    UserAgent = get_header_user_agent(),
-    Authorization = get_header_authorization(),
-    marvin_log:debug("Gathering meta information with user-agent ~p", [UserAgent]),
-    StreamRef = gun:get(S0#state.gun_pid, get_gateway_url(), [
-        {<<"user-agent">>, UserAgent},
-        {<<"authorization">>, Authorization}
+    ?l_info(#{
+        text => "Gathering API gateway meta",
+        what => gather_meta, dst => marvin_log:target(S0#state.api_host, S0#state.api_port),
+        http_req => marvin_log:http_req_map(#{
+            path => S0#state.api_root_url ++ S0#state.api_gateway_url, agent => S0#state.header_user_agent
+        })
+    }),
+    StreamRef = gun:get(S0#state.gun_pid, S0#state.api_root_url ++ S0#state.api_gateway_url, [
+        {<<"user-agent">>, S0#state.header_user_agent},
+        {<<"authorization">>, S0#state.header_authorization}
     ]),
     {next_state, on_gather_meta_headers, S0#state{
         http_req_start_time = erlang:monotonic_time(),
@@ -88,11 +114,12 @@ handle_event(info, ?gun_response(_ConnPid, StreamRef, nofin, 200, Data), on_gath
     do_report_http_req_duration(HttpReqStartTime),
     IntervalSec = case proplists:get_value(<<"x-ratelimit-reset">>, Data, undefined) of
         undefined ->
-            marvin_log:error(
-                "Error while gathering meta: no 'x-ratelimit-reset' header found, falling to +10s",
-                []
-            ),
-            10 * 1000;
+            ?l_warning(#{
+                text => "No 'x-ratelimit-reset' header found, falling to 10 seconds",
+                what => gather_meta_headers,
+                dst => marvin_log:target(S0#state.api_host, S0#state.api_port)
+            }),
+            10;
         TimestampBin ->
             FutureTimestamp = binary_to_integer(TimestampBin),
             CurrentTimestamp = marvin_helper_time:timestamp(),
@@ -101,28 +128,58 @@ handle_event(info, ?gun_response(_ConnPid, StreamRef, nofin, 200, Data), on_gath
             CalculatedIntervalSec
     end,
     do_report_http_request_interval(IntervalSec),
+    ?l_info(#{
+        text => "Gathered API gateway meta headers",
+        what => gather_meta_headers, result => ok, details => #{ratelimit_interval => IntervalSec},
+        http_ret => marvin_log:http_ret_map(#{
+            code => 200, path => S0#state.api_root_url ++ S0#state.api_gateway_url, agent => S0#state.header_user_agent
+        })
+    }),
     {next_state, on_gather_meta_body, S0#state{
         next_gather_after = IntervalSec * 1000
     }};
 
-handle_event(info, ?gun_response(_ConnPid, _StreamRef, nofin, 401, _), on_gather_meta_headers, _S0) ->
-    marvin_log:error("Error while gathering meta: access token seems to be invalid", []),
+handle_event(info, ?gun_response(_ConnPid, _StreamRef, nofin, 401, _), on_gather_meta_headers, S0) ->
+    ?l_critical(#{
+        text => "Failed to gather API meta headers",
+        what => gather_meta_headers, result => error, details => invalid_token,
+        dst => marvin_log:target(S0#state.api_host, S0#state.api_port),
+        http_ret => marvin_log:http_ret_map(#{
+            code => 401, path => S0#state.api_root_url ++ S0#state.api_gateway_url, agent => S0#state.header_user_agent
+        })
+    }),
     {stop, invalid_token};
+
+handle_event(info, ?gun_response(_ConnPid, _StreamRef, nofin, Code, Data), on_gather_meta_headers, S0) ->
+    ?l_critical(#{
+        text => "Failed to gather API meta headers",
+        what => gather_meta_headers, result => error, details => Data,
+        dst => marvin_log:target(S0#state.api_host, S0#state.api_port),
+        http_ret => marvin_log:http_ret_map(#{
+            code => Code, path => S0#state.api_root_url ++ S0#state.api_gateway_url, agent => S0#state.header_user_agent,
+            authorization => S0#state.header_authorization
+        })
+    }),
+    {stop, invalid_response};
 
 handle_event(info, ?gun_data(_ConnPid, StreamRef, nofin, Data), on_gather_meta_body, #state{
     gun_stream_reference = StreamRef
 } = S0) when is_binary(Data) ->
     try
         #{<<"url">> := WssUrl, <<"shards">> := ShardsCount} = jiffy:decode(Data, [return_maps]),
+        ?l_info(#{
+            text => "Gathered API gateway meta body",
+            what => gather_meta_body, result => ok, details => #{url => WssUrl, shards => ShardsCount}
+        }),
         {next_state, on_gather_meta_fin, S0#state{
             wss_url = WssUrl,
             shards_count = ShardsCount
         }}
     catch Type:Error ->
-        marvin_log:error(
-            "Failed to decode gathered meta with ~p:~p when data was ~p, ignoring",
-            [Type, Error, Data]
-        ),
+        ?l_error(#{
+            text => "Failed to gather API gateway meta body",
+            what => gather_meta_body, result => Type, details => #{type => Type, error => Error, data => Data}
+        }),
         {next_state, on_gather_meta_fin, S0}
     end;
 
@@ -137,10 +194,10 @@ handle_event(state_timeout, ?maybe_rebuild_layout(), on_maybe_rebuild_layout, #s
     shards_count = ShardsCount,
     running_shards_count = RunningShardsCount
 } = S0) when ShardsCount < RunningShardsCount ->
-    marvin_log:info(
-        "Going to reduce shards count due to switch ~p -> ~p",
-        [RunningShardsCount, ShardsCount]
-    ),
+    ?l_info(#{
+        text => "Rebuilding layout",
+        what => maybe_rebuild_layout, result => decrease, shards => #{old => RunningShardsCount, new => ShardsCount}
+    }),
     ShardsToStop = lists:nthtail(ShardsCount, lists:seq(0, RunningShardsCount - 1)),
     lists:foreach(fun marvin_shard_sup:stop_shard_rx/1, ShardsToStop),
     do_report_shards_count(ShardsCount),
@@ -153,10 +210,10 @@ handle_event(state_timeout, ?maybe_rebuild_layout(), on_maybe_rebuild_layout, #s
     running_shards_count = RunningShardsCount,
     wss_url = WssUrl
 } = S0) when ShardsCount > RunningShardsCount ->
-    marvin_log:info(
-        "Going to increase shards count due to switch ~p -> ~p",
-        [RunningShardsCount, ShardsCount]
-    ),
+    ?l_info(#{
+        text => "Rebuilding layout",
+        what => maybe_rebuild_layout, result => increase, shards => #{old => RunningShardsCount, new => ShardsCount}
+    }),
     ShardsToStart = lists:nthtail(RunningShardsCount, lists:seq(0, ShardsCount - 1)),
     lists:foreach(fun(ShardId) ->
         marvin_shard_sup:start_shard_session(ShardId, WssUrl)
@@ -210,15 +267,6 @@ do_report_shards_count(ShardsCount) ->
         ShardsCount
     ),
     ok.
-
-
--spec get_gateway_url() ->
-    Ret :: string().
-
-get_gateway_url() ->
-    {ok, ApiRootUrl} = marvin_config:get(marvin, [discord, api, root_url]),
-    {ok, ApiGatewayUrl} = marvin_config:get(marvin, [discord, api, gateway_url]),
-    ApiRootUrl ++ ApiGatewayUrl.
 
 
 

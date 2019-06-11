@@ -1,6 +1,7 @@
 -module(marvin_plugin_moderator).
 -behaviour(gen_server).
 
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -92,13 +93,13 @@ init([GuildId]) ->
 
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -110,11 +111,15 @@ handle_info(Info, S0) ->
     try
         handle_info_guild_event(Info, S0)
     catch
-        T:R ->
-            marvin_log:error(
-                "Guild '~s' plugin '~s' failed guild event handling with reason ~p:~p. ~p",
-                [S0#state.guild_id, ?MODULE, T, R, erlang:get_stacktrace()]
-            ),
+        T:R:S ->
+            ?l_error(#{
+                text => "Plugin failed guild event handling",
+                what => handle_info, result => fail,
+                details => #{
+                    type => T, reason => R, stacktrace => S,
+                    guild_id => S0#state.guild_id
+                }
+            }),
             {noreply, S0}
     end.
 
@@ -159,8 +164,7 @@ handle_info_cleanup_event_maybe_mute_stop(#active_mute{
                     <<"role_id">> => RoleMute
                 }, #{}
             ),
-            Resp = marvin_rest:request(Req),
-            marvin_log:info("Response: ~p", [Resp]),
+            _ = marvin_rest:request(Req),
             delete_mute(S0#state.active_mutes, UserId);
         false ->
             ok
@@ -175,11 +179,15 @@ handle_info_guild_event(Event, S0) ->
     case {marvin_guild_pubsub:type(Event), marvin_guild_pubsub:action(Event)} of
         {TypeCommand, ShortCommandMute} ->
             handle_info_guild_event_command_mute_prepare(Event, S0);
-        {_Type, _Action} ->
-            marvin_log:warn(
-                "Plugin '~s' for guild '~s' got unknown guild event: ~ts/~ts",
-                [?MODULE, S0#state.guild_id, _Type, _Action]
-            ),
+        {Type, Action} ->
+            ?l_warning(#{
+                text => "Plugin got unknown guild event",
+                what => handle_info, result => fail,
+                details => #{
+                    pubsub_type => Type, pubsub_action => Action,
+                    guild_id => S0#state.guild_id
+                }
+            }),
             {noreply, S0}
     end.
 
@@ -232,10 +240,14 @@ handle_info_guild_event_command_mute_prepare(Event, S0) ->
             ),
             ok;
         {error, Reason} ->
-            marvin_log:error(
-                "Guild '~s' plugin '~s' failed mute command handling with reason ~p",
-                [S0#state.guild_id, ?MODULE, Reason]
-            ),
+            ?l_error(#{
+                text => "Plugin failed to perform mute command",
+                what => handle_info, result => error,
+                details => #{
+                    guild_id => S0#state.guild_id,
+                    type => error, reason => Reason
+                }
+            }),
             ok
     end,
 
@@ -337,8 +349,7 @@ handle_info_guild_event_command_mute_act_set_role(#handle_info_guild_event_comma
                 <<"role_id">> => RoleMute
             }, #{}
         ),
-        Resp = marvin_rest:request(Req),
-        marvin_log:info("Response: ~p", [Resp]),
+        _ = marvin_rest:request(Req),
         ok = insert_mute(ActiveMutes, #active_mute{
             user_id = UserId,
             mute_till = marvin_helper_time:timestamp() + Duration * 60
@@ -357,8 +368,7 @@ handle_info_guild_event_command_mute_act_send_message(#handle_info_guild_event_c
         #{<<"channel_id">> => ChannelId},
         #{content => Message}
     ),
-    Resp = marvin_rest:request(Req),
-    marvin_log:info("Response: ~p", [Resp]),
+    _ = marvin_rest:request(Req),
     {ok, ChainCtx}.
 
 

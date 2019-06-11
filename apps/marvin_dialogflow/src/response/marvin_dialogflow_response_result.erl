@@ -5,7 +5,7 @@
     source :: source(),
     resolvedQuery :: resolvedQuery(),
     action :: action(),
-    parameters :: parameters(),
+    parameters = [] :: parameters(),
     fulfillment :: fulfillment(),
     score :: score()
 }).

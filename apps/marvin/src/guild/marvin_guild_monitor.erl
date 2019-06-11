@@ -1,6 +1,6 @@
 -module(marvin_guild_monitor).
 -behaviour(gen_server).
-
+-include_lib("marvin_log/include/marvin_log.hrl").
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
@@ -8,7 +8,7 @@
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
 ]).
--export([maybe_start_guild/2, start_guild/2, stop_guild/1, get_guild/1]).
+-export([maybe_start_guild/2, start_guild/2, stop_guild/1, get_guild/1, get_all_guild_ids/0]).
 
 
 
@@ -40,8 +40,18 @@
 maybe_start_guild(GuildId, MyId) ->
     case get_guild(GuildId) of
         {ok, Pid} ->
+            ?l_info(#{
+                text => "Guild maybe start: already started",
+                what => maybe_start_guild, result => ok,
+                details => #{guild_id => GuildId, my_id => MyId, guild_pid => Pid}
+            }),
             {ok, Pid};
         {error, not_found} ->
+            ?l_info(#{
+                text => "Guild maybe start: not_found",
+                what => maybe_start_guild, result => not_found,
+                details => #{guild_id => GuildId, my_id => MyId}
+            }),
             start_guild(GuildId, MyId)
     end.
 
@@ -56,8 +66,18 @@ maybe_start_guild(GuildId, MyId) ->
 start_guild(GuildId, MyId) ->
     case get_guild(GuildId) of
         {ok, _Pid} ->
+            ?l_error(#{
+                text => "Guild start failed: duplicate",
+                what => start_guild, result => duplicate,
+                details => #{guild_id => GuildId, my_id => MyId, guild_pid => _Pid}
+            }),
             {error, duplicate};
         {error, not_found} ->
+            ?l_info(#{
+                text => "Guild start call",
+                what => start_guild,
+                details => #{guild_id => GuildId, my_id => MyId}
+            }),
             gen_server:call(?MODULE, ?start_guild(GuildId, MyId))
     end.
 
@@ -67,6 +87,11 @@ start_guild(GuildId, MyId) ->
     marvin_helper_type:ok_return().
 
 stop_guild(GuildId) ->
+    ?l_info(#{
+        text => "Guild stop call",
+        what => stop_guild,
+        details => #{guild_id => GuildId}
+    }),
     gen_server:call(?MODULE, ?stop_guild(GuildId)).
 
 
@@ -80,10 +105,31 @@ stop_guild(GuildId) ->
 get_guild(GuildId) ->
     case ets:lookup(?registry_table, GuildId) of
         [#guild{guild_id = GuildId, guild_pid = Pid}] ->
+            ?l_debug(#{
+                text => "Guild get",
+                what => get_guild, result => ok,
+                details => #{guild_id => GuildId, guild_pid => Pid}
+            }),
             {ok, Pid};
         [] ->
+            ?l_warning(#{
+                text => "Guild get",
+                what => get_guild, result => not_found,
+                details => #{guild_id => GuildId}
+            }),
             {error, not_found}
     end.
+
+
+
+-spec get_all_guild_ids() ->
+    marvin_helper_type:generic_return(
+        OkRet :: [marvin_pdu2_object_guild:id()],
+        ErrorRet :: not_found
+    ).
+
+get_all_guild_ids() ->
+    {ok, [GuildId || #guild{guild_id = GuildId} <- ets:tab2list(?registry_table)]}.
 
 
 
@@ -110,13 +156,13 @@ handle_call(?stop_guild(GuildId), _GenReplyTo, S0) ->
     handle_call_stop_guild(GuildId, S0);
 
 handle_call(Unexpected, _GenReplyTo, S0) ->
-    marvin_log:warn("Unexpected call: ~p", [Unexpected]),
+    ?l_error(#{text => "Unexpected call", what => handle_call, details => Unexpected}),
     {reply, badarg, S0}.
 
 
 
 handle_cast(Unexpected, S0) ->
-    marvin_log:warn("Unexpected cast: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected cast", what => handle_cast, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -125,7 +171,7 @@ handle_info(?monitor_down(MonRef, Pid, Info), S0) ->
     handle_info_monitor_down(MonRef, Pid, Info, S0);
 
 handle_info(Unexpected, S0) ->
-    marvin_log:warn("Unexpected info: ~p", [Unexpected]),
+    ?l_warning(#{text => "Unexpected info", what => handle_info, details => Unexpected}),
     {noreply, S0}.
 
 
@@ -156,6 +202,11 @@ code_change(_OldVsn, S0, _Extra) ->
 
 handle_call_start_guild(GuildId, MyId, S0) ->
     {ok, Pid} = do_start_guild(GuildId, MyId),
+    ?l_info(#{
+        text => "Guild started",
+        what => handle_call_start_guild, result => ok,
+        details => #{guild_id => GuildId, my_id => MyId, guild_pid => Pid}
+    }),
     {reply, {ok, Pid}, S0}.
 
 
@@ -174,9 +225,18 @@ handle_call_stop_guild(GuildId, S0) ->
         [#guild{guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef}] ->
             _ = erlang:demonitor(MonRef, [flush, info]),
             ok = marvin_guild_sup:stop_guild(Pid),
-            true = ets:delete(?registry_table, GuildId);
+            true = ets:delete(?registry_table, GuildId),
+            ?l_info(#{
+                text => "Guild stopped",
+                what => handle_call_stop_guild, result => ok,
+                details => #{guild_id => GuildId, guild_pid => Pid}
+            });
         [] ->
-            ok
+            ?l_notice(#{
+                text => "Guild not found",
+                what => handle_call_stop_guild, result => not_found,
+                details => #{guild_id => GuildId}
+            })
     end,
     {reply, ok, S0}.
 
@@ -193,16 +253,18 @@ handle_call_stop_guild(GuildId, S0) ->
 handle_info_monitor_down(MonRef, Pid, Info, S0) ->
     case ets:match_object(?registry_table, {'_', '_', '_', Pid, MonRef}) of
         [] ->
-            marvin_log:warn(
-                "Unexpected monitor DOWN from ~p with reason ~w",
-                [Pid, Info]
-            );
+            ?l_warning(#{
+                text => "Monitor not found",
+                what => handle_info_monitor_down, result => not_found,
+                details => #{guild_pid => Pid, info => Info}
+            });
         [#guild{my_id = MyId, guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef}] ->
-            marvin_log:warn(
-                "Guild '~ts' (~p) terminated with reason ~w; restarting",
-                [GuildId, Pid, Info]
-            ),
             true = ets:delete(?registry_table, GuildId),
+            ?l_warning(#{
+                text => "Monitor down",
+                what => handle_info_monitor_down, result => ok,
+                details => #{guild_id => GuildId, my_id => MyId, guild_pid => Pid}
+            }),
             {ok, _Pid} = do_start_guild(GuildId, MyId)
     end,
     {noreply, S0}.
@@ -214,5 +276,10 @@ do_start_guild(GuildId, MyId) ->
     MonRef = erlang:monitor(process, Pid),
     true = ets:insert(?registry_table, #guild{
         my_id = MyId, guild_id = GuildId, guild_pid = Pid, guild_mon_ref = MonRef
+    }),
+    ?l_info(#{
+        text => "Guild started",
+        what => do_start_guild, result => ok,
+        details => #{guild_id => GuildId, my_id => MyId, guild_pid => Pid}
     }),
     {ok, Pid}.

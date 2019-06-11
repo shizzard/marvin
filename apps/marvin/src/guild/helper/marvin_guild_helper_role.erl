@@ -1,6 +1,6 @@
 -module(marvin_guild_helper_role).
-
 -include("marvin_guild_state.hrl").
+-include_lib("marvin_log/include/marvin_log.hrl").
 
 -export([w_do_provision/2, r_get_everyone/1]).
 
@@ -16,7 +16,14 @@
     marvin_helper_type:ok_return().
 
 w_do_provision(Roles, Ctx) ->
-    marvin_log:info("Guild '~s' roles: ~p total", [marvin_guild_context:guild_id(Ctx), length(Roles)]),
+    ?l_debug(#{
+        text => "Guild roles provisioned",
+        what => role_provision, result => ok,
+        details => #{
+            guild_id => marvin_guild_context:guild_id(Ctx),
+            total => length(Roles)
+        }
+    }),
     ets:insert(marvin_guild_context:role_state(Ctx), [#role{
         role_id = marvin_pdu2_object_role:id(Role),
         role = Role
