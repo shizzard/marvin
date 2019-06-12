@@ -52,7 +52,7 @@ run-release:
 	MARVIN_APP_DIALOGFLOW_ROOT_URL=/v1 \
 	MARVIN_APP_SYSINFO_LIBRARY_NAME=Marvin \
 	MARVIN_APP_SYSINFO_LIBRARY_WEB=http://shizzard.github.io/marvin \
-	MARVIN_APP_LAGER_LOG_ROOT=log/ \
+	MARVIN_APP_LOGGER_LOG_ROOT=log/ \
 	MARVIN_APP_GUILD_CONFIG_ROOT=`pwd`/data/guild/ \
 	MARVIN_APP_GUILD_CONFIG_FILENAME_TEMPLATE=guild_{{guild_id}}_config.json \
 	MARVIN_APP_PLUGIN_CONFIG_ROOT=`pwd`/data/plugin/ \
