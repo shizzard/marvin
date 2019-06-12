@@ -91,7 +91,7 @@ handle_event(info, ?gun_up(_ConnPid, _Proto), on_gun_connect, S0) ->
     {next_state, on_gun_up, S0, {state_timeout, 0, ?gather_meta()}};
 
 handle_event(state_timeout, ?gather_meta(), on_gun_up, S0) ->
-    ?l_info(#{
+    ?l_debug(#{
         text => "Gathering API gateway meta",
         what => gather_meta, dst => marvin_log:target(S0#state.api_host, S0#state.api_port),
         http_req => marvin_log:http_req_map(#{
@@ -128,7 +128,7 @@ handle_event(info, ?gun_response(_ConnPid, StreamRef, nofin, 200, Data), on_gath
             CalculatedIntervalSec
     end,
     do_report_http_request_interval(IntervalSec),
-    ?l_info(#{
+    ?l_debug(#{
         text => "Gathered API gateway meta headers",
         what => gather_meta_headers, result => ok, details => #{ratelimit_interval => IntervalSec},
         http_ret => marvin_log:http_ret_map(#{
@@ -167,7 +167,7 @@ handle_event(info, ?gun_data(_ConnPid, StreamRef, nofin, Data), on_gather_meta_b
 } = S0) when is_binary(Data) ->
     try
         #{<<"url">> := WssUrl, <<"shards">> := ShardsCount} = jiffy:decode(Data, [return_maps]),
-        ?l_info(#{
+        ?l_debug(#{
             text => "Gathered API gateway meta body",
             what => gather_meta_body, result => ok, details => #{url => WssUrl, shards => ShardsCount}
         }),

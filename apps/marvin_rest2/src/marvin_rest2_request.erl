@@ -1,6 +1,11 @@
--module(marvin_rest_request).
+-module(marvin_rest2_request).
 
--callback ratelimit_group() -> guild_id | channel_id | webhook_id.
+-include("marvin_rest2.hrl").
+
+-callback ratelimit_group() ->
+    ?ratelimit_group_guild |
+    ?ratelimit_group_channel |
+    ?ratelimit_group_webhook.
 -callback method() -> get | post | head | delete | patch | put | options.
 -callback pdu() -> atom().
 -callback url_template() -> binary().

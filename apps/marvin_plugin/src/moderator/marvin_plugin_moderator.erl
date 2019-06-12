@@ -156,15 +156,15 @@ handle_info_cleanup_event_maybe_mute_stop(#active_mute{
     #{<<"role_mute">> := RoleMute} = marvin_plugin_config:data(S0#state.config),
     case os:system_time(second) >= MuteTill of
         true ->
-            Req = marvin_rest_request:new(
-                marvin_rest_impl_guild_member_role_delete,
+            Req = marvin_rest2_request:new(
+                marvin_rest2_impl_guild_member_role_delete,
                 #{
                     <<"guild_id">> => S0#state.guild_id,
                     <<"user_id">> => UserId,
                     <<"role_id">> => RoleMute
                 }, #{}
             ),
-            _ = marvin_rest:request(Req),
+            _ = marvin_rest2:request(Req),
             delete_mute(S0#state.active_mutes, UserId);
         false ->
             ok
@@ -341,15 +341,15 @@ handle_info_guild_event_command_mute_act_set_role(#handle_info_guild_event_comma
 } = ChainCtx) ->
     lists:map(fun(Subject) ->
         UserId = marvin_pdu2_object_user:id(marvin_pdu2_object_member:user(Subject)),
-        Req = marvin_rest_request:new(
-            marvin_rest_impl_guild_member_role_add,
+        Req = marvin_rest2_request:new(
+            marvin_rest2_impl_guild_member_role_add,
             #{
                 <<"guild_id">> => GuildId,
                 <<"user_id">> => UserId,
                 <<"role_id">> => RoleMute
             }, #{}
         ),
-        _ = marvin_rest:request(Req),
+        _ = marvin_rest2:request(Req),
         ok = insert_mute(ActiveMutes, #active_mute{
             user_id = UserId,
             mute_till = marvin_helper_time:timestamp() + Duration * 60
@@ -363,12 +363,12 @@ handle_info_guild_event_command_mute_act_send_message(#handle_info_guild_event_c
     channel_id = ChannelId,
     message = Message
 } = ChainCtx) ->
-    Req = marvin_rest_request:new(
-        marvin_rest_impl_message_create,
+    Req = marvin_rest2_request:new(
+        marvin_rest2_impl_message_create,
         #{<<"channel_id">> => ChannelId},
         #{content => Message}
     ),
-    _ = marvin_rest:request(Req),
+    _ = marvin_rest2:request(Req),
     {ok, ChainCtx}.
 
 

@@ -1,0 +1,3 @@
+-define(ratelimit_group_guild, ratelimit_group_guild).
+-define(ratelimit_group_channel, ratelimit_group_channel).
+-define(ratelimit_group_webhook, ratelimit_group_webhook).

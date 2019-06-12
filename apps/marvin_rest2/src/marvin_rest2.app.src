@@ -1,0 +1,8 @@
+{application, marvin_rest2, [
+    {description, ""},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {mod, {marvin_rest2_app, []}},
+    {applications, [kernel, stdlib, marvin_log]},
+    {env, []}
+]}.
