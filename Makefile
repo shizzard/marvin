@@ -28,6 +28,12 @@ dialyze:
 test:
 	$(REBAR) eunit
 
+clean-release:
+	rm -rf _build/default/rel
+
+clean-release-prod:
+	rm -rf _build/prod/rel
+
 run-release:
 	RELX_REPLACE_OS_VARS=true \
 	MARVIN_VMARGS_SNAME=marvin \

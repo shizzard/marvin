@@ -1,5 +1,7 @@
--module(marvin_rest_app).
+-module(marvin_rest2_app).
 -behaviour(application).
+
+-include("marvin_rest2.hrl").
 -include_lib("marvin_helper/include/marvin_specs_application.hrl").
 
 -export([start/2, stop/1]).
@@ -13,9 +15,9 @@
 start(_StartType, _StartArgs) ->
     [
         hackney_pool:start_pool(RateLimitGroup, [{timeout, 10000}, {max_connections, 20}])
-        || RateLimitGroup <- [guild_id, channel_id, webhook_id]
+        || RateLimitGroup <- [?ratelimit_group_guild, ?ratelimit_group_channel, ?ratelimit_group_webhook]
     ],
-    marvin_rest_sup:start_link().
+    marvin_rest2_sup:start_link().
 
 stop(_State) ->
     ok.

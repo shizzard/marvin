@@ -152,21 +152,21 @@ handle_info_guild_event_change_nickname(Event, S0) ->
             guild_id => S0#state.guild_id
         }
     }),
-    ChangeNicknameReq = marvin_rest_request:new(
-        marvin_rest_impl_guild_member_update,
+    ChangeNicknameReq = marvin_rest2_request:new(
+        marvin_rest2_impl_guild_member_update,
         #{
             <<"guild_id">> => marvin_guild_context:guild_id(marvin_guild_pubsub:guild_context(Event)),
             <<"user_id">> => marvin_pdu2_object_user:id(Author)
         },
         #{nick => Nickname}
     ),
-    _ = marvin_rest:request(ChangeNicknameReq),
-    SendMessageReq = marvin_rest_request:new(
-        marvin_rest_impl_message_create,
+    _ = marvin_rest2:request(ChangeNicknameReq),
+    SendMessageReq = marvin_rest2_request:new(
+        marvin_rest2_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{content => <<"Буду звать тебя "/utf8, (marvin_pdu2_object_user:format(Author))/binary, "."/utf8>>}
     ),
-    _ = marvin_rest:request(SendMessageReq),
+    _ = marvin_rest2:request(SendMessageReq),
     {noreply, S0}.
 
 

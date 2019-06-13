@@ -103,12 +103,12 @@ code_change(_OldVsn, S0, _Extra) ->
 
 handle_info_guild_event(Event, S0) ->
     #{original_message := OriginalMessage} = marvin_guild_pubsub:payload(Event),
-    Req = marvin_rest_request:new(
-        marvin_rest_impl_message_create,
+    Req = marvin_rest2_request:new(
+        marvin_rest2_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{content => get_status_message()}
     ),
-    _ = marvin_rest:request(Req),
+    _ = marvin_rest2:request(Req),
     {noreply, S0}.
 
 

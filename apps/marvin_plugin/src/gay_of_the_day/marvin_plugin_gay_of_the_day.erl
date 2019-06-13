@@ -218,15 +218,15 @@ handle_info_award_gay_of_the_day_drop_role(#handle_info_award_gay_of_the_day{
         Members ->
             lists:map(fun(Member) ->
                 UserId = marvin_pdu2_object_user:id(marvin_pdu2_object_member:user(Member)),
-                Req = marvin_rest_request:new(
-                    marvin_rest_impl_guild_member_role_delete,
+                Req = marvin_rest2_request:new(
+                    marvin_rest2_impl_guild_member_role_delete,
                     #{
                         <<"guild_id">> => GuildId,
                         <<"user_id">> => UserId,
                         <<"role_id">> => RoleId
                     }, #{}
                 ),
-                _ = marvin_rest:request(Req)
+                _ = marvin_rest2:request(Req)
             end, Members)
     end,
     {ok, ChainCtx}.
@@ -237,15 +237,15 @@ handle_info_award_gay_of_the_day_set_role(#handle_info_award_gay_of_the_day{
     guild_id = GuildId, role_id = RoleId, awarded_user = #active_user{user = User}
 } = ChainCtx) ->
     UserId = marvin_pdu2_object_user:id(User),
-    Req = marvin_rest_request:new(
-        marvin_rest_impl_guild_member_role_add,
+    Req = marvin_rest2_request:new(
+        marvin_rest2_impl_guild_member_role_add,
         #{
             <<"guild_id">> => GuildId,
             <<"user_id">> => UserId,
             <<"role_id">> => RoleId
         }, #{}
     ),
-    _ = marvin_rest:request(Req),
+    _ = marvin_rest2:request(Req),
     {ok, ChainCtx}.
 
 
@@ -255,8 +255,8 @@ handle_info_award_gay_of_the_day_send_message(#handle_info_award_gay_of_the_day{
     awards_channel_id = ChannelId,
     awards_message_template = MessageTemplate
 } = ChainCtx) ->
-    Req = marvin_rest_request:new(
-        marvin_rest_impl_message_create,
+    Req = marvin_rest2_request:new(
+        marvin_rest2_impl_message_create,
         #{<<"channel_id">> => ChannelId},
         #{content => binary:replace(
             MessageTemplate,
@@ -265,7 +265,7 @@ handle_info_award_gay_of_the_day_send_message(#handle_info_award_gay_of_the_day{
             [global]
         )}
     ),
-    _ = marvin_rest:request(Req),
+    _ = marvin_rest2:request(Req),
     {ok, ChainCtx}.
 
 

@@ -113,6 +113,7 @@ handle_possible_command_parse(#handle_possible_command{
 
 
 handle_possible_command_maybe_detect(#handle_possible_command{
+    original_message = OriginalMessage,
     parsed_message_content = ParsedMessage,
     ctx = Ctx
 } = ChainCtx) ->
@@ -138,7 +139,11 @@ handle_possible_command_maybe_detect(#handle_possible_command{
                 details => #{
                     guild_id => marvin_guild_context:guild_id(Ctx),
                     plugin => marvin_plugin_command:plugin_id(Command),
-                    command => marvin_plugin_command:command(Command)
+                    command => marvin_plugin_command:command(Command),
+                    user_id => marvin_pdu2_object_user:id(
+                        marvin_pdu2_dispatch_message_create:author(OriginalMessage)),
+                    user_username => marvin_pdu2_object_user:username(
+                        marvin_pdu2_dispatch_message_create:author(OriginalMessage))
                 }
             }),
             {ok, ChainCtx#handle_possible_command{detected_command = Command}}
@@ -157,12 +162,12 @@ handle_possible_command_run_command_or_response(#handle_possible_command{
         marvin_pdu2_dispatch_message_create:content(Message)
     ) of
         {ok, DialogFlowResponse} ->
-            SendReq = marvin_rest_request:new(
-                marvin_rest_impl_message_create,
+            SendReq = marvin_rest2_request:new(
+                marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(Message)},
                 #{content => marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))}
             ),
-            marvin_rest:request(SendReq),
+            marvin_rest2:request(SendReq),
             {ok, ChainCtx};
         {error, Reason} ->
             {error, Reason}

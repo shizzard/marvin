@@ -22,7 +22,7 @@ start_link() ->
 
 
 init([]) ->
-    {ok, {{one_for_one, 2, 10}, [
+    {ok, {{one_for_one, 10, 2}, [
         {marvin_channel_registry, {
             marvin_channel_registry, start_link, []
         }, permanent, 5000, worker, [marvin_channel_registry]},

@@ -192,12 +192,12 @@ handle_info_cleanup_event_channel_delete(ActiveChannel, S0) ->
             channel_name => ActiveChannel#active_channel.channel_name
         }
     }),
-    Req = marvin_rest_request:new(
-        marvin_rest_impl_guild_channel_delete,
+    Req = marvin_rest2_request:new(
+        marvin_rest2_impl_guild_channel_delete,
         #{<<"channel_id">> => ActiveChannel#active_channel.channel_id},
         #{}
     ),
-    _ = marvin_rest:request(Req),
+    _ = marvin_rest2:request(Req),
     S0.
 
 
@@ -245,8 +245,8 @@ handle_info_guild_event_command_create(Event, S0) ->
         }
     }),
     UserLimit = maybe_get_user_limit(ParsedMessage),
-    Req = marvin_rest_request:new(
-        marvin_rest_impl_guild_channel_create,
+    Req = marvin_rest2_request:new(
+        marvin_rest2_impl_guild_channel_create,
         #{<<"guild_id">> => marvin_guild_context:guild_id(marvin_guild_pubsub:guild_context(Event))},
         #{
             type => marvin_pdu2_rest_guild_channel_create:channel_type_guild_voice(),
@@ -260,7 +260,7 @@ handle_info_guild_event_command_create(Event, S0) ->
             )
         }
     ),
-    _ = marvin_rest:request(Req),
+    _ = marvin_rest2:request(Req),
     insert_channel(S0#state.active_channels, #active_channel{
         channel_name = ChannelName,
         origin_channel_id = marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
@@ -287,12 +287,12 @@ handle_info_guild_event_channel_voice_create(Event, S0) ->
             insert_channel(S0#state.active_channels, ActiveChannel#active_channel{
                 channel_id = marvin_pdu2_dispatch_channel_create:id(OriginalEvent)
             }),
-            Req = marvin_rest_request:new(
-                marvin_rest_impl_message_create,
+            Req = marvin_rest2_request:new(
+                marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => ActiveChannel#active_channel.origin_channel_id},
                 #{content => <<"Канал '"/utf8, (ActiveChannel#active_channel.channel_name)/binary, "' готов."/utf8>>}
             ),
-            _ = marvin_rest:request(Req),
+            _ = marvin_rest2:request(Req),
             {noreply, S0};
         {error, not_found} ->
             {noreply, S0}

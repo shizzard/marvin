@@ -137,8 +137,8 @@ handle_info_guild_event_get_help(Event, S0) ->
         {MyNickname, []},
         marvin_guild_context:commands(GuildCtx)
     ),
-    Req = marvin_rest_request:new(
-        marvin_rest_impl_message_create,
+    Req = marvin_rest2_request:new(
+        marvin_rest2_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{
             content => <<>>,
@@ -150,7 +150,7 @@ handle_info_guild_event_get_help(Event, S0) ->
             }
         }
     ),
-    _ = marvin_rest:request(Req),
+    _ = marvin_rest2:request(Req),
     {noreply, S0}.
 
 
