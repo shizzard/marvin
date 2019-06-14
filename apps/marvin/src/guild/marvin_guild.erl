@@ -8,7 +8,9 @@
 -export([
     get_context/1,
     do_provision/2, do_provision_guild_members/2, do_provision_guild_members_timeout/2,
-    member_update/2, presence_update/2, voice_state_update/2, message_create/2,
+    member_update/2,
+    role_create/2, role_update/2, role_delete/2,
+    presence_update/2, voice_state_update/2, message_create/2,
     channel_create/2, channel_update/2, channel_delete/2,
     start_link/2, init/1,
     handle_call/3, handle_cast/2, handle_info/2,
@@ -20,6 +22,9 @@
 -define(do_provision_guild_members(Struct), {do_provision_guild_members, Struct}).
 -define(do_provision_guild_members_timeout(Ref), {do_provision_guild_members_timeout, Ref}).
 -define(member_update(Struct), {member_update, Struct}).
+-define(role_create(Struct), {role_create, Struct}).
+-define(role_update(Struct), {role_update, Struct}).
+-define(role_delete(Struct), {role_delete, Struct}).
 -define(presence_update(Struct), {presence_update, Struct}).
 -define(voice_state_update(Struct), {voice_state_update, Struct}).
 -define(message_create(Struct), {message_create, Struct}).
@@ -73,6 +78,33 @@ do_provision_guild_members_timeout(GuildPid, Ref) ->
 member_update(GuildId, Struct) ->
     {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
     gen_server:call(GuildPid, ?member_update(Struct)).
+
+
+
+-spec role_create(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_guild_role_create:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+role_create(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?role_create(Struct)).
+
+
+
+-spec role_update(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_guild_role_update:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+role_update(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?role_update(Struct)).
+
+
+
+-spec role_delete(GuildId :: marvin_pdu2:snowflake(), Struct :: marvin_pdu2_dispatch_guild_role_delete:t()) ->
+    Ret :: marvin_helper_type:ok_return().
+
+role_delete(GuildId, Struct) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?role_delete(Struct)).
 
 
 
@@ -442,6 +474,45 @@ handle_call(?channel_delete(Struct), _GenReplyTo, S0) ->
     ok = marvin_guild_helper_channel_text:w_channel_delete(Struct, Ctx),
     ok = marvin_guild_helper_channel_voice:w_channel_delete(Struct, Ctx),
     ok = marvin_guild_helper_channel_category:w_channel_delete(Struct, Ctx),
+    {reply, ok, S0};
+
+handle_call(?role_create(Struct), _GenReplyTo, S0) ->
+    ?l_debug(#{
+        text => "Guild role create",
+        what => handle_call_role_create, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            role_id => marvin_pdu2_object_role:id(marvin_pdu2_dispatch_guild_role_create:role(Struct))
+        }
+    }),
+    Ctx = context_from_state(S0),
+    ok = marvin_guild_helper_role:w_role_create(Struct, Ctx),
+    {reply, ok, S0};
+
+handle_call(?role_update(Struct), _GenReplyTo, S0) ->
+    ?l_debug(#{
+        text => "Guild role update",
+        what => handle_call_role_update, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            role_id => marvin_pdu2_object_role:id(marvin_pdu2_dispatch_guild_role_update:role(Struct))
+        }
+    }),
+    Ctx = context_from_state(S0),
+    ok = marvin_guild_helper_role:w_role_update(Struct, Ctx),
+    {reply, ok, S0};
+
+handle_call(?role_delete(Struct), _GenReplyTo, S0) ->
+    ?l_debug(#{
+        text => "Guild role delete",
+        what => handle_call_role_delete, result => ok,
+        details => #{
+            guild_id => S0#state.guild_id,
+            role_id => marvin_pdu2_dispatch_guild_role_delete:role_id(Struct)
+        }
+    }),
+    Ctx = context_from_state(S0),
+    ok = marvin_guild_helper_role:w_role_delete(Struct, Ctx),
     {reply, ok, S0};
 
 handle_call(Unexpected, _GenReplyTo, S0) ->

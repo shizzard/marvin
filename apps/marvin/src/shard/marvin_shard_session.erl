@@ -92,7 +92,8 @@ when is_binary(Event) ->
             details => #{
                 shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
                 type => Type, reason => Reason, stacktrace => Stacktrace,
-                link => 'https://github.com/shizzard/marvin/issues/31'
+                link => 'https://github.com/shizzard/marvin/issues/31',
+                event => Event
             }
         }),
         {reply, ok, S0}
@@ -206,7 +207,7 @@ handle_call_incoming_event(Event, S0) ->
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_hello]),
                     handle_call_incoming_event_hello(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_invalid_session ->
-                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_hello]),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_invalid_session]),
                     handle_call_incoming_event_invalid_session(marvin_pdu2:d(Struct), S0);
                 marvin_pdu2_dispatch_resumed ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
@@ -239,6 +240,18 @@ handle_call_incoming_event(Event, S0) ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_member_update]),
                     handle_call_incoming_event_dispatch_guild_member_update(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_guild_role_create ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_role_create]),
+                    handle_call_incoming_event_dispatch_guild_role_create(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_guild_role_update ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_role_update]),
+                    handle_call_incoming_event_dispatch_guild_role_update(marvin_pdu2:d(Struct), S1);
+                marvin_pdu2_dispatch_guild_role_delete ->
+                    {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
+                    prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_role_delete]),
+                    handle_call_incoming_event_dispatch_guild_role_delete(marvin_pdu2:d(Struct), S1);
                 marvin_pdu2_dispatch_guild_members_chunk ->
                     {ok, S1} = maybe_bump_heart_seq(marvin_pdu2:s(Struct), S0),
                     prometheus_counter:inc(marvin_shard_session_incoming_events, [S0#state.shard_id, marvin_pdu2_dispatch_guild_members_chunk]),
@@ -686,6 +699,85 @@ handle_call_incoming_event_dispatch_guild_member_update(Struct, S0) ->
         }
     }),
     ok = marvin_guild:member_update(GuildId, Struct),
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_guild_role_create(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_guild_role_create(Struct, S0) ->
+    GuildId = marvin_pdu2_dispatch_guild_role_create:guild_id(Struct),
+    Role = marvin_pdu2_dispatch_guild_role_create:role(Struct),
+    RoleId = marvin_pdu2_object_role:id(Role),
+    RoleName = marvin_pdu2_object_role:name(Role),
+    ?l_debug(#{
+        text => "Shard got 'role create' event",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            guild_id => GuildId, role_id => RoleId, role_name => RoleName
+        }
+    }),
+    ok = marvin_guild:role_create(GuildId, Struct),
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_guild_role_update(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_guild_role_update(Struct, S0) ->
+    GuildId = marvin_pdu2_dispatch_guild_role_update:guild_id(Struct),
+    Role = marvin_pdu2_dispatch_guild_role_update:role(Struct),
+    RoleId = marvin_pdu2_object_role:id(Role),
+    RoleName = marvin_pdu2_object_role:name(Role),
+    ?l_debug(#{
+        text => "Shard got 'role update' event",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            guild_id => GuildId, role_id => RoleId, role_name => RoleName
+        }
+    }),
+    ok = marvin_guild:role_update(GuildId, Struct),
+    {reply, ok, S0}.
+
+
+
+-spec handle_call_incoming_event_dispatch_guild_role_delete(
+    PDU :: marvin_pdu2:data(),
+    State :: state()
+) ->
+    marvin_helper_type:gen_server_reply_simple(
+        Reply :: marvin_helper_type:ok_return(),
+        State :: state()
+    ).
+
+handle_call_incoming_event_dispatch_guild_role_delete(Struct, S0) ->
+    GuildId = marvin_pdu2_dispatch_guild_role_delete:guild_id(Struct),
+    RoleId = marvin_pdu2_dispatch_guild_role_delete:role_id(Struct),
+    ?l_debug(#{
+        text => "Shard got 'role delete' event",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            guild_id => GuildId, role_id => RoleId
+        }
+    }),
+    ok = marvin_guild:role_delete(GuildId, Struct),
     {reply, ok, S0}.
 
 
