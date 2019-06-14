@@ -1,4 +1,5 @@
 -module(marvin_guild_helper_members).
+
 -include("marvin_guild_state.hrl").
 -include_lib("marvin_log/include/marvin_log.hrl").
 
@@ -6,7 +7,8 @@
     w_do_provision/2,
     w_member_update/2,
     r_get_member_by_user_id/2,
-    r_get_members_by_role/2
+    r_get_members_by_role/2,
+    r_get_members_by_roles/2
 ]).
 
 
@@ -49,10 +51,6 @@ w_member_update(Struct, Ctx) ->
             }),
             ok;
         Member ->
-            ets:insert(marvin_guild_context:member_state(Ctx), #member{
-                member_id = UserId,
-                member = marvin_pdu2_object_member:update(Member, marvin_pdu2_dispatch_guild_member_update:export(Struct))
-            }),
             ?l_debug(#{
                 text => "Guild member update",
                 what => member_update, result => ok,
@@ -61,6 +59,17 @@ w_member_update(Struct, Ctx) ->
                     member_id => UserId
                 }
             }),
+            ets:insert(marvin_guild_context:member_state(Ctx), #member{
+                member_id = UserId,
+                member = marvin_pdu2_object_member:update(Member, marvin_pdu2_dispatch_guild_member_update:export(Struct))
+            }),
+            marvin_guild_pubsub:publish(
+                marvin_guild_context:guild_id(Ctx),
+                Ctx,
+                marvin_guild_pubsub:type_member(),
+                marvin_guild_pubsub:action_update(),
+                Struct
+            ),
             ok
     end.
 
@@ -71,6 +80,17 @@ r_get_members_by_role(RoleId, Ctx) ->
         Member#member.member || Member
         <- ets:tab2list(marvin_guild_context:member_state(Ctx)),
         lists:member(RoleId, marvin_pdu2_object_member:roles(Member#member.member))
+    ].
+
+
+
+r_get_members_by_roles(RoleIds, Ctx) ->
+    [
+        Member#member.member || Member
+        <- ets:tab2list(marvin_guild_context:member_state(Ctx)),
+        lists:any(fun(RoleId) ->
+            lists:member(RoleId, marvin_pdu2_object_member:roles(Member#member.member))
+        end, RoleIds)
     ].
 
 

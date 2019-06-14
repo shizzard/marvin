@@ -164,7 +164,7 @@ handle_info_cleanup_event_maybe_mute_stop(#active_mute{
                     <<"role_id">> => RoleMute
                 }, #{}
             ),
-            _ = marvin_rest2:request(Req),
+            _ = marvin_rest2:enqueue_request(Req),
             delete_mute(S0#state.active_mutes, UserId);
         false ->
             ok
@@ -349,7 +349,7 @@ handle_info_guild_event_command_mute_act_set_role(#handle_info_guild_event_comma
                 <<"role_id">> => RoleMute
             }, #{}
         ),
-        _ = marvin_rest2:request(Req),
+        _ = marvin_rest2:enqueue_request(Req),
         ok = insert_mute(ActiveMutes, #active_mute{
             user_id = UserId,
             mute_till = marvin_helper_time:timestamp() + Duration * 60
@@ -368,7 +368,7 @@ handle_info_guild_event_command_mute_act_send_message(#handle_info_guild_event_c
         #{<<"channel_id">> => ChannelId},
         #{content => Message}
     ),
-    _ = marvin_rest2:request(Req),
+    _ = marvin_rest2:enqueue_request(Req),
     {ok, ChainCtx}.
 
 

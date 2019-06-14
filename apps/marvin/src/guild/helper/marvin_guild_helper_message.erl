@@ -167,7 +167,7 @@ handle_possible_command_run_command_or_response(#handle_possible_command{
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(Message)},
                 #{content => marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))}
             ),
-            marvin_rest2:request(SendReq),
+            marvin_rest2:enqueue_request(SendReq),
             {ok, ChainCtx};
         {error, Reason} ->
             {error, Reason}

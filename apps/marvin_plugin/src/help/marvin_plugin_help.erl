@@ -150,7 +150,7 @@ handle_info_guild_event_get_help(Event, S0) ->
             }
         }
     ),
-    _ = marvin_rest2:request(Req),
+    _ = marvin_rest2:enqueue_request(Req),
     {noreply, S0}.
 
 

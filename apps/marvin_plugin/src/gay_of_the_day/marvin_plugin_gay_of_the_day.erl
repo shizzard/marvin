@@ -226,7 +226,7 @@ handle_info_award_gay_of_the_day_drop_role(#handle_info_award_gay_of_the_day{
                         <<"role_id">> => RoleId
                     }, #{}
                 ),
-                _ = marvin_rest2:request(Req)
+                _ = marvin_rest2:enqueue_request(Req)
             end, Members)
     end,
     {ok, ChainCtx}.
@@ -245,7 +245,7 @@ handle_info_award_gay_of_the_day_set_role(#handle_info_award_gay_of_the_day{
             <<"role_id">> => RoleId
         }, #{}
     ),
-    _ = marvin_rest2:request(Req),
+    _ = marvin_rest2:enqueue_request(Req),
     {ok, ChainCtx}.
 
 
@@ -265,7 +265,7 @@ handle_info_award_gay_of_the_day_send_message(#handle_info_award_gay_of_the_day{
             [global]
         )}
     ),
-    _ = marvin_rest2:request(Req),
+    _ = marvin_rest2:enqueue_request(Req),
     {ok, ChainCtx}.
 
 

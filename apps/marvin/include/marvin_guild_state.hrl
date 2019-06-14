@@ -3,6 +3,7 @@
     my_id :: marvin_pdu2:snowflake(),
     guild_id :: marvin_pdu2:snowflake(),
     guild_config :: marvin_guild_config:t(),
+    do_provision_guild_members_tref :: timer:tref(),
     owner_id :: marvin_pdu2:snowflake() | undefined,
     role_admin_id :: marvin_pdu2:snowflake() | undefined,
     role_moderator_id :: marvin_pdu2:snowflake() | undefined,

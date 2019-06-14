@@ -1,8 +1,9 @@
 -module(marvin_guild_helper_role).
+
 -include("marvin_guild_state.hrl").
 -include_lib("marvin_log/include/marvin_log.hrl").
 
--export([w_do_provision/2, r_get_everyone/1]).
+-export([w_do_provision/2, r_get_everyone/1, r_get_all_roles/1]).
 
 -define(role_everyone, <<"@everyone">>).
 
@@ -41,3 +42,8 @@ r_get_everyone(Ctx) ->
         marvin_pdu2_object_role:name(Role#role.role) == ?role_everyone
     ],
     Everyone.
+
+
+
+r_get_all_roles(Ctx) ->
+    [Role#role.role || Role <- ets:tab2list(marvin_guild_context:role_state(Ctx))].
