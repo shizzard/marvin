@@ -4,7 +4,7 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    content :: content(),
+    content = undefined :: content() | undefined,
     nonce = undefined :: nonce() | undefined,
     tts = undefined :: tts() | undefined,
     embed = undefined :: embed() | undefined
@@ -42,7 +42,7 @@ export(#?MODULE{
     embed = Embed
 }) ->
     #{
-        <<"content">> => Content,
+        <<"content">> => marvin_pdu2:nullify(Content),
         <<"nonce">> => marvin_pdu2:nullify(Nonce),
         <<"tts">> => marvin_pdu2:nullify(Tts),
         <<"embed">> => case Embed of

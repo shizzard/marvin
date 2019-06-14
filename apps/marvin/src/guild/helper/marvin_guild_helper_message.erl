@@ -117,7 +117,7 @@ handle_possible_command_maybe_detect(#handle_possible_command{
     parsed_message_content = ParsedMessage,
     ctx = Ctx
 } = ChainCtx) ->
-    Words = [Part || Part <- ParsedMessage, not is_integer(Part), not is_tuple(Part)],
+    Words = [string:lowercase(Part) || Part <- ParsedMessage, not is_integer(Part), not is_tuple(Part)],
     Commands = marvin_guild_context:commands(Ctx),
     case lists:foldl(fun
         (FoldCommand, undefined) ->
