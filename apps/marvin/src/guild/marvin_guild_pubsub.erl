@@ -3,7 +3,7 @@
 
 -export([
     type_command/0, type_channel_voice/0, type_voice_state/0, type_message/0,
-    type_member/0, type_presence/0,
+    type_member/0, type_presence/0, type_role/0,
     type_internal/0,
     action_create/0, action_update/0, action_delete/0,
     action_internal_event_guild_provisioned/0, action_internal_event_guild_members_provisioned/0
@@ -31,6 +31,7 @@ type_voice_state() -> <<"voice_state">>.
 type_message() -> <<"message">>.
 type_member() -> <<"member">>.
 type_presence() -> <<"presence">>.
+type_role() -> <<"role">>.
 type_internal() -> <<"internal">>.
 
 action_create() -> <<"create">>.

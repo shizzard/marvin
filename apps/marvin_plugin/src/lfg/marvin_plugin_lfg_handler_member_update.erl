@@ -3,7 +3,7 @@
 -include("marvin_plugin_lfg.hrl").
 -include_lib("marvin_log/include/marvin_log.hrl").
 
--export([handle_member_update/2, handle_presence_update/2]).
+-export([handle_member_update/2, handle_presence_update/2, maybe_change_role_active_state/4]).
 
 
 

@@ -123,9 +123,22 @@ handle_event(info, ?gun_response(_ConnPid, StreamRef, nofin, 200, Data), on_gath
         TimestampBin ->
             FutureTimestamp = binary_to_integer(TimestampBin),
             CurrentTimestamp = marvin_helper_time:timestamp(),
-            CalculatedIntervalSec = (FutureTimestamp - CurrentTimestamp) * 2,
-            true = (CalculatedIntervalSec > 0),
-            CalculatedIntervalSec
+            case (FutureTimestamp - CurrentTimestamp) * 2 of
+                CalculatedIntervalSec when CalculatedIntervalSec > 0 ->
+                    CalculatedIntervalSec;
+                _Negative ->
+                    ?l_warning(#{
+                        text => "'x-ratelimit-reset' header has invalid value, falling to 10 seconds",
+                        what => gather_meta_headers,
+                        dst => marvin_log:target(S0#state.api_host, S0#state.api_port),
+                        details => #{
+                            future_timestamp => FutureTimestamp,
+                            current_timestamp => CurrentTimestamp,
+                            original_header_value => TimestampBin
+                        }
+                    }),
+                    10
+            end
     end,
     do_report_http_request_interval(IntervalSec),
     ?l_debug(#{

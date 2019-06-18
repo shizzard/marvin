@@ -62,6 +62,18 @@ init([GuildId]) ->
         GuildId, marvin_guild_pubsub:type_presence(),
         marvin_guild_pubsub:action_update()
     ),
+    marvin_guild_pubsub:subscribe(
+        GuildId, marvin_guild_pubsub:type_role(),
+        marvin_guild_pubsub:action_create()
+    ),
+    marvin_guild_pubsub:subscribe(
+        GuildId, marvin_guild_pubsub:type_role(),
+        marvin_guild_pubsub:action_update()
+    ),
+    marvin_guild_pubsub:subscribe(
+        GuildId, marvin_guild_pubsub:type_role(),
+        marvin_guild_pubsub:action_delete()
+    ),
     {ok, #state{
         config = PluginConfig,
         guild_id = GuildId
@@ -116,6 +128,7 @@ code_change(_OldVsn, S0, _Extra) ->
 handle_info_guild_event(Event, S0) ->
     TypeMember = marvin_guild_pubsub:type_member(),
     TypePresence = marvin_guild_pubsub:type_presence(),
+    TypeRole = marvin_guild_pubsub:type_role(),
     TypeInternal = marvin_guild_pubsub:type_internal(),
     ActionUpdate = marvin_guild_pubsub:action_update(),
     ActionIEGP = marvin_guild_pubsub:action_internal_event_guild_provisioned(),
@@ -129,6 +142,8 @@ handle_info_guild_event(Event, S0) ->
             marvin_plugin_lfg_handler_member_update:handle_member_update(Event, S0);
         {TypePresence, ActionUpdate} ->
             marvin_plugin_lfg_handler_member_update:handle_presence_update(Event, S0);
+        {TypeRole, _AnyAction} ->
+            marvin_plugin_lfg_handler_role_change:handle(Event, S0);
         {Type, Action} ->
             ?l_warning(#{
                 text => "Plugin got unknown guild event",

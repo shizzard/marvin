@@ -41,6 +41,13 @@ w_role_create(Struct, Ctx) ->
         role_id = marvin_pdu2_object_role:id(Role),
         role = Role
     }),
+    marvin_guild_pubsub:publish(
+        marvin_guild_context:guild_id(Ctx),
+        Ctx,
+        marvin_guild_pubsub:type_role(),
+        marvin_guild_pubsub:action_create(),
+        Struct
+    ),
     ok.
 
 
@@ -51,12 +58,26 @@ w_role_update(Struct, Ctx) ->
         role_id = marvin_pdu2_object_role:id(Role),
         role = Role
     }),
+    marvin_guild_pubsub:publish(
+        marvin_guild_context:guild_id(Ctx),
+        Ctx,
+        marvin_guild_pubsub:type_role(),
+        marvin_guild_pubsub:action_update(),
+        Struct
+    ),
     ok.
 
 
 
 w_role_delete(Struct, Ctx) ->
     ets:delete(marvin_guild_context:role_state(Ctx), marvin_pdu2_dispatch_guild_role_delete:role_id(Struct)),
+    marvin_guild_pubsub:publish(
+        marvin_guild_context:guild_id(Ctx),
+        Ctx,
+        marvin_guild_pubsub:type_role(),
+        marvin_guild_pubsub:action_delete(),
+        Struct
+    ),
     ok.
 
 
