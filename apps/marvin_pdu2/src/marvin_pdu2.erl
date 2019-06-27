@@ -288,7 +288,7 @@ cloak_validate_struct_construct_data_safe_temp(Mod, Data) ->
     catch
         _:_ ->
             spawn(fun() ->
-                {ok, LogDir} = marvin_config:get(lager, log_root),
+                {ok, LogDir} = marvin_config:get(logger, log_root),
                 Filename = filename:join([LogDir, io_lib:format("dump_~p_~p.json", [Mod, marvin_helper_time:timestamp()])]),
                 ?l_warning(#{
                     text => "Unexpected cast",

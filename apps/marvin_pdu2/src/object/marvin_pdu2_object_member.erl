@@ -5,7 +5,7 @@
 
 -record(?MODULE, {
     user :: user(),
-    roles :: roles(),
+    roles = [] :: roles(),
     nick = undefined :: nick() | undefined,
     mute :: mute(),
     joined_at :: joined_at(),

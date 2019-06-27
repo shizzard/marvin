@@ -3,6 +3,7 @@
     my_id :: marvin_pdu2:snowflake(),
     guild_id :: marvin_pdu2:snowflake(),
     guild_config :: marvin_guild_config:t(),
+    do_provision_guild_members_tref :: timer:tref(),
     owner_id :: marvin_pdu2:snowflake() | undefined,
     role_admin_id :: marvin_pdu2:snowflake() | undefined,
     role_moderator_id :: marvin_pdu2:snowflake() | undefined,
@@ -16,6 +17,7 @@
     channel_category_state :: ets:tid(),
     member_state :: ets:tid(),
     voice_state :: ets:tid(),
+    pre_command_hooks = #{} :: #{Key :: atom() := F :: marvin_guild:pre_command_hook()},
     members_online = 0 :: non_neg_integer(),
     members_idle = 0 :: non_neg_integer(),
     members_dnd = 0 :: non_neg_integer()

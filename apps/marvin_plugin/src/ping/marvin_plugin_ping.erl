@@ -108,7 +108,7 @@ handle_info_guild_event(Event, S0) ->
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{content => get_status_message()}
     ),
-    _ = marvin_rest2:request(Req),
+    _ = marvin_rest2:enqueue_request(Req),
     {noreply, S0}.
 
 

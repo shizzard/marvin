@@ -2,7 +2,7 @@
 
 -include_lib("marvin_log/include/marvin_log.hrl").
 
--export([request/1]).
+-export([enqueue_request/1, request/1]).
 
 -define(is_2xx(StatusCode), ((StatusCode div 100) == 2)).
 -define(is_3xx(StatusCode), ((StatusCode div 100) == 3)).
@@ -16,6 +16,14 @@
 
 
 %% Interface
+
+
+
+enqueue_request(Req) ->
+    marvin_rest2_queue:push_request(
+        marvin_rest2_queue:queue_name(marvin_rest2_request:ratelimit_group(Req)),
+        Req
+    ).
 
 
 

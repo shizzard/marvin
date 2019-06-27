@@ -160,13 +160,13 @@ handle_info_guild_event_change_nickname(Event, S0) ->
         },
         #{nick => Nickname}
     ),
-    _ = marvin_rest2:request(ChangeNicknameReq),
+    _ = marvin_rest2:enqueue_request(ChangeNicknameReq),
     SendMessageReq = marvin_rest2_request:new(
         marvin_rest2_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
         #{content => <<"Буду звать тебя "/utf8, (marvin_pdu2_object_user:format(Author))/binary, "."/utf8>>}
     ),
-    _ = marvin_rest2:request(SendMessageReq),
+    _ = marvin_rest2:enqueue_request(SendMessageReq),
     {noreply, S0}.
 
 

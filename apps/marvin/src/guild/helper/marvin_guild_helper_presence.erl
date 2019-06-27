@@ -51,6 +51,13 @@ w_presence_update(Presence, Ctx) ->
     }),
     do_update_member_presence(UserId, OldStatus, Status, Ctx),
     do_report_presence_state(Ctx),
+    marvin_guild_pubsub:publish(
+        marvin_guild_context:guild_id(Ctx),
+        Ctx,
+        marvin_guild_pubsub:type_presence(),
+        marvin_guild_pubsub:action_update(),
+        Presence
+    ),
     ok.
 
 
