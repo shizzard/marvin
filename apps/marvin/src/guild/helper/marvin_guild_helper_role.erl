@@ -5,7 +5,7 @@
 
 -export([
     w_do_provision/2, w_role_create/2, w_role_update/2, w_role_delete/2,
-    r_get_everyone/1, r_get_all_roles/1]).
+    r_get_everyone/1, r_get_role_by_id/2, r_get_all_roles/1]).
 
 -define(role_everyone, <<"@everyone">>).
 
@@ -91,6 +91,19 @@ r_get_everyone(Ctx) ->
         marvin_pdu2_object_role:name(Role#role.role) == ?role_everyone
     ],
     Everyone.
+
+
+
+-spec r_get_role_by_id(RoleId :: marvin_pdu2:snowflake(), Ctx :: marvin_guild_context:t()) ->
+    marvin_pdu2_object_role:t() | undefined.
+
+r_get_role_by_id(RoleId, Ctx) ->
+    case ets:lookup(marvin_guild_context:role_state(Ctx), RoleId) of
+        [#role{role = Role}] ->
+            Role;
+        [] ->
+            undefined
+    end.
 
 
 

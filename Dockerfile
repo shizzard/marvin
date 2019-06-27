@@ -1,4 +1,4 @@
-FROM erlang:20.1-slim
+FROM erlang:22-slim
 LABEL maintainer="Denis Fakhrtdinov <me@shizz.ru>"
 
 # Installing required tools

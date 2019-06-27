@@ -6,18 +6,20 @@
 -include_lib("marvin_helper/include/marvin_specs_gen_server.hrl").
 
 -export([
-    get_context/1,
+    get_context/1, set_pre_command_hook/3,
     do_provision/2, do_provision_guild_members/2, do_provision_guild_members_timeout/2,
     member_update/2,
     role_create/2, role_update/2, role_delete/2,
     presence_update/2, voice_state_update/2, message_create/2,
     channel_create/2, channel_update/2, channel_delete/2,
+
     start_link/2, init/1,
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
 ]).
 
 -define(get_context(), {get_context}).
+-define(set_pre_command_hook(PluginId, Function), {set_pre_command_hook, PluginId, Function}).
 -define(do_provision(Struct), {do_provision, Struct}).
 -define(do_provision_guild_members(Struct), {do_provision_guild_members, Struct}).
 -define(do_provision_guild_members_timeout(Ref), {do_provision_guild_members_timeout, Ref}).
@@ -31,6 +33,13 @@
 -define(channel_create(Struct), {channel_create, Struct}).
 -define(channel_update(Struct), {channel_update, Struct}).
 -define(channel_delete(Struct), {channel_delete, Struct}).
+
+-type pre_command_hook() :: fun(
+    (Event :: marvin_guild_pubsub:t()) ->
+        skip | terminate
+).
+
+-export_type([pre_command_hook/0]).
 
 
 
@@ -52,6 +61,19 @@ start_link(GuildId, MyId) ->
 get_context(GuildId) ->
     {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
     gen_server:call(GuildPid, ?get_context()).
+
+
+
+-spec set_pre_command_hook(
+    GuildId :: marvin_pdu2:snowflake(),
+    PluginId :: atom(),
+    Function :: pre_command_hook()
+) ->
+    skip | terminate.
+
+set_pre_command_hook(GuildId, PluginId, Function) ->
+    {ok, GuildPid} = marvin_guild_monitor:get_guild(GuildId),
+    gen_server:call(GuildPid, ?set_pre_command_hook(PluginId, Function)).
 
 
 
@@ -271,7 +293,8 @@ context_from_state(#state{
     channel_voice_state = ChannelVoiceState,
     channel_category_state = ChannelCategoryState,
     member_state = MemberState,
-    voice_state = VoiceState
+    voice_state = VoiceState,
+    pre_command_hooks = PreCommandHooks
 }) ->
     marvin_guild_context:new(#{
         name => Name,
@@ -288,7 +311,8 @@ context_from_state(#state{
         channel_voice_state => ChannelVoiceState,
         channel_category_state => ChannelCategoryState,
         member_state => MemberState,
-        voice_state => VoiceState
+        voice_state => VoiceState,
+        pre_command_hooks => PreCommandHooks
     }).
 
 
@@ -302,6 +326,13 @@ init_do_provision_guild_members_timer() ->
 
 handle_call(?get_context(), _GenReplyTo, S0) ->
     {reply, {ok, context_from_state(S0)}, S0};
+
+handle_call(?set_pre_command_hook(PluginId, Fun), _GenReplyTo, #state{
+    pre_command_hooks = PreCommandHooks
+} = S0) ->
+    {reply, ok, S0#state{
+        pre_command_hooks = PreCommandHooks#{PluginId => Fun}
+    }};
 
 handle_call(?do_provision(Struct), _GenReplyTo, S0) ->
     S1 = S0#state{

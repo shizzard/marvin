@@ -17,7 +17,7 @@ handle(Event, S0) ->
         marvin_pdu2_object_role:id(Role) || Role <- Roles,
         marvin_plugin_lfg:is_game_role_name(RoleGamePrefix, marvin_pdu2_object_role:name(Role))
     ],
-    ?l_alert(#{
+    ?l_debug(#{
         text => "Plugin is provisioned with roles",
         what => handle_info,
         details => #{

@@ -4,7 +4,8 @@
 
 -export([
     w_do_provision/2, w_channel_create/2,
-    w_channel_update/2, w_channel_delete/2
+    w_channel_update/2, w_channel_delete/2,
+    r_get_channel_by_id/2
 ]).
 
 
@@ -112,6 +113,19 @@ w_channel_delete(ChannelEvent, Ctx) ->
             ok;
         {_, _} ->
             ok
+    end.
+
+
+
+-spec r_get_channel_by_id(ChannelId :: marvin_pdu2:snowflake(), Ctx :: marvin_guild_context:t()) ->
+    marvin_pdu2_object_role:t() | undefined.
+
+r_get_channel_by_id(ChannelId, Ctx) ->
+    case ets:lookup(marvin_guild_context:channel_text_state(Ctx), ChannelId) of
+        [#channel{channel = Channel}] ->
+            Channel;
+        [] ->
+            undefined
     end.
 
 

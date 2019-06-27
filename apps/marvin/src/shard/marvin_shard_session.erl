@@ -405,7 +405,7 @@ handle_call_incoming_event_invalid_session(_Struct, S0) ->
             shard_id => S0#state.shard_id, shard_name => S0#state.shard_name
         }
     }),
-    {stop, invalid_session, ok, S0}.
+    {stop, {shutdown, invalid_session}, ok, S0}.
 
 
 
@@ -961,15 +961,7 @@ get_pdu_identify(#state{
     {ok, LibraryVersion} = marvin_config:get(marvin, [system_info, library_version]),
     Library = <<LibraryName/binary, "/", LibraryVersion/binary>>,
     Shard = [ShardId, marvin_gateway_meta:get_shards_count()],
-    ?l_info(#{
-        text => "Shard is about to identify against discord server",
-        what => handle_call,
-        details => #{
-            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
-            library => Library
-        }
-    }),
-    marvin_pdu2:render(marvin_pdu2_identify:new(#{
+    IdentifyParams = #{
         token => Token,
         compress => Compress,
         large_threshold => LargeThreshold,
@@ -981,7 +973,16 @@ get_pdu_identify(#state{
             '$referrer' => LibraryWeb,
             '$referring_domain' => LibraryWeb
         }
-    })).
+    },
+    ?l_info(#{
+        text => "Shard is about to identify against discord server",
+        what => handle_call,
+        details => #{
+            shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
+            library => Library, params => IdentifyParams
+        }
+    }),
+    marvin_pdu2:render(marvin_pdu2_identify:new(IdentifyParams)).
 
 
 

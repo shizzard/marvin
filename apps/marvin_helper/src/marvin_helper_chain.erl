@@ -40,18 +40,25 @@ when is_function(Fun, 1) ->
                 text => "Chain skipped function execution",
                 what => skip,
                 details => #{
-                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason,
-                    initial_value => InitialValue
+                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason
                 }
             }),
             {skip, Reason};
+        {stop, Reason} ->
+            ?l_info(#{
+                text => "Chain stopped function execution",
+                what => skip,
+                details => #{
+                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason
+                }
+            }),
+            {stop, Reason};
         {error, Reason} ->
             ?l_error(#{
                 text => "Chain dropped function execution with error",
                 what => error,
                 details => #{
-                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason,
-                    initial_value => InitialValue
+                    chain => Name, 'fun' => length(Funs) + 1, reason => Reason
                 }
             }),
             {error, Reason}

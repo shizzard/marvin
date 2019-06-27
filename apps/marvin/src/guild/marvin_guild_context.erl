@@ -16,7 +16,8 @@
     channel_voice_state :: ets:tid(),
     channel_category_state :: ets:tid(),
     member_state :: ets:tid(),
-    voice_state :: ets:tid()
+    voice_state :: ets:tid(),
+    pre_command_hooks = #{} :: #{Key :: atom() := F :: marvin_guild:pre_command_hook()}
 }).
 -type t() :: #?MODULE{}.
 -export_type([t/0]).

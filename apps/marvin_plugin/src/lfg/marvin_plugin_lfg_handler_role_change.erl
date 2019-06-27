@@ -63,12 +63,4 @@ recalculate_game_roles(GuildCtx, S0) ->
         marvin_pdu2_object_role:id(Role) || Role <- Roles,
         marvin_plugin_lfg:is_game_role_name(RoleGamePrefix, marvin_pdu2_object_role:name(Role))
     ],
-    ?l_alert(#{
-        text => "Plugin is provisioned with roles",
-        what => handle_info,
-        details => #{
-            guild_id => S0#state.guild_id,
-            roles_total => length(GameRoles)
-        }
-    }),
     S0#state{game_roles = GameRoles}.

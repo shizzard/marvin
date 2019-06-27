@@ -12,6 +12,9 @@
     handle_call/3, handle_cast/2, handle_info/2,
     terminate/2, code_change/3
 ]).
+-export([get_pre_command_hook_fun/2]).
+
+-define(init_pre_command_hook(), {init_pre_command_hook}).
 
 
 
@@ -46,34 +49,15 @@ start_link(GuildId) ->
 
 init([GuildId]) ->
     {ok, PluginConfig} = marvin_plugin_config:load(list_to_binary(atom_to_list(?MODULE)), GuildId),
-    marvin_guild_pubsub:subscribe(
-        GuildId, marvin_guild_pubsub:type_internal(),
-        marvin_guild_pubsub:action_internal_event_guild_provisioned()
-    ),
-    marvin_guild_pubsub:subscribe(
-        GuildId, marvin_guild_pubsub:type_internal(),
-        marvin_guild_pubsub:action_internal_event_guild_members_provisioned()
-    ),
-    marvin_guild_pubsub:subscribe(
-        GuildId, marvin_guild_pubsub:type_member(),
-        marvin_guild_pubsub:action_update()
-    ),
-    marvin_guild_pubsub:subscribe(
-        GuildId, marvin_guild_pubsub:type_presence(),
-        marvin_guild_pubsub:action_update()
-    ),
-    marvin_guild_pubsub:subscribe(
-        GuildId, marvin_guild_pubsub:type_role(),
-        marvin_guild_pubsub:action_create()
-    ),
-    marvin_guild_pubsub:subscribe(
-        GuildId, marvin_guild_pubsub:type_role(),
-        marvin_guild_pubsub:action_update()
-    ),
-    marvin_guild_pubsub:subscribe(
-        GuildId, marvin_guild_pubsub:type_role(),
-        marvin_guild_pubsub:action_delete()
-    ),
+    timer:send_after(5000, ?init_pre_command_hook()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_internal(), marvin_guild_pubsub:action_internal_event_guild_provisioned()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_internal(), marvin_guild_pubsub:action_internal_event_guild_members_provisioned()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_member(), marvin_guild_pubsub:action_update()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_presence(), marvin_guild_pubsub:action_update()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_role(), marvin_guild_pubsub:action_create()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_role(), marvin_guild_pubsub:action_update()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_role(), marvin_guild_pubsub:action_delete()),
+    marvin_guild_pubsub:subscribe(GuildId, marvin_guild_pubsub:type_message(), marvin_guild_pubsub:action_create()),
     {ok, #state{
         config = PluginConfig,
         guild_id = GuildId
@@ -82,6 +66,47 @@ init([GuildId]) ->
 
 
 %% Internals
+
+
+
+get_pre_command_hook_fun(RoleGamePrefix, ChannelId) ->
+    fun(Event) ->
+        OriginalMessage = marvin_guild_pubsub:payload(Event),
+        case marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage) of
+            ChannelId ->
+                skip;
+            _ ->
+                GuildCtx = marvin_guild_pubsub:guild_context(Event),
+                OriginalMessage,
+                case lists:any(fun(RoleId) ->
+                    Role = marvin_guild_helper_role:r_get_role_by_id(RoleId, GuildCtx),
+                    marvin_plugin_lfg:is_game_role_name(RoleGamePrefix, marvin_pdu2_object_role:name(Role))
+                end, marvin_pdu2_dispatch_message_create:mention_roles(OriginalMessage)) of
+                    true ->
+                        TargetChannel = marvin_guild_helper_channel_text:r_get_channel_by_id(ChannelId, GuildCtx),
+                        _ = marvin_rest2:enqueue_request(marvin_rest2_request:new(
+                            marvin_rest2_impl_message_delete,
+                            #{
+                                <<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
+                                <<"message_id">> => marvin_pdu2_dispatch_message_create:id(OriginalMessage)
+                            },
+                            #{}
+                        )),
+                        _ = marvin_rest2:enqueue_request(marvin_rest2_request:new(
+                            marvin_rest2_impl_message_create,
+                            #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
+                            #{
+                                content => iolist_to_binary([
+                                    <<"Слыш пёс, тереби в "/utf8>>, marvin_pdu2_object_channel:format(TargetChannel), <<".">>
+                                ])
+                            }
+                        )),
+                        terminate;
+                    false ->
+                        skip
+                end
+        end
+    end.
 
 
 
@@ -96,6 +121,26 @@ handle_cast(Unexpected, S0) ->
     {noreply, S0}.
 
 
+
+handle_info(?init_pre_command_hook(), #state{
+    config = PluginConfig,
+    guild_id = GuildId
+} = S0) ->
+    ?l_info(#{
+        text => "Plugin is installing pre_command_hook",
+        what => handle_info,
+        details => #{
+            guild_id => S0#state.guild_id,
+            plugin_id => ?MODULE
+        }
+    }),
+    #{
+        <<"role_game_prefix">> := RoleGamePrefix,
+        <<"channel_id">> := ChannelId
+    } = marvin_plugin_config:data(PluginConfig),
+    PreCommandHookFun = get_pre_command_hook_fun(RoleGamePrefix, ChannelId),
+    ok = marvin_guild:set_pre_command_hook(GuildId, ?MODULE, PreCommandHookFun),
+    {noreply, S0};
 
 handle_info(Info, S0) ->
     try
@@ -126,10 +171,12 @@ code_change(_OldVsn, S0, _Extra) ->
 
 
 handle_info_guild_event(Event, S0) ->
+    TypeMessage = marvin_guild_pubsub:type_message(),
     TypeMember = marvin_guild_pubsub:type_member(),
     TypePresence = marvin_guild_pubsub:type_presence(),
     TypeRole = marvin_guild_pubsub:type_role(),
     TypeInternal = marvin_guild_pubsub:type_internal(),
+    ActionCreate = marvin_guild_pubsub:action_create(),
     ActionUpdate = marvin_guild_pubsub:action_update(),
     ActionIEGP = marvin_guild_pubsub:action_internal_event_guild_provisioned(),
     ActionIEGMP = marvin_guild_pubsub:action_internal_event_guild_members_provisioned(),
@@ -138,6 +185,8 @@ handle_info_guild_event(Event, S0) ->
             marvin_plugin_lfg_handler_guild_provisioned:handle(Event, S0);
         {TypeInternal, ActionIEGMP} ->
             marvin_plugin_lfg_handler_guild_members_provisioned:handle(Event, S0);
+        {TypeMessage, ActionCreate} ->
+            marvin_plugin_lfg_handler_message_create:handle_message_create(Event, S0);
         {TypeMember, ActionUpdate} ->
             marvin_plugin_lfg_handler_member_update:handle_member_update(Event, S0);
         {TypePresence, ActionUpdate} ->

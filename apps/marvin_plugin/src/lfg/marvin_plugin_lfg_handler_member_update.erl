@@ -48,7 +48,7 @@ maybe_change_role_active_state(Member, Event, RoleActive, GameRoles) ->
     HasRoleActive = lists:member(RoleActive, marvin_pdu2_object_member:roles(Member)),
     case {HasGameRoles, HasRoleActive, IsOnline} of
         {HasGameRoles, true, IsOnline} when (not HasGameRoles) orelse (not IsOnline) ->
-            ?l_alert(#{
+            ?l_debug(#{
                 text => "Plugin removing role-active for user",
                 what => handle_info,
                 details => #{
@@ -69,7 +69,7 @@ maybe_change_role_active_state(Member, Event, RoleActive, GameRoles) ->
             ));
         %% Member has game roles, does not have role-active
         {true, false, true} ->
-            ?l_alert(#{
+            ?l_debug(#{
                 text => "Plugin adding role-active for user",
                 what => handle_info,
                 details => #{

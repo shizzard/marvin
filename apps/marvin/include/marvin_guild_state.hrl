@@ -17,6 +17,7 @@
     channel_category_state :: ets:tid(),
     member_state :: ets:tid(),
     voice_state :: ets:tid(),
+    pre_command_hooks = #{} :: #{Key :: atom() := F :: marvin_guild:pre_command_hook()},
     members_online = 0 :: non_neg_integer(),
     members_idle = 0 :: non_neg_integer(),
     members_dnd = 0 :: non_neg_integer()

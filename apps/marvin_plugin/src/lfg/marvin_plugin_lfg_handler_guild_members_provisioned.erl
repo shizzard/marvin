@@ -57,7 +57,7 @@ handle_info_guild_event_guild_members_provisioned_detect_members(Ctx) ->
         _Acc = {Ctx, {_AddRoleActiveMembers = [], _RemoveRoleActiveMembers = []}},
         Ctx#handle_info_guild_event_guild_members_provisioned.members_with_roles
     ),
-    ?l_alert(#{
+    ?l_debug(#{
         text => "Plugin managing role-active for users",
         what => handle_info,
         details => #{

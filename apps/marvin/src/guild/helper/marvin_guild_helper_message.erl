@@ -63,6 +63,7 @@ w_message_create(Message, Ctx) ->
 
 handle_possible_command(Message, Ctx) ->
     case marvin_helper_chain:chain('marvin_guild_helper_message:handle_possible_command', [
+        fun handle_possible_command_run_pre_command_hooks/1,
         fun handle_possible_command_tokenize/1,
         fun handle_possible_command_parse/1,
         fun handle_possible_command_maybe_detect/1,
@@ -70,6 +71,16 @@ handle_possible_command(Message, Ctx) ->
     ], #handle_possible_command{original_message = Message, ctx = Ctx}) of
         {ok, _ChainCtx} ->
             ok;
+        {stop, Reason} ->
+            ?l_info(#{
+                text => "Guild handle_possible_command stopped",
+                what => handle_possible_command, result => stop,
+                details => #{
+                    error => Reason,
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    original_message => marvin_pdu2_dispatch_message_create:content(Message)
+                }
+            });
         {error, Reason} ->
             ?l_error(#{
                 text => "Guild handle_possible_command failure",
@@ -81,6 +92,36 @@ handle_possible_command(Message, Ctx) ->
                 }
             })
     end.
+
+
+
+handle_possible_command_run_pre_command_hooks(#handle_possible_command{
+    original_message = Message,
+    ctx = Ctx
+} = ChainCtx) ->
+    case run_pre_command_hooks(marvin_guild_pubsub:new(#{
+        guild_context => Ctx,
+        type => marvin_guild_pubsub:type_message(),
+        action => marvin_guild_pubsub:action_create(),
+        payload => Message
+    }), marvin_guild_context:pre_command_hooks(Ctx)) of
+        terminate ->
+            ?l_info(#{
+                text => "Guild command terminated",
+                what => handle_possible_command, result => terminate,
+                details => #{
+                    guild_id => marvin_guild_context:guild_id(Ctx),
+                    user_id => marvin_pdu2_object_user:id(
+                        marvin_pdu2_dispatch_message_create:author(Message)),
+                    user_username => marvin_pdu2_object_user:username(
+                        marvin_pdu2_dispatch_message_create:author(Message))
+                }
+            }),
+            {stop, terminate};
+        skip ->
+            {ok, ChainCtx}
+    end.
+
 
 
 
@@ -191,3 +232,41 @@ handle_possible_command_run_command_or_response(#handle_possible_command{
         }
     ),
     {ok, ChainCtx}.
+
+
+
+run_pre_command_hooks(Event, PreCommandHooks) ->
+    Message = marvin_guild_pubsub:payload(Event),
+    Ctx = marvin_guild_pubsub:guild_context(Event),
+    maps:fold(fun(PluginId, Fun, Acc) ->
+        ?l_info(#{
+            text => "Running pre-command hook",
+            what => handle_possible_command, result => skip,
+            details => #{
+                plugin_id => PluginId,
+                guild_id => marvin_guild_context:guild_id(Ctx),
+                user_id => marvin_pdu2_object_user:id(
+                    marvin_pdu2_dispatch_message_create:author(Message)),
+                user_username => marvin_pdu2_object_user:username(
+                    marvin_pdu2_dispatch_message_create:author(Message))
+            }
+        }),
+        case Fun(Event) of
+            skip when terminate == Acc -> terminate;
+            skip -> skip;
+            terminate ->
+                ?l_info(#{
+                    text => "Plugin terminated the command execution",
+                    what => handle_possible_command, result => skip,
+                    details => #{
+                        plugin_id => PluginId,
+                        guild_id => marvin_guild_context:guild_id(Ctx),
+                        user_id => marvin_pdu2_object_user:id(
+                            marvin_pdu2_dispatch_message_create:author(Message)),
+                        user_username => marvin_pdu2_object_user:username(
+                            marvin_pdu2_dispatch_message_create:author(Message))
+                    }
+                }),
+                terminate
+        end
+    end, skip, PreCommandHooks).
