@@ -163,7 +163,7 @@ handle_info_guild_event_prepare_query(#handle_info_guild_event{
     Url = hackney_url:make_url(?wiki_base_url, ?wiki_base_path, [
         {<<"action">>, <<"opensearch">>},
         {<<"format">>, <<"json">>},
-        {<<"limit">>, <<"3">>},
+        {<<"limit">>, <<"1">>},
         {<<"redirects">>, <<"resolve">>},
         {<<"search">>, SearchQuery}
     ]),
@@ -195,73 +195,32 @@ handle_info_guild_event_send_message(#handle_info_guild_event{
 } = Ctx) ->
     case Body of
         [SearchQuery, [], [], []] ->
-            Req = marvin_rest2_request:new(
+            marvin_rest2:enqueue_request(marvin_rest2_request:new(
                 marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
                 #{
                     content => iolist_to_binary([
                         <<"По запросу '"/utf8>>, SearchQuery, <<"' статей в Википедии нет."/utf8>>])
                 }
-            ),
-            marvin_rest2_queue:push_request(
-                marvin_rest2_queue:queue_name(
-                    marvin_rest2_request:ratelimit_group(Req)),
-                Req
-            );
-        [SearchQuery, Headers, Texts, Links] ->
-            Reqs = handle_info_guild_event_send_message_generate_messages(
-                SearchQuery, Headers, Texts, Links, Ctx, []
-            ),
-            [marvin_rest2_queue:push_request(
-                marvin_rest2_queue:queue_name(
-                    marvin_rest2_request:ratelimit_group(R)),
-                R
-            ) || R <- Reqs];
+            ));
+        [SearchQuery, [Header], [Text], [Link]] ->
+            marvin_rest2:enqueue_request(marvin_rest2_request:new(
+                marvin_rest2_impl_message_create,
+                #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
+                #{
+                    content => iolist_to_binary([
+                        <<"Вот что я нашел в Википедии по запросу '"/utf8>>, SearchQuery, <<"':"/utf8>>]),
+                    embed => #{title => Header, url => Link, description => Text}
+                }
+            ));
         _ ->
-            Req = marvin_rest2_request:new(
+            marvin_rest2:enqueue_request(marvin_rest2_request:new(
                 marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
                 #{
                     content => iolist_to_binary([
                         <<"Чота сломалось. Почините."/utf8>>])
                 }
-            ),
-            marvin_rest2_queue:push_request(
-                marvin_rest2_queue:queue_name(
-                    marvin_rest2_request:ratelimit_group(Req)),
-                Req
-            )
+            ))
     end,
     {ok, Ctx}.
-
-
-
-handle_info_guild_event_send_message_generate_messages(SearchQuery, [], [], [], #handle_info_guild_event{
-    original_message = OriginalMessage
-} = _Ctx, Acc) ->
-    [marvin_rest2_request:new(
-        marvin_rest2_impl_message_create,
-        #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
-        #{
-            content => iolist_to_binary([
-                <<"Вот что я нашел в Википедии по запросу '"/utf8>>, SearchQuery, <<"':"/utf8>>])
-        }
-    ) | lists:reverse(Acc)];
-
-handle_info_guild_event_send_message_generate_messages(
-    SearchQuery,
-    [Header | Headers],
-    [Text | Texts],
-    [Link | Links],
-    #handle_info_guild_event{
-        original_message = OriginalMessage
-    } = Ctx,
-    Acc
-) ->
-    handle_info_guild_event_send_message_generate_messages(
-        SearchQuery, Headers, Texts, Links, Ctx, [marvin_rest2_request:new(
-            marvin_rest2_impl_message_create,
-            #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
-            #{embed => #{title => Header, url => Link, description => Text}}
-        ) | Acc]
-    ).
