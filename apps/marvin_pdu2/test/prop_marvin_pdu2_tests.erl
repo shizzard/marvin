@@ -135,7 +135,7 @@ ensure_same_pdus(OriginalPDU, ResultPDU) ->
 
 
 ensure_same_pdus_fold(Key, Value, ResultPDU) ->
-    case maps:get(list_to_binary(atom_to_list(Key)), ResultPDU) of
+    case maps:get(atom_to_binary(Key, latin1), ResultPDU) of
         Value ->
             ResultPDU;
         ReturnValue when is_map(ReturnValue) ->
@@ -459,7 +459,7 @@ marvin_pdu2_object_game_playing() ->
     ?MAP([
         {type, 0},
         {timestamps, ?MAP([
-            {<<"start">>, marvin_pdu2_object_game:timestamps()}
+            {start, marvin_pdu2_object_game:timestamps()}
         ])},
         {name, non_empty(proper_unicode:utf8(20))}
     ]).
@@ -480,9 +480,7 @@ marvin_pdu2_object_game_listening() ->
 
 marvin_pdu2_object_presence() ->
     ?MAP([
-        {user, ?MAP([
-            {<<"id">>, non_empty(proper_unicode:utf8(20))}
-        ])},
+        {user, ?MAP([{<<"id">>, non_empty(proper_unicode:utf8(20))}])},
         {game, ?NULLABLE(marvin_pdu2_object_game())},
         {status, oneof([<<"online">>, <<"offline">>, <<"idle">>, <<"dnd">>])}
     ]).

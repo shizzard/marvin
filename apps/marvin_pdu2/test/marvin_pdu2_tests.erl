@@ -17,8 +17,8 @@ can_get_valid_parsed_pdu_test_() ->
                     {ok, Struct} = marvin_pdu2:parse(JSONBin),
                     ?_assertMatch(PDUMod, marvin_pdu2:prot_mod(Struct))
                 catch
-                    _:_ ->
-                        io:format("Stacktrace:~n~p~n", [erlang:get_stacktrace()]),
+                    _:_:S ->
+                        io:format("Stacktrace:~n~p~n", [S]),
                         throw(test_failed)
                 end
             end | List]
@@ -39,8 +39,8 @@ can_get_valid_parsed_object_test_() ->
                     {ok, JSONBin} = file:read_file(File),
                     PDUMod:new(jiffy:decode(JSONBin, [return_maps]))
                 catch
-                    _:_ ->
-                        io:format("Stacktrace:~n~p~n", [erlang:get_stacktrace()]),
+                    _:_:S ->
+                        io:format("Stacktrace:~n~p~n", [S]),
                         throw(test_failed)
                 end
             end | List]

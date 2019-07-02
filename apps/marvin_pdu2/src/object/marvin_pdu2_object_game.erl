@@ -59,7 +59,7 @@ export(#?MODULE{
     #{
         <<"type">> => Type,
         <<"name">> => Name,
-        <<"timestamps">> => #{<<"start">> => Timestamps},
+        <<"timestamps">> => Timestamps,
         <<"url">> => marvin_pdu2:nullify(Url),
         <<"details">> => marvin_pdu2:nullify(Details)
     }.
