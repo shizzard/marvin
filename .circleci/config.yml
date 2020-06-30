@@ -1,0 +1,39 @@
+# Elixir CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-elixir/ for more details
+version: 2.1
+
+orbs:
+  slack: circleci/slack@3.4.2
+
+jobs:
+  build:
+    docker:
+      - image: erlang:22-slim
+    working_directory: ~/marvin
+    steps:
+      - checkout
+      - run:
+          name: Install prerequisites
+          command: apt-get update -y && apt-get install -y make gcc g++ git curl
+      - slack/notify:
+          message: Starting build for updated source.
+      - restore_cache:
+          key: deps-cache-{{ checksum "rebar.lock" }}
+          paths:
+            - _build/default/lib
+      - run:
+          name: Building the project
+          command: make get-deps compile
+      - save_cache:
+          name: Creating dependencies cache
+          key: deps-cache-{{ checksum "rebar.lock" }}
+          paths:
+            - _build/default/lib
+      - run:
+          name: Build release
+          command: make release
+      - slack/status:
+          fail_only: false
+          failure_message: Build failed.
+          success_message: Build succeeded.

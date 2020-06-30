@@ -6,4 +6,4 @@ An OTP application
 Build
 -----
 
-    $ rebar3 compile
+    $ make get-deps compile release run-release
