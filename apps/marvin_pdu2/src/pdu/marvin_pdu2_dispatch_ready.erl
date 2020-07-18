@@ -4,12 +4,12 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    guilds :: guilds(),
-    private_channels :: private_channels(),
-    session_id :: session_id(),
-    user :: user(),
-    v :: protocol_version(),
-    '_trace' :: trace()
+    guilds = undefined :: guilds(),
+    private_channels = undefined :: private_channels(),
+    session_id = undefined :: session_id(),
+    user = undefined :: user(),
+    v = undefined :: protocol_version(),
+    '_trace' = undefined :: trace()
 }).
 
 -type guilds() :: [marvin_pdu2_object_guild_unavailable:t()].
@@ -36,23 +36,11 @@ cloak_validate(guilds, Value) when is_list(Value) ->
 cloak_validate(private_channels, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_channel:new(Item) || Item <- Value]};
 
-cloak_validate(session_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
 cloak_validate(user, Value) ->
     {ok, marvin_pdu2_object_user:new(Value)};
 
-cloak_validate(v, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate('_trace', Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

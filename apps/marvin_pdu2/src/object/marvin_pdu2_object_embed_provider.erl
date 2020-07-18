@@ -5,8 +5,8 @@
 % name    string  name of provider
 % url string  url of provider
 -record(?MODULE, {
-    name :: name(),
-    url :: url()
+    name = undefined :: name(),
+    url = undefined :: url()
 }).
 
 -type name() :: unicode:unicode_binary().
@@ -15,18 +15,11 @@
 
 -export_type([name/0, url/0, t/0]).
 
-
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(url, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

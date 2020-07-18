@@ -4,11 +4,11 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    id :: id(),
-    filename :: filename(),
-    size :: size(),
-    url :: url(),
-    proxy_url :: proxy_url(),
+    id = undefined :: id(),
+    filename = undefined :: filename(),
+    size = undefined :: size(),
+    url = undefined :: url(),
+    proxy_url = undefined :: proxy_url(),
     height = undefined :: height(),
     width = undefined :: width()
 }).
@@ -24,36 +24,11 @@
 
 -export_type([id/0, filename/0, size/0, url/0, proxy_url/0, height/0, width/0, t/0]).
 
-
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(filename, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(size, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(proxy_url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(height, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(height, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate(width, null) ->
-    {ok, undefined};
-
-cloak_validate(width, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

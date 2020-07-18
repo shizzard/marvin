@@ -6,9 +6,9 @@
 % me  bool    whether the current user reacted using this emoji
 % emoji   partial emoji object    emoji information
 -record(?MODULE, {
-    count :: count(),
-    me :: me(),
-    emoji :: emoji()
+    count = undefined :: count(),
+    me = undefined :: me(),
+    emoji = undefined :: emoji()
 }).
 
 -type count() :: pos_integer().
@@ -19,17 +19,11 @@
 -export_type([count/0, me/0, emoji/0, t/0]).
 
 
-cloak_validate(count, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(me, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(emoji, Value) ->
-    {ok, marvin_pdu2_object_emoji:new(Value)};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

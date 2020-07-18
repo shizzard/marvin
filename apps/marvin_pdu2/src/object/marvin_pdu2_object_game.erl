@@ -4,9 +4,9 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    type :: type(),
+    type = undefined :: type(),
     state = undefined :: state(),
-    name :: name(),
+    name = undefined :: name(),
     id = undefined :: id(),
     timestamps = undefined :: timestamps() | undefined,
     url = undefined :: url() | undefined,
@@ -30,35 +30,11 @@
 
 -export_type([type/0, name/0, timestamps/0, url/0, details/0, t/0]).
 
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(type, Value)
-when is_integer(Value) andalso (
-    ?type_playing == Value orelse ?type_streaming == Value
-    orelse ?type_listening == Value orelse ?type_watching == Value
-    orelse ?type_custom == Value
-) ->
-    {ok, Value};
-
-cloak_validate(state, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(timestamps, Map) when is_map(Map) ->
-    {ok, Map};
-
-cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(details, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

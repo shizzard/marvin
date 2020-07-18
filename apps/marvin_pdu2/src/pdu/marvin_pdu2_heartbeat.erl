@@ -4,7 +4,7 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    plain_value :: sequence()
+    plain_value = undefined :: sequence()
 }).
 
 -type sequence() :: marvin_pdu2:sequence().

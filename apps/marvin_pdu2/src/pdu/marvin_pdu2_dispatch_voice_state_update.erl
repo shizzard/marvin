@@ -4,16 +4,16 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    user_id :: user_id(),
+    user_id = undefined :: user_id(),
     guild_id = undefined :: guild_id() | undefined,
     channel_id = undefined :: channel_id() | undefined,
-    session_id :: session_id(),
-    suppress :: suppress(),
-    self_video :: self_video(),
-    self_mute :: self_mute(),
-    self_deaf :: self_deaf(),
-    mute :: mute(),
-    deaf :: deaf()
+    session_id = undefined :: session_id(),
+    suppress = undefined :: suppress(),
+    self_video = undefined :: self_video(),
+    self_mute = undefined :: self_mute(),
+    self_deaf = undefined :: self_deaf(),
+    mute = undefined :: mute(),
+    deaf = undefined :: deaf()
 }).
 
 -type user_id() :: marvin_pdu2:snowflake().
@@ -33,42 +33,11 @@
     self_mute/0, self_deaf/0, mute/0, deaf/0, t/0
 ]).
 
-
-cloak_validate(user_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(channel_id, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(session_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(suppress, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(self_video, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(self_mute, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(self_deaf, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(mute, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(deaf, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

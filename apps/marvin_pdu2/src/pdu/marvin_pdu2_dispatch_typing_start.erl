@@ -6,9 +6,9 @@
 % user_id snowflake   id of the user
 % timestamp   integer unix time (in seconds) of when the user started typing
 -record(?MODULE, {
-    channel_id :: channel_id(),
-    user_id :: user_id(),
-    timestamp :: timestamp()
+    channel_id = undefined :: channel_id(),
+    user_id = undefined :: user_id(),
+    timestamp = undefined :: timestamp()
 }).
 
 -type channel_id() :: marvin_pdu2:showflake().
@@ -19,18 +19,8 @@
 
 -export_type([channel_id/0, user_id/0, timestamp/0, t/0]).
 
-
-cloak_validate(channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(user_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(timestamp, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

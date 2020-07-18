@@ -6,9 +6,9 @@
 % height  integer height of video
 % width   integer width of video
 -record(?MODULE, {
-    url :: url(),
-    height :: height(),
-    width :: width()
+    url = undefined :: url(),
+    height = undefined :: height(),
+    width = undefined :: width()
 }).
 
 -type url() :: unicode:unicode_binary().
@@ -18,18 +18,11 @@
 
 -export_type([url/0, height/0, width/0, t/0]).
 
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(height, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(width, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

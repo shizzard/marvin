@@ -4,9 +4,9 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    token :: token(),
-    session_id :: session_id(),
-    seq :: sequence()
+    token = undefined :: token(),
+    session_id = undefined :: session_id(),
+    seq = undefined :: sequence()
 }).
 
 -type token() :: marvin_pdu2:token().
@@ -16,18 +16,8 @@
 
 -export_type([token/0, session_id/0, sequence/0, t/0]).
 
-
-cloak_validate(token, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(session_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(seq, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

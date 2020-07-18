@@ -4,9 +4,9 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    guild_id :: guild_id(),
-    query :: query(),
-    limit :: limit()
+    guild_id = undefined :: guild_id(),
+    query = undefined :: query(),
+    limit = undefined :: limit()
 }).
 
 -type guild_id() :: marvin_pdu2:snowflake().
@@ -16,18 +16,8 @@
 
 -export_type([guild_id/0, 'query'/0, limit/0, t/0]).
 
-
-cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(query, Value) when is_binary(Value) ->
-    {ok, Value};
-
-cloak_validate(limit, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

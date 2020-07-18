@@ -22,23 +22,23 @@
 % activity?   message activity object sent with Rich Presence-related chat embeds
 % application?    message application object  sent with Rich Presence-related chat embeds
 -record(?MODULE, {
-    id :: id(),
-    channel_id :: channel_id(),
-    author :: author(),
-    content :: content(),
-    timestamp :: timestamp(),
+    id = undefined :: id(),
+    channel_id = undefined :: channel_id(),
+    author = undefined :: author(),
+    content = undefined :: content(),
+    timestamp = undefined :: timestamp(),
     edited_timestamp = undefined :: edited_timestamp(),
-    tts :: tts(),
-    mention_everyone :: mention_everyone(),
-    mentions :: mentions(),
-    mention_roles :: mention_roles(),
-    attachments :: attachments(),
-    embeds :: embeds(),
+    tts = undefined :: tts(),
+    mention_everyone = undefined :: mention_everyone(),
+    mentions = undefined :: mentions(),
+    mention_roles = undefined :: mention_roles(),
+    attachments = undefined :: attachments(),
+    embeds = undefined :: embeds(),
     reactions = [] :: reactions(),
     nonce = undefined :: nonce(),
-    pinned :: pinned(),
+    pinned = undefined :: pinned(),
     webhook_id = undefined :: webhook_id(),
-    type :: type()
+    type = undefined :: type()
     % activity = undefined :: activity(),
     % application = undefined :: application()
 }).
@@ -81,41 +81,14 @@
     t/0
 ]).
 
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
 cloak_validate(author, Value) ->
     {ok, marvin_pdu2_object_user:new(Value)};
 
-cloak_validate(content, Value) when is_binary(Value) ->
-    {ok, Value};
-
-cloak_validate(timestamp, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(edited_timestamp, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
-
-cloak_validate(edited_timestamp, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(tts, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(mention_everyone, Value) when is_boolean(Value) ->
-    {ok, Value};
 
 cloak_validate(mentions, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_user:new(Item) || Item <- Value]};
-
-cloak_validate(mention_roles, Value) when is_list(Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
 
 cloak_validate(attachments, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_attachment:new(Item) || Item <- Value]};
@@ -126,39 +99,8 @@ cloak_validate(embeds, Value) when is_list(Value) ->
 cloak_validate(reactions, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_reaction:new(Item) || Item <- Value]};
 
-cloak_validate(nonce, null) ->
-    {ok, undefined};
-
-cloak_validate(nonce, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(pinned, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(webhook_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(type, Value)
-when is_integer(Value) andalso (
-    ?type_default == Value
-    orelse ?type_recipient_add == Value
-    orelse ?type_recipient_remove == Value
-    orelse ?type_call == Value
-    orelse ?type_channel_name_change == Value
-    orelse ?type_channel_icon_change == Value
-    orelse ?type_channel_pinned_message == Value
-    orelse ?type_guild_member_join == Value
-) ->
-    {ok, Value};
-
-% cloak_validate(activity, Value) ->
-%     {ok, marvin_pdu2_object_activity:new(Value)};
-
-% cloak_validate(application, Value) ->
-%     {ok, marvin_pdu2_object_application:new(Value)};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

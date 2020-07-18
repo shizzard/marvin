@@ -5,7 +5,7 @@
 
 -record(?MODULE, {
     id = undefined :: id(),
-    name :: name(),
+    name = undefined :: name(),
     roles = [] :: roles(),
     require_colons = false :: require_colons(),
     managed = false :: managed(),
@@ -30,32 +30,11 @@ format(#?MODULE{id = Id, name = Name, animated = false}) ->
     <<"<:", Name/binary, ":", Id/binary, ">">>.
 
 
-cloak_validate(id, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(roles, Value) when is_list(Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
-
-cloak_validate(require_colons, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(managed, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(animated, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

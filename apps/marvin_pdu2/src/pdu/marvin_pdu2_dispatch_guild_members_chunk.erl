@@ -4,7 +4,7 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    guild_id :: guild_id(),
+    guild_id = undefined :: guild_id(),
     members = [] :: members()
 }).
 
@@ -15,15 +15,11 @@
 -export_type([guild_id/0, members/0, t/0
 ]).
 
-
-cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
 cloak_validate(members, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_member:new(Item) || Item <- Value]};
 
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

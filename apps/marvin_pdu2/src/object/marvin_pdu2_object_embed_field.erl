@@ -6,9 +6,9 @@
 % value   string  value of the field
 % inline  bool    whether or not this field should display inline
 -record(?MODULE, {
-    name :: name(),
-    value :: value(),
-    inline :: inline()
+    name = undefined :: name(),
+    value = undefined :: value(),
+    inline = undefined :: inline()
 }).
 
 -type name() :: unicode:unicode_binary().
@@ -18,18 +18,11 @@
 
 -export_type([name/0, value/0, inline/0, t/0]).
 
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(value, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(inline, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

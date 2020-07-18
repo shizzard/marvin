@@ -4,12 +4,12 @@
 -export([export/1, get_nickname/1, have_role/2]).
 
 -record(?MODULE, {
-    user :: user(),
+    user = undefined :: user(),
     roles = [] :: roles(),
     nick = undefined :: nick() | undefined,
-    mute :: mute(),
-    joined_at :: joined_at(),
-    deaf :: deaf()
+    mute = undefined :: mute(),
+    joined_at = undefined :: joined_at(),
+    deaf = undefined :: deaf()
 }).
 
 -type user() :: marvin_pdu2_object_user:t().
@@ -36,33 +36,11 @@ have_role(Member, RoleId) ->
     lists:member(RoleId, roles(Member)).
 
 
-
-cloak_validate(user, Value) ->
-    {ok, marvin_pdu2_object_user:new(Value)};
-
-cloak_validate(roles, Value) when is_list(Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
-
-cloak_validate(nick, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(nick, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(mute, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(joined_at, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(deaf, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

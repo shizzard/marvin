@@ -6,7 +6,7 @@
 -record(?MODULE, {
     user :: user(),
     game = undefined :: game() | undefined,
-    status :: status()
+    status = undefined :: status()
 }).
 
 -define(status_online, <<"online">>).
@@ -21,27 +21,11 @@
 
 -export_type([user/0, game/0, status/0, t/0]).
 
-
-cloak_validate(user, #{<<"id">> := Value}) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(game, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(game, Value) ->
-    {ok, marvin_pdu2_object_game:new(Value)};
-
-cloak_validate(status, Value)
-when is_binary(Value) andalso (
-    ?status_online == Value
-    orelse ?status_offline == Value
-    orelse ?status_idle == Value
-    orelse ?status_dnd == Value
-) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

@@ -7,9 +7,9 @@
 ]).
 
 -record(?MODULE, {
-    id :: id(),
+    id = undefined :: id(),
     guild_id = undefined :: guild_id() | undefined,
-    type :: type(),
+    type = undefined :: type(),
     parent_id = undefined :: parent_id() | undefined,
     name = undefined :: name() | undefined,
     topic = undefined :: topic() | undefined,
@@ -67,77 +67,17 @@ channel_type_guild_voice() -> ?channel_type_guild_voice.
 channel_type_group_dm() -> ?channel_type_group_dm.
 channel_type_guild_category() -> ?channel_type_guild_category.
 
-
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(type, Value)
-when ?channel_type_guild_text == Value
-orelse ?channel_type_dm == Value
-orelse ?channel_type_guild_voice == Value
-orelse ?channel_type_group_dm == Value
-orelse ?channel_type_guild_category == Value ->
-    {ok, Value};
-
-cloak_validate(parent_id, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
-
-cloak_validate(parent_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(topic, null) ->
-    {ok, undefined};
-
-cloak_validate(topic, Value) when is_binary(Value) ->
-    {ok, Value};
-
-cloak_validate(nsfw, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(last_message_id, null) ->
-    {ok, undefined};
-
-cloak_validate(last_message_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(position, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(user_limit, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
 
 cloak_validate(recipients, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_user:new(Item) || Item <- Value]};
 
-cloak_validate(owner_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(application_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(icon, null) ->
-    {ok, undefined};
-
-cloak_validate(icon, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(bitrate, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
 cloak_validate(permission_overwrites, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_permission_overwrite:new(Item) || Item <- Value]};
 
-cloak_validate(last_pin_timestamp, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

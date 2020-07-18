@@ -7,7 +7,7 @@
 % icon_url    string  url of author icon (only supports http(s) and attachments)
 % proxy_icon_url  string  a proxied url of author icon
 -record(?MODULE, {
-    name :: name(),
+    name = undefined :: name(),
     url = undefined :: url(),
     icon_url = undefined :: icon_url() | undefined,
     proxy_icon_url = undefined :: proxy_icon_url() | undefined
@@ -21,21 +21,11 @@
 
 -export_type([name/0, url/0, icon_url/0, proxy_icon_url/0, t/0]).
 
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(icon_url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(proxy_icon_url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

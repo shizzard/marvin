@@ -4,25 +4,25 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    id :: id(),
-    name :: name(),
+    id = undefined :: id(),
+    name = undefined :: name(),
     icon = undefined :: icon() | undefined,
     splash = undefined :: splash() | undefined,
     owner = undefined :: owner() | undefined,
-    owner_id :: owner_id(),
+    owner_id = undefined :: owner_id(),
     permissions = undefined :: permissions() | undefined,
-    region :: region(),
-    afk_channel_id :: afk_channel_id(),
-    afk_timeout :: afk_timeout(),
+    region = undefined :: region(),
+    afk_channel_id = undefined :: afk_channel_id(),
+    afk_timeout = undefined :: afk_timeout(),
     embed_enabled = undefined :: embed_enabled() | undefined,
     embed_channel_id = unsefined :: embed_channel_id() | undefined,
-    verification_level :: verification_level(),
-    default_message_notifications :: default_message_notifications(),
-    explicit_content_filter :: explicit_content_filter(),
-    roles :: roles(),
-    emojis :: emojis(),
-    features :: features(),
-    mfa_level :: mfa_level(),
+    verification_level = undefined :: verification_level(),
+    default_message_notifications = undefined :: default_message_notifications(),
+    explicit_content_filter = undefined :: explicit_content_filter(),
+    roles = [] :: roles(),
+    emojis = [] :: emojis(),
+    features = [] :: features(),
+    mfa_level = undefined :: mfa_level(),
     application_id = undefined :: application_id() | undefined,
     widget_enabled = undefined :: widget_enabled() | undefined,
     widget_channel_id = undefined :: widget_channel_id() | undefined,
@@ -96,125 +96,14 @@
     member_count/0, voice_states/0, members/0, channels/0, presences/0, t/0
 ]).
 
-
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(icon, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(icon, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
-
-cloak_validate(splash, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(splash, null) ->
-    {ok, undefined};
-
-cloak_validate(owner, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(owner_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(permissions, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate(region, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(afk_channel_id, null) ->
-    {ok, undefined};
-
-cloak_validate(afk_channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(afk_timeout, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate(embed_enabled, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(embed_channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(verification_level, Value)
-when is_integer(Value) andalso (
-    ?verification_level_none == Value
-    orelse ?verification_level_low == Value
-    orelse ?verification_level_medium == Value
-    orelse ?verification_level_high == Value
-    orelse ?verification_level_veryhigh == Value
-) ->
-    {ok, Value};
-
-cloak_validate(default_message_notifications, Value)
-when is_integer(Value) andalso (
-    ?default_message_notifications_all == Value
-    orelse ?default_message_notifications_only_mentions == Value
-) ->
-    {ok, Value};
-
-cloak_validate(explicit_content_filter, Value)
-when is_integer(Value) andalso (
-    ?explicit_content_filter_disabled == Value
-    orelse ?explicit_content_filter_members_wo_roles == Value
-    orelse ?explicit_content_filter_all == Value
-) ->
-    {ok, Value};
 
 cloak_validate(roles, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_role:new(Item) || Item <- Value]};
 
 cloak_validate(emojis, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_emoji:new(Item) || Item <- Value]};
-
-cloak_validate(features, Value) when is_list(Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
-
-cloak_validate(mfa_level, Value)
-when is_integer(Value) andalso (
-    ?mfa_level_none == Value
-    orelse ?mfa_level_elevated == Value
-) ->
-    {ok, Value};
-
-cloak_validate(application_id, null) ->
-    {ok, undefined};
-
-cloak_validate(application_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(widget_enabled, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(widget_channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(system_channel_id, null) ->
-    {ok, undefined};
-
-cloak_validate(system_channel_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(joined_at, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(large, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(unavailable, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(member_count, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
 
 cloak_validate(voice_states, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_voice_state:new(Item) || Item <- Value]};
@@ -228,8 +117,8 @@ cloak_validate(channels, Value) when is_list(Value) ->
 cloak_validate(presences, Value) when is_list(Value) ->
     {ok, [marvin_pdu2_object_presence:new(Item) || Item <- Value]};
 
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

@@ -51,48 +51,11 @@
     image/0, thumbnail/0, video/0, provider/0, author/0, fields/0, t/0
 ]).
 
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(title, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(type, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(description, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(url, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(timestamp, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(color, Value) when is_integer(Value) andalso Value >= 16#000000 andalso Value =< 16#FFFFFF ->
-    {ok, Value};
-
-cloak_validate(footer, Value) ->
-    {ok, marvin_pdu2_object_embed_footer:new(Value)};
-
-cloak_validate(image, Value) ->
-    {ok, marvin_pdu2_object_embed_image:new(Value)};
-
-cloak_validate(thumbnail, Value) ->
-    {ok, marvin_pdu2_object_embed_thumbnail:new(Value)};
-
-cloak_validate(video, Value) ->
-    {ok, marvin_pdu2_object_embed_video:new(Value)};
-
-cloak_validate(provider, Value) ->
-    {ok, marvin_pdu2_object_embed_provider:new(Value)};
-
-cloak_validate(author, Value) ->
-    {ok, marvin_pdu2_object_embed_author:new(Value)};
-
-cloak_validate(fields, Value) ->
-    {ok, [marvin_pdu2_object_embed_field:new(Item) || Item <- Value]};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

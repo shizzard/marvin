@@ -9,7 +9,7 @@
 -record(?MODULE, {
     since = undefined :: since() | undefined,
     game = undefined :: game() | undefined,
-    status :: status(),
+    status = undefined :: status(),
     afk = false :: afk()
 }).
 
@@ -32,33 +32,14 @@
 
 
 
-cloak_validate(since, null) ->
-    {ok, undefined};
-
-cloak_validate(since, Value) when is_integer(Value) andalso Value > 0 ->
-    {ok, Value};
-
-cloak_validate(game, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
 cloak_validate(game, Value) ->
     {ok, marvin_pdu2_object_game:new(Value)};
 
-cloak_validate(status, Value)
-when is_binary(Value) andalso (
-    ?status_online == Value
-    orelse ?status_offline == Value
-    orelse ?status_idle == Value
-    orelse ?status_dnd == Value
-    orelse ?status_invisible == Value
-) ->
-    {ok, Value};
-
-cloak_validate(afk, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

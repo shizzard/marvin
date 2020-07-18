@@ -4,14 +4,14 @@
 -export([export/1, format/1]).
 
 -record(?MODULE, {
-    id :: id(),
-    name :: name(),
-    permissions :: permissions(),
-    position :: position(),
-    color :: color(),
-    mentionable :: mentionable(),
-    managed :: managed(),
-    hoist :: hoist()
+    id = undefined :: id(),
+    name = undefined :: name(),
+    permissions = undefined :: permissions(),
+    position = undefined :: position(),
+    color = undefined :: color(),
+    mentionable = undefined :: mentionable(),
+    managed = undefined :: managed(),
+    hoist = undefined :: hoist()
 }).
 
 -type id() :: marvin_pdu2:snowflake().
@@ -34,32 +34,11 @@ format(#?MODULE{id = Id}) ->
     <<"<@&", Id/binary, ">">>.
 
 
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(name, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(permissions, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(position, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(color, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(mentionable, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(managed, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(hoist, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

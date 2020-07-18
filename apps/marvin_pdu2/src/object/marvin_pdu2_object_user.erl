@@ -4,9 +4,9 @@
 -export([export/1, is/2, format/1, format_username/1]).
 
 -record(?MODULE, {
-    id :: id(),
-    username :: username(),
-    discriminator :: discriminator(),
+    id = undefined :: id(),
+    username = undefined :: username(),
+    discriminator = undefined :: discriminator(),
     avatar = undefined :: avatar() | undefined,
     bot = false :: bot(),
     mfa_enabled = false :: mfa_enabled(),
@@ -42,38 +42,11 @@ format_username(#?MODULE{id = Id}) ->
     <<"<@!", Id/binary, ">">>.
 
 
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(username, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(discriminator, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(avatar, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(avatar, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(bot, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(mfa_enabled, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(verified, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(email, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(email, null) ->
-    {ok, undefined};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

@@ -4,11 +4,11 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    '$os' :: os(),
-    '$browser' :: browser(),
-    '$device' :: device(),
-    '$referrer' :: referrer(),
-    '$referring_domain' :: referring_domain()
+    '$os' = undefined :: os(),
+    '$browser' = undefined :: browser(),
+    '$device' = undefined :: device(),
+    '$referrer' = undefined :: referrer(),
+    '$referring_domain' = undefined :: referring_domain()
 }).
 
 -type os() :: unicode:unicode_binary().
@@ -20,25 +20,8 @@
 
 -export_type([os/0, browser/0, device/0, referrer/0, referring_domain/0, t/0]).
 
-
-
-cloak_validate('$os', Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate('$browser', Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate('$device', Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate('$referrer', Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate('$referring_domain', Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

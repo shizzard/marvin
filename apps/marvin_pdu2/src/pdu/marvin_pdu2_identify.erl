@@ -4,13 +4,13 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    token :: token(),
-    compress :: compress(),
-    large_threshold :: large_threshold(),
-    properties :: properties(),
-    shard :: shard(),
-    prot_shard :: prot_shard(),
-    prot_total_shards :: prot_total_shards()
+    token = undefined :: token(),
+    compress = undefined :: compress(),
+    large_threshold = undefined :: large_threshold(),
+    properties = undefined :: properties(),
+    shard = undefined :: shard(),
+    prot_shard = undefined :: prot_shard(),
+    prot_total_shards = undefined :: prot_total_shards()
 }).
 
 -type token() :: marvin_pdu2:token().
@@ -27,16 +27,6 @@
     prot_shard/0, prot_total_shards/0, t/0
 ]).
 
-
-cloak_validate(token, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(compress, Value) when is_boolean(Value) ->
-    {ok, Value};
-
-cloak_validate(large_threshold, Value) when Value > 0 andalso Value =< 250 ->
-    {ok, Value};
-
 cloak_validate(properties, Value) ->
     {ok, marvin_pdu2_identify_properties:new(Value)};
 
@@ -45,8 +35,8 @@ when is_integer(Shard) andalso is_integer(TotalShards)
 andalso Shard < TotalShards ->
     {ok, Value};
 
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 cloak_validate_struct(#?MODULE{shard = [Shard, TotalShards]} = Struct) ->

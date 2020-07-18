@@ -4,8 +4,8 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    guild_id :: guild_id(),
-    role_id :: role_id()
+    guild_id = undefined :: guild_id(),
+    role_id = undefined :: role_id()
 }).
 
 -type guild_id() :: marvin_pdu2:snowflake().
@@ -14,15 +14,8 @@
 
 -export_type([guild_id/0, role_id/0, t/0]).
 
-
-cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(role_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

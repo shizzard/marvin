@@ -8,12 +8,12 @@
 % guild_id    snowflake   id of the guild
 % status  string  either "idle", "dnd", "online", or "offline"
 -record(?MODULE, {
-    user :: user(),
+    user = undefined :: user(),
     nick = undefined :: nick(),
-    roles :: roles(),
+    roles = [] :: roles(),
     game = undefined :: game() | undefined,
-    guild_id :: guild_id(),
-    status :: status()
+    guild_id = undefined :: guild_id(),
+    status = undefined :: status()
 }).
 
 -define(status_online, <<"online">>).
@@ -39,38 +39,14 @@
 cloak_validate(user, #{<<"id">> := Value}) when is_binary(Value) andalso Value /= <<>> ->
     {ok, Value};
 
-cloak_validate(nick, null) ->
-    {ok, undefined};
-
-cloak_validate(nick, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(roles, Value) when is_list(Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
-
-cloak_validate(game, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
 cloak_validate(game, Value) ->
     {ok, marvin_pdu2_object_game:new(Value)};
 
-cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(status, Value)
-when is_binary(Value) andalso (
-    ?status_online == Value
-    orelse ?status_offline == Value
-    orelse ?status_idle == Value
-    orelse ?status_dnd == Value
-) ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

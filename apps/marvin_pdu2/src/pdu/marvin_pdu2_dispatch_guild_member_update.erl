@@ -4,9 +4,9 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    guild_id :: guild_id(),
-    roles :: roles(),
-    user :: user(),
+    guild_id = undefined :: guild_id(),
+    roles = undefined :: roles(),
+    user = undefined :: user(),
     nick = undefined :: nick()
 }).
 
@@ -18,27 +18,14 @@
 
 -export_type([guild_id/0, roles/0, user/0, nick/0, t/0]).
 
-
-cloak_validate(guild_id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(roles, Value) when is_list(Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end;
-
 cloak_validate(user, Value) ->
     {ok, marvin_pdu2_object_user:new(Value)};
 
-cloak_validate(nick, null) ->
+cloak_validate(_, null) ->
     {ok, undefined};
 
-cloak_validate(nick, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

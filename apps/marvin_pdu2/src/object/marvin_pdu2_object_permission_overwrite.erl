@@ -5,10 +5,10 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    id :: id(),
-    type :: type(),
-    deny :: deny(),
-    allow :: allow()
+    id = undefined :: id(),
+    type = undefined :: type(),
+    deny = undefined :: deny(),
+    allow = undefined :: allow()
 }).
 
 -define(type_member, <<"member">>).
@@ -26,22 +26,11 @@
 type_member() -> <<"member">>.
 type_role() -> <<"role">>.
 
+cloak_validate(_, null) ->
+    {ok, undefined};
 
-cloak_validate(id, Value) when is_binary(Value) andalso Value /= <<>> ->
-    {ok, Value};
-
-cloak_validate(type, Value)
-when is_binary(Value) andalso (?type_member == Value orelse ?type_role == Value) ->
-    {ok, Value};
-
-cloak_validate(deny, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(allow, Value) when is_integer(Value) andalso Value >= 0 ->
-    {ok, Value};
-
-cloak_validate(_, _) ->
-    {error, invalid}.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{

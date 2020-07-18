@@ -4,7 +4,7 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    '_trace' :: trace()
+    '_trace' = undefined :: trace()
 }).
 
 -type trace() :: marvin_pdu2:trace().
@@ -12,12 +12,8 @@
 
 -export_type([trace/0, t/0]).
 
-
-cloak_validate('_trace', Value) ->
-    case lists:all(fun is_binary/1, Value) of
-        true -> {ok, Value};
-        false -> {error, invalid}
-    end.
+cloak_validate(_, Value) ->
+    {ok, Value}.
 
 
 export(#?MODULE{'_trace' = Trace}) ->
