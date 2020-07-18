@@ -39,6 +39,9 @@ have_role(Member, RoleId) ->
 cloak_validate(_, null) ->
     {ok, undefined};
 
+cloak_validate(user, Value) ->
+    {ok, marvin_pdu2_object_user:new(Value)};
+
 cloak_validate(_, Value) ->
     {ok, Value}.
 

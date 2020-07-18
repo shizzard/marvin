@@ -4,7 +4,7 @@
 -export([export/1]).
 
 -record(?MODULE, {
-    user :: user(),
+    user = undefined :: user(),
     game = undefined :: game() | undefined,
     status = undefined :: status()
 }).
@@ -21,8 +21,12 @@
 
 -export_type([user/0, game/0, status/0, t/0]).
 
+
 cloak_validate(_, null) ->
     {ok, undefined};
+
+cloak_validate(game, Value) ->
+    {ok, marvin_pdu2_object_game:new(Value)};
 
 cloak_validate(_, Value) ->
     {ok, Value}.

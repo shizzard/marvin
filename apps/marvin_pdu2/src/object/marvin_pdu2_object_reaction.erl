@@ -22,6 +22,9 @@
 cloak_validate(_, null) ->
     {ok, undefined};
 
+cloak_validate(emoji, Value) ->
+    {ok, marvin_pdu2_object_emoji:new(Value)};
+
 cloak_validate(_, Value) ->
     {ok, Value}.
 
