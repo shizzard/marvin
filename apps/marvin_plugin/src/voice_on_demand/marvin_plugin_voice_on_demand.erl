@@ -428,11 +428,25 @@ lookup_channel(Ets, ChannelName) ->
 
 
 insert_channel(Ets, Channel) ->
+    ?l_debug(#{
+        text => "Plugin voice channel inserted for monitoring",
+        what => insert_channel,
+        details => #{
+            channel => Channel
+        }
+    }),
     ets:insert(Ets, Channel),
     ok.
 
 
 
 delete_channel(Ets, ChannelName) ->
+    ?l_debug(#{
+        text => "Plugin voice channel deleted from monitoring",
+        what => delete_channel,
+        details => #{
+            channel_name => ChannelName
+        }
+    }),
     ets:delete(Ets, ChannelName),
     ok.
