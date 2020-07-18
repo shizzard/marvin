@@ -35,7 +35,7 @@ export(#?MODULE{
     emoji = Emoji
 }) ->
     #{
-        <<"count">> => Count,
-        <<"me">> => Me,
+        <<"count">> => marvin_pdu2:nullify(Count),
+        <<"me">> => marvin_pdu2:nullify(Me),
         <<"emoji">> => marvin_pdu2_object_emoji:export(Emoji)
     }.

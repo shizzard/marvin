@@ -35,8 +35,8 @@ export(#?MODULE{
     nick = Nick
 }) ->
     #{
-        <<"guild_id">> => GuildId,
-        <<"roles">> => Roles,
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
+        <<"roles">> => marvin_pdu2:nullify(Roles),
         <<"user">> => marvin_pdu2_object_user:export(User),
         <<"nick">> => marvin_pdu2:nullify(Nick)
     }.

@@ -27,6 +27,6 @@ export(#?MODULE{
     members = Members
 }) ->
     #{
-        <<"guild_id">> => GuildId,
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
         <<"members">> => [marvin_pdu2_object_member:export(Item) || Item <- Members]
     }.

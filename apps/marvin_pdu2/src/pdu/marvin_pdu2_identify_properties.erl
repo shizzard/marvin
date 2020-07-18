@@ -32,9 +32,9 @@ export(#?MODULE{
     '$referring_domain' = ReferringDomain
 }) ->
     #{
-        <<"$os">> => OS,
-        <<"$browser">> => Browser,
-        <<"$device">> => Device,
-        <<"$referrer">> => Referrer,
-        <<"$referring_domain">> => ReferringDomain
+        <<"$os">> => marvin_pdu2:nullify(OS),
+        <<"$browser">> => marvin_pdu2:nullify(Browser),
+        <<"$device">> => marvin_pdu2:nullify(Device),
+        <<"$referrer">> => marvin_pdu2:nullify(Referrer),
+        <<"$referring_domain">> => marvin_pdu2:nullify(ReferringDomain)
     }.

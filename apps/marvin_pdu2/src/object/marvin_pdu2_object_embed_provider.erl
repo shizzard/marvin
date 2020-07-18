@@ -27,6 +27,6 @@ export(#?MODULE{
     url = Url
 }) ->
     #{
-        <<"name">> => Name,
+        <<"name">> => marvin_pdu2:nullify(Name),
         <<"url">> => marvin_pdu2:nullify(Url)
     }.

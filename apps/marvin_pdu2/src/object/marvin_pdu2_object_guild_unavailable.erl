@@ -26,6 +26,6 @@ export(#?MODULE{
     unavailable = Unavailable
 }) ->
     #{
-        <<"id">> => Id,
-        <<"unavailable">> => Unavailable
+        <<"id">> => marvin_pdu2:nullify(Id),
+        <<"unavailable">> => marvin_pdu2:nullify(Unavailable)
     }.

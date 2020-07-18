@@ -52,12 +52,12 @@ export(#?MODULE{
     hoist = Hoist
 }) ->
     #{
-        <<"id">> => Id,
-        <<"name">> => Name,
-        <<"permissions">> => Permissions,
-        <<"position">> => Position,
-        <<"color">> => Color,
-        <<"mentionable">> => Mentionable,
-        <<"managed">> => Managed,
-        <<"hoist">> => Hoist
+        <<"id">> => marvin_pdu2:nullify(Id),
+        <<"name">> => marvin_pdu2:nullify(Name),
+        <<"permissions">> => marvin_pdu2:nullify(Permissions),
+        <<"position">> => marvin_pdu2:nullify(Position),
+        <<"color">> => marvin_pdu2:nullify(Color),
+        <<"mentionable">> => marvin_pdu2:nullify(Mentionable),
+        <<"managed">> => marvin_pdu2:nullify(Managed),
+        <<"hoist">> => marvin_pdu2:nullify(Hoist)
     }.

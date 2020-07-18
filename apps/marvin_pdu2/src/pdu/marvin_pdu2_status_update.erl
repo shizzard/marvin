@@ -54,6 +54,6 @@ export(#?MODULE{
             undefined -> null;
             _ -> marvin_pdu2_object_game:export(Game)
         end,
-        <<"status">> => Status,
-        <<"afk">> => Afk
+        <<"status">> => marvin_pdu2:nullify(Status),
+        <<"afk">> => marvin_pdu2:nullify(Afk)
     }.

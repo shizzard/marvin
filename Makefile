@@ -34,8 +34,6 @@ MARVIN_APP_PLUGIN_CONFIG_FILENAME_TEMPLATE = plugin_{{plugin_id}}_{{guild_id}}_c
 MARVIN_STORAGE_DB_POOL_SIZE = 10
 MARVIN_STORAGE_DB_POOL_OVERFLOW = 10
 MARVIN_STORAGE_DB_NAME = marvin
-MARVIN_STORAGE_DB_HOST = 192.168.99.100
-MARVIN_STORAGE_DB_PORT = 27017
 
 .PHONY: all get-deps compile release test shell clean dialyze run-release run-logtail
 

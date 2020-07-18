@@ -29,7 +29,7 @@ export(#?MODULE{
     timestamp = Timestamp
 }) ->
     #{
-        <<"channel_id">> => ChannelId,
-        <<"user_id">> => UserId,
-        <<"timestamp">> => Timestamp
+        <<"channel_id">> => marvin_pdu2:nullify(ChannelId),
+        <<"user_id">> => marvin_pdu2:nullify(UserId),
+        <<"timestamp">> => marvin_pdu2:nullify(Timestamp)
     }.

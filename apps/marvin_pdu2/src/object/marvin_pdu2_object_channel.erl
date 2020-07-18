@@ -95,21 +95,21 @@ export(#?MODULE{
     last_pin_timestamp = LastPinTimestamp
 }) ->
     marvin_pdu2:export(#{
-        <<"id">> => Id,
-        <<"guild_id">> => GuildId,
-        <<"type">> => Type,
+        <<"id">> => marvin_pdu2:nullify(Id),
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
+        <<"type">> => marvin_pdu2:nullify(Type),
         <<"parent_id">> => marvin_pdu2:nullify(ParentId),
-        <<"name">> => Name,
+        <<"name">> => marvin_pdu2:nullify(Name),
         <<"topic">> => marvin_pdu2:nullify(Topic),
-        <<"nsfw">> => Nsfw,
+        <<"nsfw">> => marvin_pdu2:nullify(Nsfw),
         <<"last_message_id">> => marvin_pdu2:nullify(LastMessageId),
-        <<"position">> => Position,
-        <<"user_limit">> => UserLimit,
+        <<"position">> => marvin_pdu2:nullify(Position),
+        <<"user_limit">> => marvin_pdu2:nullify(UserLimit),
         <<"recipients">> => [marvin_pdu2_object_user:export(Item) || Item <- Recipients],
-        <<"owner_id">> => OwnerId,
-        <<"application_id">> => ApplicationId,
+        <<"owner_id">> => marvin_pdu2:nullify(OwnerId),
+        <<"application_id">> => marvin_pdu2:nullify(ApplicationId),
         <<"icon">> => marvin_pdu2:nullify(Icon),
-        <<"bitrate">> => Bitrate,
+        <<"bitrate">> => marvin_pdu2:nullify(Bitrate),
         <<"permission_overwrites">> => [marvin_pdu2_object_permission_overwrite:export(Item) || Item <- PermissionOverwrites],
-        <<"last_pin_timestamp">> => LastPinTimestamp
+        <<"last_pin_timestamp">> => marvin_pdu2:nullify(LastPinTimestamp)
     }).

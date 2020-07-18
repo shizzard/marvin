@@ -54,8 +54,8 @@ export(#?MODULE{
     #{
         <<"guilds">> => [marvin_pdu2_object_guild_unavailable:export(Item) || Item <- Guilds],
         <<"private_channels">> => [marvin_pdu2_object_channel:export(Item) || Item <- PrivateChannels],
-        <<"session_id">> => SessionId,
+        <<"session_id">> => marvin_pdu2:nullify(SessionId),
         <<"user">> => marvin_pdu2_object_user:export(User),
-        <<"v">> => Version,
-        <<"_trace">> => Trace
+        <<"v">> => marvin_pdu2:nullify(Version),
+        <<"_trace">> => marvin_pdu2:nullify(Trace)
     }.

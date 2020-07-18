@@ -26,6 +26,6 @@ export(#?MODULE{
     role = Role
 }) ->
     #{
-        <<"guild_id">> => GuildId,
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
         <<"role">> => marvin_pdu2_object_role:export(Role)
     }.

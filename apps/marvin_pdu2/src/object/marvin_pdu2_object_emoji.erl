@@ -47,9 +47,9 @@ export(#?MODULE{
 }) ->
     #{
         <<"id">> => marvin_pdu2:nullify(Id),
-        <<"name">> => Name,
-        <<"roles">> => Roles,
-        <<"require_colons">> => RequireColons,
-        <<"managed">> => Managed,
-        <<"animated">> => Animated
+        <<"name">> => marvin_pdu2:nullify(Name),
+        <<"roles">> => marvin_pdu2:nullify(Roles),
+        <<"require_colons">> => marvin_pdu2:nullify(RequireColons),
+        <<"managed">> => marvin_pdu2:nullify(Managed),
+        <<"animated">> => marvin_pdu2:nullify(Animated)
     }.

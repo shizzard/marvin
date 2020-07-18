@@ -31,7 +31,7 @@ export(#?MODULE{
     width = Width
 }) ->
     #{
-        <<"url">> => Url,
-        <<"height">> => Height,
-        <<"width">> => Width
+        <<"url">> => marvin_pdu2:nullify(Url),
+        <<"height">> => marvin_pdu2:nullify(Height),
+        <<"width">> => marvin_pdu2:nullify(Width)
     }.

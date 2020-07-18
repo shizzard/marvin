@@ -35,8 +35,8 @@ export(#?MODULE{
     width = Width
 }) ->
     #{
-        <<"url">> => Url,
-        <<"proxy_url">> => ProxyUrl,
-        <<"height">> => Height,
-        <<"width">> => Width
+        <<"url">> => marvin_pdu2:nullify(Url),
+        <<"proxy_url">> => marvin_pdu2:nullify(ProxyUrl),
+        <<"height">> => marvin_pdu2:nullify(Height),
+        <<"width">> => marvin_pdu2:nullify(Width)
     }.

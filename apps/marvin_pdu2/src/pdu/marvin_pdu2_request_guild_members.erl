@@ -26,7 +26,7 @@ export(#?MODULE{
     limit = Limit
 }) ->
     #{
-        <<"guild_id">> => GuildId,
-        <<"query">> => Query,
-        <<"limit">> => Limit
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
+        <<"query">> => marvin_pdu2:nullify(Query),
+        <<"limit">> => marvin_pdu2:nullify(Limit)
     }.

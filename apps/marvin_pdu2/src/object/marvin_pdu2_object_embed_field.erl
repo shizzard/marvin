@@ -31,7 +31,7 @@ export(#?MODULE{
     inline = Inline
 }) ->
     #{
-        <<"name">> => Name,
-        <<"value">> => Value,
-        <<"inline">> => Inline
+        <<"name">> => marvin_pdu2:nullify(Name),
+        <<"value">> => marvin_pdu2:nullify(Value),
+        <<"inline">> => marvin_pdu2:nullify(Inline)
     }.

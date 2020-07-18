@@ -65,6 +65,6 @@ export(#?MODULE{
             undefined -> null;
             _ -> marvin_pdu2_object_game:export(Game)
         end,
-        <<"guild_id">> => GuildId,
-        <<"status">> => Status
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
+        <<"status">> => marvin_pdu2:nullify(Status)
     }.

@@ -60,12 +60,12 @@ export(#?MODULE{
     email = Email
 }) ->
     #{
-        <<"id">> => Id,
-        <<"username">> => Username,
-        <<"discriminator">> => Discriminator,
+        <<"id">> => marvin_pdu2:nullify(Id),
+        <<"username">> => marvin_pdu2:nullify(Username),
+        <<"discriminator">> => marvin_pdu2:nullify(Discriminator),
         <<"avatar">> => marvin_pdu2:nullify(Avatar),
-        <<"bot">> => Bot,
-        <<"mfa_enabled">> => MfaEnabled,
-        <<"verified">> => Verified,
+        <<"bot">> => marvin_pdu2:nullify(Bot),
+        <<"mfa_enabled">> => marvin_pdu2:nullify(MfaEnabled),
+        <<"verified">> => marvin_pdu2:nullify(Verified),
         <<"email">> => marvin_pdu2:nullify(Email)
     }.

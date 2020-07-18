@@ -125,23 +125,23 @@ export(#?MODULE{
     % application = Application
 }) ->
     #{
-        <<"id">> => Id,
-        <<"channel_id">> => ChannelId,
+        <<"id">> => marvin_pdu2:nullify(Id),
+        <<"channel_id">> => marvin_pdu2:nullify(ChannelId),
         <<"author">> => marvin_pdu2_object_user:export(Author),
-        <<"content">> => Content,
-        <<"timestamp">> => Timestamp,
+        <<"content">> => marvin_pdu2:nullify(Content),
+        <<"timestamp">> => marvin_pdu2:nullify(Timestamp),
         <<"edited_timestamp">> => marvin_pdu2:nullify(EditedTimestamp),
-        <<"tts">> => Tts,
-        <<"mention_everyone">> => MentionEveryone,
+        <<"tts">> => marvin_pdu2:nullify(Tts),
+        <<"mention_everyone">> => marvin_pdu2:nullify(MentionEveryone),
         <<"mentions">> => [marvin_pdu2_object_user:export(Item) || Item <- Mentions],
-        <<"mention_roles">> => MentionRoles,
+        <<"mention_roles">> => marvin_pdu2:nullify(MentionRoles),
         <<"attachments">> => [marvin_pdu2_object_attachment:export(Item) || Item <- Attachments],
         <<"embeds">> => [marvin_pdu2_object_embed:export(Item) || Item <- Embeds],
         <<"reactions">> => [marvin_pdu2_object_reaction:export(Item) || Item <- Reactions],
         <<"nonce">> => marvin_pdu2:nullify(Nonce),
-        <<"pinned">> => Pinned,
+        <<"pinned">> => marvin_pdu2:nullify(Pinned),
         <<"webhook_id">> => marvin_pdu2:nullify(WebhookId),
-        <<"type">> => Type
+        <<"type">> => marvin_pdu2:nullify(Type)
         % <<"activity">> => case Activity of
         %     undefined -> null;
         %     _ -> marvin_pdu2_object_activity:export(Activity)

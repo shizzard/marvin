@@ -54,9 +54,9 @@ export(#?MODULE{
     shard = ShardSpec
 }) ->
     #{
-        <<"token">> => Token,
-        <<"compress">> => Compress,
-        <<"large_threshold">> => LargeThreshold,
+        <<"token">> => marvin_pdu2:nullify(Token),
+        <<"compress">> => marvin_pdu2:nullify(Compress),
+        <<"large_threshold">> => marvin_pdu2:nullify(LargeThreshold),
         <<"properties">> => marvin_pdu2_identify_properties:export(Properties),
-        <<"shard">> => ShardSpec
+        <<"shard">> => marvin_pdu2:nullify(ShardSpec)
     }.

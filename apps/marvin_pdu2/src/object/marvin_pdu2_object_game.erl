@@ -47,11 +47,11 @@ export(#?MODULE{
     details = Details
 }) ->
     #{
-        <<"type">> => Type,
+        <<"type">> => marvin_pdu2:nullify(Type),
         <<"state">> => marvin_pdu2:nullify(State),
-        <<"name">> => Name,
+        <<"name">> => marvin_pdu2:nullify(Name),
         <<"id">> => marvin_pdu2:nullify(Id),
-        <<"timestamps">> => Timestamps,
+        <<"timestamps">> => marvin_pdu2:nullify(Timestamps),
         <<"url">> => marvin_pdu2:nullify(Url),
         <<"details">> => marvin_pdu2:nullify(Details)
     }.

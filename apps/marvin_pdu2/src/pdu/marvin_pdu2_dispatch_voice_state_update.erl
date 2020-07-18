@@ -53,14 +53,14 @@ export(#?MODULE{
     deaf = Deaf
 }) ->
     #{
-        <<"user_id">> => UserId,
+        <<"user_id">> => marvin_pdu2:nullify(UserId),
         <<"guild_id">> => marvin_pdu2:nullify(GuildId),
         <<"channel_id">> => marvin_pdu2:nullify(ChannelId),
-        <<"session_id">> => SessionId,
-        <<"suppress">> => Suppress,
-        <<"self_video">> => SelfVideo,
-        <<"self_mute">> => SelfMute,
-        <<"self_deaf">> => SelfDeaf,
-        <<"mute">> => Mute,
-        <<"deaf">> => Deaf
+        <<"session_id">> => marvin_pdu2:nullify(SessionId),
+        <<"suppress">> => marvin_pdu2:nullify(Suppress),
+        <<"self_video">> => marvin_pdu2:nullify(SelfVideo),
+        <<"self_mute">> => marvin_pdu2:nullify(SelfMute),
+        <<"self_deaf">> => marvin_pdu2:nullify(SelfDeaf),
+        <<"mute">> => marvin_pdu2:nullify(Mute),
+        <<"deaf">> => marvin_pdu2:nullify(Deaf)
     }.

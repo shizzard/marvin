@@ -23,6 +23,6 @@ export(#?MODULE{
     role_id = RoleId
 }) ->
     #{
-        <<"guild_id">> => GuildId,
-        <<"role_id">> => RoleId
+        <<"guild_id">> => marvin_pdu2:nullify(GuildId),
+        <<"role_id">> => marvin_pdu2:nullify(RoleId)
     }.

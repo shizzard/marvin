@@ -31,7 +31,7 @@ export(#?MODULE{
     proxy_icon_url = ProxyIconUrl
 }) ->
     #{
-        <<"text">> => Text,
-        <<"icon_url">> => IconUrl,
-        <<"proxy_icon_url">> => ProxyIconUrl
+        <<"text">> => marvin_pdu2:nullify(Text),
+        <<"icon_url">> => marvin_pdu2:nullify(IconUrl),
+        <<"proxy_icon_url">> => marvin_pdu2:nullify(ProxyIconUrl)
     }.

@@ -40,8 +40,8 @@ export(#?MODULE{
     allow = Allow
 }) ->
     #{
-        <<"id">> => Id,
-        <<"type">> => Type,
-        <<"deny">> => Deny,
-        <<"allow">> => Allow
+        <<"id">> => marvin_pdu2:nullify(Id),
+        <<"type">> => marvin_pdu2:nullify(Type),
+        <<"deny">> => marvin_pdu2:nullify(Deny),
+        <<"allow">> => marvin_pdu2:nullify(Allow)
     }.

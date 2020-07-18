@@ -41,11 +41,11 @@ export(#?MODULE{
     width = Width
 }) ->
     #{
-        <<"id">> => Id,
-        <<"filename">> => Filename,
-        <<"size">> => Size,
-        <<"url">> => Url,
-        <<"proxy_url">> => ProxyUrl,
+        <<"id">> => marvin_pdu2:nullify(Id),
+        <<"filename">> => marvin_pdu2:nullify(Filename),
+        <<"size">> => marvin_pdu2:nullify(Size),
+        <<"url">> => marvin_pdu2:nullify(Url),
+        <<"proxy_url">> => marvin_pdu2:nullify(ProxyUrl),
         <<"height">> => marvin_pdu2:nullify(Height),
         <<"width">> => marvin_pdu2:nullify(Width)
     }.

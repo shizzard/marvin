@@ -26,7 +26,7 @@ export(#?MODULE{
     seq = Sequence
 }) ->
     #{
-        <<"token">> => Token,
-        <<"session_id">> => SessionId,
-        <<"seq">> => Sequence
+        <<"token">> => marvin_pdu2:nullify(Token),
+        <<"session_id">> => marvin_pdu2:nullify(SessionId),
+        <<"seq">> => marvin_pdu2:nullify(Sequence)
     }.
