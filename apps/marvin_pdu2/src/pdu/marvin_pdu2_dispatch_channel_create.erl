@@ -67,6 +67,13 @@ channel_type_guild_voice() -> ?channel_type_guild_voice.
 channel_type_group_dm() -> ?channel_type_group_dm.
 channel_type_guild_category() -> ?channel_type_guild_category.
 
+
+cloak_validate(_, null) ->
+    {ok, undefined};
+
+cloak_validate(permission_overwrites, Value) when is_list(Value) ->
+    {ok, [marvin_pdu2_object_permission_overwrite:new(Item) || Item <- Value]};
+
 cloak_validate(_, Value) ->
     {ok, Value}.
 
