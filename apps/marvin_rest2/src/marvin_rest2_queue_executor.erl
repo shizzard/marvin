@@ -142,7 +142,8 @@ do_execute_request_handle_response(Req, 429 = StatusCode, ReplenishAfter, Slots,
     {ok, S0#state{
         active_request = Req,
         replenish_after = ReplenishAfter,
-        slots = Slots
+        slots = Slots,
+        tref = init_sleep_timer(ReplenishAfter)
     }};
 
 do_execute_request_handle_response(Req, StatusCode, ReplenishAfter, Slots, #state{
@@ -180,7 +181,7 @@ do_execute_request_handle_response(Req, StatusCode, ReplenishAfter, Slots, #stat
             ratelimit_group => RateLimitGroup,
             request => Req,
             status_code => StatusCode,
-            replenish_in => ReplenishAfter - marvin_helper_time:timestamp()
+            replenish_after => ReplenishAfter
         }
     }),
     {ok, S0#state{

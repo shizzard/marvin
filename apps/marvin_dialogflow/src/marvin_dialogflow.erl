@@ -106,7 +106,7 @@ detect_intent_handle_response(#request_ctx{
         })
     }),
     Result = try
-        {ok, Ctx#request_ctx{result_body = marvin_dialogflow_response:new(jiffy:decode(Body, [return_maps]))}}
+        {ok, Ctx#request_ctx{result_body = marvin_dialogflow_response:new(jsone:decode(Body))}}
     catch
         T:Reason ->
             ?l_error(#{
@@ -161,7 +161,7 @@ get_session_id(GuildId, UserId) ->
 
 
 build_body(SessionId, MessageBody) ->
-    jiffy:encode(#{<<"lang">> => <<"ru">>, <<"query">> => MessageBody, <<"sessionId">> => SessionId}).
+    jsone:encode(#{<<"lang">> => <<"ru">>, <<"query">> => MessageBody, <<"sessionId">> => SessionId}).
 
 
 

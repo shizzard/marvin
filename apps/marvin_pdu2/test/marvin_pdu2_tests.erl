@@ -37,7 +37,7 @@ can_get_valid_parsed_object_test_() ->
                 io:format("~s#~p~n", [PDUMod, TestId]),
                 try
                     {ok, JSONBin} = file:read_file(File),
-                    PDUMod:new(jiffy:decode(JSONBin, [return_maps]))
+                    PDUMod:new(jsone:decode(JSONBin))
                 catch
                     _:_:S ->
                         io:format("Stacktrace:~n~p~n", [S]),

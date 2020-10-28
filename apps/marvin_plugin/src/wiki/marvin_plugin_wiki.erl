@@ -182,7 +182,7 @@ handle_info_guild_event_perform_query(#handle_info_guild_event{
     case hackney:request(get, Url) of
         {ok, 200, _, ClientRef} ->
             {ok, Body} = hackney:body(ClientRef),
-            {ok, Ctx#handle_info_guild_event{response_body = jiffy:decode(Body)}};
+            {ok, Ctx#handle_info_guild_event{response_body = jsone:decode(Body)}};
         {error, Reason} ->
             {error, Reason}
     end.

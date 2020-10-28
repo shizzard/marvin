@@ -179,7 +179,7 @@ handle_event(info, ?gun_data(_ConnPid, StreamRef, nofin, Data), on_gather_meta_b
     gun_stream_reference = StreamRef
 } = S0) when is_binary(Data) ->
     try
-        #{<<"url">> := WssUrl, <<"shards">> := ShardsCount} = jiffy:decode(Data, [return_maps]),
+        #{<<"url">> := WssUrl, <<"shards">> := ShardsCount} = jsone:decode(Data),
         ?l_debug(#{
             text => "Gathered API gateway meta body",
             what => gather_meta_body, result => ok, details => #{url => WssUrl, shards => ShardsCount}

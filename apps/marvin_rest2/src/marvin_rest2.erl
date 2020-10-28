@@ -9,9 +9,9 @@
 -define(is_4xx(StatusCode), ((StatusCode div 100) == 4)).
 -define(is_5xx(StatusCode), ((StatusCode div 100) == 5)).
 
--define(response_header_limit, <<"X-RateLimit-Limit">>).
--define(response_header_remaining, <<"X-RateLimit-Remaining">>).
--define(response_header_reset, <<"X-RateLimit-Reset">>).
+-define(response_header_limit, <<"x-ratelimit-limit">>).
+-define(response_header_remaining, <<"x-ratelimit-remaining">>).
+-define(response_header_reset, <<"x-ratelimit-reset">>).
 
 
 

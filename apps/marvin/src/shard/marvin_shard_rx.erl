@@ -169,7 +169,7 @@ handle_event(info, ?gun_ws_data(WssPid, text, Data), on_operational, #state{
         details => #{
             shard_id => S0#state.shard_id, shard_name => S0#state.shard_name,
             fsm_state => on_operational,
-            data_type => text, data => jiffy:decode(Data, [return_maps])
+            data_type => text, data => jsone:decode(Data)
         }
     }),
     marvin_shard_session:incoming_event(SessionPid, Data),

@@ -41,7 +41,7 @@ load(PluginId, GuildId) ->
     ConfigFilename = get_config_filename(PluginId, GuildId),
     try
         case file:read_file(ConfigFilename) of
-            {ok, Binary} -> {ok, new(jiffy:decode(Binary, [return_maps]))};
+            {ok, Binary} -> {ok, new(jsone:decode(Binary))};
             {error, Reason} -> throw({read_failed, Reason})
         end
     catch CatchType:CatchReason ->
@@ -66,7 +66,7 @@ load(PluginId, GuildId) ->
 save(Config) ->
     ConfigFilename = get_config_filename(plugin_id(Config), guild_id(Config)),
     try
-        case file:write_file(ConfigFilename, jiffy:encode(export(Config))) of
+        case file:write_file(ConfigFilename, jsone:encode(export(Config))) of
             ok -> ok;
             {error, Reason} -> throw({write_failed, Reason})
         end

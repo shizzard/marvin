@@ -88,7 +88,7 @@ new(ReqImplModule, UrlParams, PduMap) ->
         path = UrlPath,
         body = case ReqImplModule:pdu() of
             undefined -> <<>>;
-            PduMod -> jiffy:encode(PduMod:export(PduMod:new(PduMap)))
+            PduMod -> jsone:encode(PduMod:export(PduMod:new(PduMap)))
         end
     }.
 

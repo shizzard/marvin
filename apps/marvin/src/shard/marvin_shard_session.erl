@@ -972,7 +972,19 @@ get_pdu_identify(#state{
             '$device' => Library,
             '$referrer' => LibraryWeb,
             '$referring_domain' => LibraryWeb
-        }
+        },
+        intents => marvin_pdu2_identify:create_intent([
+            marvin_pdu2_identify:intent_guilds(),
+            marvin_pdu2_identify:intent_guild_members(),
+            marvin_pdu2_identify:intent_guild_bans(),
+            marvin_pdu2_identify:intent_guild_emojis(),
+            marvin_pdu2_identify:intent_guild_integrations(),
+            marvin_pdu2_identify:intent_guild_webhooks(),
+            marvin_pdu2_identify:intent_guild_invites(),
+            marvin_pdu2_identify:intent_guild_voice_states(),
+            marvin_pdu2_identify:intent_guild_presences(),
+            marvin_pdu2_identify:intent_guild_messages()
+        ])
     },
     ?l_info(#{
         text => "Shard is about to identify against discord server",

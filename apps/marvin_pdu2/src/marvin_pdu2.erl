@@ -112,7 +112,7 @@
     marvin_helper_type:generic_return(
         OkRet :: t(),
         ErrorRet ::
-            {jiffy_error, term()} |
+            {jsone_error, term()} |
             not_implemented | invalid_op | term()
     ).
 
@@ -162,15 +162,15 @@ export(Map) ->
 -spec decode_json(Binary :: binary()) ->
     marvin_helper_type:generic_return(
         OkRet :: #{},
-        ErrorRet :: {jiffy_error, term()}
+        ErrorRet :: {jsone_error, term()}
     ).
 
 decode_json(Binary) ->
     try
-        Message = jiffy:decode(Binary, [return_maps]),
+        Message = jsone:decode(Binary),
         {ok, Message}
     catch
-        _Type:Error -> {error, {jiffy_error, Error}}
+        _Type:Error -> {error, {jsone_error, Error}}
     end.
 
 
@@ -216,7 +216,7 @@ construct_external({{Mod, Op, Event}, Struct}) ->
     marvin_helper_type:ok_return(OkRet :: binary()).
 
 render_json(External) ->
-    {ok, jiffy:encode(External)}.
+    {ok, jsone:encode(External)}.
 
 
 %% Cloak callbacks
@@ -297,7 +297,7 @@ cloak_validate_struct_construct_data_safe_temp(Mod, Data) ->
                         mod => Mod, dump_to => Filename
                     }
                 }),
-                file:write_file(Filename, jiffy:encode(Data))
+                file:write_file(Filename, jsone:encode(Data))
             end),
             #{}
     end.
