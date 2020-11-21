@@ -150,7 +150,7 @@ do_execute_request_handle_response(Req, StatusCode, ReplenishAfter, Slots, #stat
     ratelimit_group = RateLimitGroup,
     queue_pid = QueuePid
 } = S0) when Slots > 0 ->
-    %% Got effective `200 OK` (-ish) code, execution succeed
+    %% Got effective `200 OK` (-ish) code, execution succeed (5xx?)
     %% We also have additional slots to be executed, thus `active_once`
     ?l_debug(#{
         text => "Executor got a response, having additional slots",

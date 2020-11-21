@@ -15,6 +15,7 @@
     guild_id :: marvin_pdu2:snowflake(),
     role_moderator :: marvin_pdu2:snowflake(),
     role_mute :: marvin_pdu2:snowflake(),
+    message_id :: marvin_pdu2:snowflake(),
     channel_id :: marvin_pdu2:snowflake(),
     caller :: marvin_pdu2_object_member:t(),
     subjects :: [marvin_pdu2_object_member:t(), ...],
@@ -272,6 +273,7 @@ handle_info_guild_event_command_mute_prepare_provision_context(
         Id, marvin_guild_pubsub:guild_context(Event)
     ) || Id <- SubjectIds, Id /= marvin_guild_context:my_id(marvin_guild_pubsub:guild_context(Event))],
     {ok, ChainCtx#handle_info_guild_event_command_mute{
+        message_id = marvin_pdu2_dispatch_message_create:id(OriginalMessage),
         channel_id = ChannelId, caller = Caller, subjects = Subjects
     }}.
 
@@ -360,13 +362,19 @@ handle_info_guild_event_command_mute_act_set_role(#handle_info_guild_event_comma
 
 
 handle_info_guild_event_command_mute_act_send_message(#handle_info_guild_event_command_mute{
+    guild_id = GuildId,
+    message_id = MessageId,
     channel_id = ChannelId,
     message = Message
 } = ChainCtx) ->
     Req = marvin_rest2_request:new(
         marvin_rest2_impl_message_create,
         #{<<"channel_id">> => ChannelId},
-        #{content => Message}
+        #{
+            content => Message,
+            message_reference => #{message_id => MessageId, channel_id => ChannelId, guild_id => GuildId},
+            allowed_mentions => #{replied_user => true}
+        }
     ),
     _ = marvin_rest2:enqueue_request(Req),
     {ok, ChainCtx}.

@@ -164,7 +164,15 @@ handle_info_guild_event_change_nickname(Event, S0) ->
     SendMessageReq = marvin_rest2_request:new(
         marvin_rest2_impl_message_create,
         #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
-        #{content => <<"Буду звать тебя "/utf8, (marvin_pdu2_object_user:format(Author))/binary, "."/utf8>>}
+        #{
+            content => <<"Буду звать тебя "/utf8, (marvin_pdu2_object_user:format(Author))/binary, "."/utf8>>,
+            message_reference => #{
+                message_id => marvin_pdu2_dispatch_message_create:id(OriginalMessage),
+                channel_id => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
+                guild_id => S0#state.guild_id
+            },
+            allowed_mentions => #{replied_user => true}
+        }
     ),
     _ = marvin_rest2:enqueue_request(SendMessageReq),
     {noreply, S0}.

@@ -14,6 +14,7 @@
 -record(active_channel, {
     channel_name :: unicode:unicode_binary(),
     origin_channel_id = undefined :: marvin_pdu2:snowflake() | undefined,
+    origin_message_id = undefined :: marvin_pdu2:snowflake() | undefined,
     owner = undefined :: marvin_pdu2_object_user:t() | undefined,
     channel_id :: marvin_pdu2:snowflake() | undefined,
     created_at = os:timestamp() :: erlang:timestamp(),
@@ -264,6 +265,7 @@ handle_info_guild_event_command_create(Event, S0) ->
     insert_channel(S0#state.active_channels, #active_channel{
         channel_name = ChannelName,
         origin_channel_id = marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
+        origin_message_id = marvin_pdu2_dispatch_message_create:id(OriginalMessage),
         owner = marvin_pdu2_dispatch_message_create:author(OriginalMessage)
     }),
     {noreply, S0}.
@@ -290,7 +292,15 @@ handle_info_guild_event_channel_voice_create(Event, S0) ->
             Req = marvin_rest2_request:new(
                 marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => ActiveChannel#active_channel.origin_channel_id},
-                #{content => <<"Канал '"/utf8, (ActiveChannel#active_channel.channel_name)/binary, "' готов."/utf8>>}
+                #{
+                    content => <<"Канал '"/utf8, (ActiveChannel#active_channel.channel_name)/binary, "' готов."/utf8>>,
+                    message_reference => #{
+                        message_id => ActiveChannel#active_channel.origin_message_id,
+                        channel_id => ActiveChannel#active_channel.origin_channel_id,
+                        guild_id => S0#state.guild_id
+                    },
+                    allowed_mentions => #{replied_user => true}
+                }
             ),
             _ = marvin_rest2:enqueue_request(Req),
             {noreply, S0};

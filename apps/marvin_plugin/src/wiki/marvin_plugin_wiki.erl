@@ -17,6 +17,7 @@
 
 -record(handle_info_guild_event, {
     parsed_message_content :: [string()],
+    guild_id :: marvin_pdu2:snowflake(),
     original_message :: marvin_pdu2_dispatch_message_create:t(),
     request_url :: term(),
     response_body :: binary()
@@ -123,6 +124,7 @@ handle_info_guild_event(Event, S0) ->
         fun handle_info_guild_event_perform_query/1,
         fun handle_info_guild_event_send_message/1
     ], #handle_info_guild_event{
+        guild_id = S0#state.guild_id,
         parsed_message_content = ParsedMessage,
         original_message = OriginalMessage
     }) of
@@ -159,13 +161,25 @@ handle_info_guild_event_prepare_query(#handle_info_guild_event{
         _ ->
             iolist_to_binary(lists:join(" ", Words))
     end,
-    %% ?action\=opensearch\&format\=json\&search\=<SEARCH>\&limit\=1\&redirects\=resolve
+    %% format=json&action=query&generator=search&gsrnamespace=0&gsrsearch=test
+    %% &gsrlimit=10&prop=extracts&pilimit=max&exintro&explaintext
+    %% &exsentences=1&exlimit=max
+    %% action=query&format=json&prop=extracts&list=search&titles=&generator=search&redirects=1&formatversion=2&exsentences=10&exlimit=1&exintro=1&explaintext=1&exsectionformat=plain&srsearch=mathematica&gsrsearch=mathematica&gsrnamespace=0&gsrlimit=1
     Url = hackney_url:make_url(?wiki_base_url, ?wiki_base_path, [
-        {<<"action">>, <<"opensearch">>},
         {<<"format">>, <<"json">>},
-        {<<"limit">>, <<"1">>},
+        {<<"formatversion">>, <<"2">>},
+        {<<"generator">>, <<"search">>},
+        {<<"action">>, <<"query">>},
         {<<"redirects">>, <<"resolve">>},
-        {<<"search">>, SearchQuery}
+        {<<"prop">>, <<"extracts">>},
+        {<<"exintro">>, <<"1">>},
+        {<<"explaintext">>, <<"1">>},
+        {<<"exsentences">>, <<"10">>},
+        {<<"exsectionformat">>, <<"plain">>},
+        {<<"exlimit">>, <<"1">>},
+        {<<"gsrlimit">>, <<"1">>},
+        {<<"gsrnamespace">>, <<"0">>},
+        {<<"gsrsearch">>, SearchQuery}
     ]),
     ?l_alert(#{
         text => "Wikipedia API url",
@@ -190,30 +204,71 @@ handle_info_guild_event_perform_query(#handle_info_guild_event{
 
 
 handle_info_guild_event_send_message(#handle_info_guild_event{
+    guild_id = GuildId,
     response_body = Body,
     original_message = OriginalMessage
 } = Ctx) ->
+    % result example:
+    % {
+    %     "batchcomplete":true,
+    %     "continue":{
+    %         "gsroffset":1,
+    %         "continue":"gsroffset||"
+    %     },
+    %     "query":{
+    %         "pages":[
+    %             {
+    %                 "pageid":119764,
+    %                 "ns":0,
+    %                 "title":"Ключ",
+    %                 "index":1,
+    %                 "extract":"Ключ может означать: Ключ — секретная информация..."
+    %             }
+    %         ]
+    %     }
+    % }
     case Body of
-        [SearchQuery, [], [], []] ->
+        #{<<"query">> := #{<<"pages">> := [#{
+            <<"title">> := Header, <<"extract">> := Text
+        }]}} ->
             marvin_rest2:enqueue_request(marvin_rest2_request:new(
                 marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
                 #{
-                    content => iolist_to_binary([
-                        <<"По запросу '"/utf8>>, SearchQuery, <<"' статей в Википедии нет."/utf8>>])
+                    content => <<"Вот что я нашел в Википедии:"/utf8>>,
+                    embed => #{title => Header, description => Text},
+                    message_reference => #{
+                        message_id => marvin_pdu2_dispatch_message_create:id(OriginalMessage),
+                        channel_id => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
+                        guild_id => GuildId
+                    },
+                    allowed_mentions => #{replied_user => true}
                 }
             ));
-        [SearchQuery, [Header], [Text], [Link]] ->
+        #{<<"batchcomplete">> := true} ->
             marvin_rest2:enqueue_request(marvin_rest2_request:new(
                 marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
                 #{
-                    content => iolist_to_binary([
-                        <<"Вот что я нашел в Википедии по запросу '"/utf8>>, SearchQuery, <<"':"/utf8>>]),
-                    embed => #{title => Header, url => Link, description => Text}
+                    content => <<"Ничего не нашел в Википедии."/utf8>>,
+                    message_reference => #{
+                        message_id => marvin_pdu2_dispatch_message_create:id(OriginalMessage),
+                        channel_id => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
+                        guild_id => GuildId
+                    },
+                    allowed_mentions => #{replied_user => true}
                 }
             ));
-        _ ->
+        Body ->
+            ?l_error(#{
+                text => "Plugin failed to parse wikipedia response",
+                what => handle_info, result => error,
+                details => #{
+                    guild_id => GuildId,
+                    type => error,
+                    details => Body
+                }
+            }),
             marvin_rest2:enqueue_request(marvin_rest2_request:new(
                 marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},

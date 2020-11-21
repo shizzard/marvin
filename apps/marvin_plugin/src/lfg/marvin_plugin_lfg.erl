@@ -97,8 +97,16 @@ get_pre_command_hook_fun(RoleGamePrefix, ChannelId) ->
                             #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage)},
                             #{
                                 content => iolist_to_binary([
-                                    <<"Слыш пёс, тереби в "/utf8>>, marvin_pdu2_object_channel:format(TargetChannel), <<".">>
-                                ])
+                                    <<"Слыш ">>,
+                                    marvin_pdu2_object_user:format(marvin_pdu2_dispatch_message_create:author(OriginalMessage)),
+                                    <<" тереби в "/utf8>>, marvin_pdu2_object_channel:format(TargetChannel), <<".">>
+                                ]),
+                                message_reference => #{
+                                    message_id => marvin_pdu2_dispatch_message_create:id(OriginalMessage),
+                                    channel_id => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
+                                    guild_id => marvin_guild_context:guild_id(GuildCtx)
+                                },
+                                allowed_mentions => #{replied_user => true}
                             }
                         )),
                         terminate;

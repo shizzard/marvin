@@ -147,7 +147,13 @@ handle_info_guild_event_get_help(Event, S0) ->
                 url => LibraryWeb,
                 type => <<"rich">>,
                 fields => Fields
-            }
+            },
+            message_reference => #{
+                message_id => marvin_pdu2_dispatch_message_create:id(OriginalMessage),
+                channel_id => marvin_pdu2_dispatch_message_create:channel_id(OriginalMessage),
+                guild_id => S0#state.guild_id
+            },
+            allowed_mentions => #{replied_user => true}
         }
     ),
     _ = marvin_rest2:enqueue_request(Req),
