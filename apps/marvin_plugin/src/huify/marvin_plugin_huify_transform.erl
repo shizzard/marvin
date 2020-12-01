@@ -1,19 +1,6 @@
 -module(marvin_plugin_huify_transform).
 
--compile([export_all, nowarn_export_all]).
-
--define(syllables(), #{
-    "evv" => "e-vv",
-    "evc" => "e-vc",
-    "ecv" => "e-cv",
-    "ecc" => "e-cc",
-    "vccccv" => "vcc-ccv",
-    "vcccv" => "vc-ccv",
-    "cvcv" => "cv-cv",
-    "vccv" => "vc-cv",
-    "cvvv" => "cv-vv",
-    "cvvc" => "cv-vc"
-}).
+-export([huify/1]).
 
 -define(cl_vowels(),
     [$а, $е, $ё, $и, $о, $у, $ы, $э, $ю, $я]).
@@ -25,14 +12,14 @@
 
 huify(Word) when is_binary(Word) ->
     case syllabify(Word) of
-        {ok, List} when erlang:length(List) < 4 -> do_huefy(List);
-        {ok, List} -> do_huefy(lists:nthtail(erlang:length(List) - 4, List));
+        {ok, List} when erlang:length(List) < 4 -> do_huify(List);
+        {ok, List} -> do_huify(lists:nthtail(erlang:length(List) - 4, List));
         {error, Reason} -> {error, Reason}
     end.
 
 
 %% one-syllable word
-do_huefy([[Grapheme | Syllable]]) ->
+do_huify([[Grapheme | Syllable]]) ->
     {SubReplace, SubKeep} = case lists:member(Grapheme, ?cl_vowels()) of
         %% first grapheme is a vowel; cut all vowels, replace them, keep the rest
         true ->
@@ -58,7 +45,7 @@ do_huefy([[Grapheme | Syllable]]) ->
     end,
     {ok, unicode:characters_to_binary(lists:flatten([do_replace(SubReplace), SubKeep]))};
 %% multi-syllable word
-do_huefy([[Grapheme1 | Syllable1], [Grapheme2 | Syllable2] | Syllables]) ->
+do_huify([[Grapheme1 | Syllable1], [Grapheme2 | Syllable2] | Syllables]) ->
     {SubReplace, SubKeep} = case lists:member(Grapheme2, ?cl_vowels()) of
         %% first grapheme of the second syllable is a vowel; cut all of first
         %% vowels of the second syllable and replace them, also toss the first
