@@ -35,8 +35,9 @@
 
 -define(noun_terms, "/voice_on_demand/noun.terms").
 -define(adjective_terms, "/voice_on_demand/adjective.terms").
--define(participats_limit_min, 1).
--define(participats_limit_max, 99).
+-define(bitrate_limit_min, 16).
+-define(bitrate_limit_max, 384).
+-define(bitrate_limit_default, 64).
 -define(max_channel_name_gen, 15).
 -define(cleanup_event(), {cleanup_event}).
 -define(cleanup_interval, 20).
@@ -64,7 +65,8 @@ command_create() ->
         help => <<
             "Создает временный голосовой канал, который будет удален после использования.\n"/utf8,
             "Если в команде будут упомянуты конкретные пользователи или группы пользователей, доступ в канал будет только у автора команды и упомянутых людей.\n"/utf8,
-            "В команде можно указать вместимость канала от 1 до 99."/utf8
+            "В команде можно указать битрейт канала, от 16 до 384 кб/с; значение по умолчанию: 64 кб/с. "
+            "Высокий битрейт может привести к ухудшению качества связи."/utf8
         >>,
         keywords => [<<"войс"/utf8>>, <<"канал"/utf8>>, <<"голос"/utf8>>, <<"комната"/utf8>>]
     }).
@@ -245,16 +247,15 @@ handle_info_guild_event_command_create(Event, S0) ->
             channel_name => ChannelName
         }
     }),
-    UserLimit = maybe_get_user_limit(ParsedMessage),
+    Bitrate = maybe_get_user_bitrate(ParsedMessage),
     Req = marvin_rest2_request:new(
         marvin_rest2_impl_guild_channel_create,
         #{<<"guild_id">> => marvin_guild_context:guild_id(marvin_guild_pubsub:guild_context(Event))},
         #{
             type => marvin_pdu2_rest_guild_channel_create:channel_type_guild_voice(),
             name => ChannelName,
-            bitrate => 64000,
+            bitrate => Bitrate * 1000,
             parent_id => CategoryId,
-            user_limit => UserLimit,
             permission_overwrites => maybe_get_permission_overwrites(
                 OriginalMessage,
                 marvin_guild_pubsub:guild_context(Event)
@@ -337,14 +338,13 @@ generate_channel_name(Adjectives, Nouns, Ets) ->
 
 
 
-maybe_get_user_limit(ParsedMessage) ->
-    case [Integer || Integer <- ParsedMessage, is_integer(Integer)] of
-        [] -> undefined;
-        List -> case hd(List) of
-            Number when Number =< ?participats_limit_min -> undefined;
-            Number when Number >= ?participats_limit_max -> ?participats_limit_max;
-            Number -> Number
-        end
+maybe_get_user_bitrate(ParsedMessage) ->
+    case [
+        I || I <- ParsedMessage,
+        is_integer(I), I >= ?bitrate_limit_min, I =< ?bitrate_limit_max
+    ] of
+        [] -> ?bitrate_limit_default;
+        List -> hd(List)
     end.
 
 

@@ -23,7 +23,7 @@
 -type name() :: unicode:unicode_binary().
 -type type() :: ?channel_type_guild_text | ?channel_type_guild_voice | ?channel_type_guild_category.
 -type topic() :: unicode:unicode_binary().
--type bitrate() :: 16000..96000.
+-type bitrate() :: 16000..384000.
 -type user_limit() :: pos_integer().
 -type permission_overwrites() :: [marvin_pdu2_object_permission_overwrite:t()].
 -type parent_id() :: marvin_pdu2:snowflake().
@@ -56,7 +56,7 @@ cloak_validate(topic, null) ->
 cloak_validate(topic, Value) when is_binary(Value) ->
     {ok, Value};
 
-cloak_validate(bitrate, Value) when is_integer(Value) andalso Value >= 16000 andalso Value =< 96000 ->
+cloak_validate(bitrate, Value) when is_integer(Value) andalso Value >= 16000 andalso Value =< 384000 ->
     {ok, Value};
 
 cloak_validate(user_limit, undefined) ->
