@@ -199,16 +199,27 @@ handle_possible_command_run_command_or_response(#handle_possible_command{
     original_message = Message,
     ctx = Ctx
 } = ChainCtx) ->
-    case marvin_dialogflow:detect_intent(
+    case marvin_gpt:run_completion(
         marvin_guild_context:guild_id(Ctx),
         marvin_pdu2_object_user:id(marvin_pdu2_dispatch_message_create:author(Message)),
         marvin_pdu2_dispatch_message_create:content(Message)
     ) of
-        {ok, DialogFlowResponse} ->
+        {ok, GptResponse} ->
             SendReq = marvin_rest2_request:new(
                 marvin_rest2_impl_message_create,
                 #{<<"channel_id">> => marvin_pdu2_dispatch_message_create:channel_id(Message)},
-                #{content => marvin_dialogflow_response_result:fulfillment(marvin_dialogflow_response:result(DialogFlowResponse))}
+                #{
+                    content => marvin_gpt_response_choice_message:content(
+                        marvin_gpt_response_choice:message(
+                            hd(marvin_gpt_response:choices(GptResponse))
+                        )),
+                    message_reference => #{
+                        message_id => marvin_pdu2_dispatch_message_create:id(Message),
+                        channel_id => marvin_pdu2_dispatch_message_create:channel_id(Message),
+                        guild_id => marvin_guild_context:guild_id(Ctx)
+                    },
+                    allowed_mentions => #{replied_user => true}
+                }
             ),
             marvin_rest2:enqueue_request(SendReq),
             {ok, ChainCtx};

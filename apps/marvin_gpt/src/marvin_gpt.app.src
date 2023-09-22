@@ -1,0 +1,8 @@
+{application, marvin_gpt, [
+    {description, "Marvin GPT helper"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {mod, {marvin_gpt_app, []}},
+    {applications, [kernel, stdlib, marvin_log]},
+    {env, []}
+]}.

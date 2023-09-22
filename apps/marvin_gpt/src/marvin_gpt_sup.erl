@@ -1,4 +1,4 @@
--module(marvin_dialogflow_sup).
+-module(marvin_gpt_sup).
 -behaviour(supervisor).
 -include_lib("marvin_helper/include/marvin_specs_supervisor.hrl").
 
